@@ -1,9 +1,9 @@
-# Trustworthy AI: algorithm assessment BB
+# Trustworthy AI: algorithm assessment BB – LOLA
 
 _Short description of the BB._
 
 ## Design Document
-See the design document overview [here](docs/).
+See the design document [here](docs/).
 
 ## Building instructions
 _Describe how to build the BB._
