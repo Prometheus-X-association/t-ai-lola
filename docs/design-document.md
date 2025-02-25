@@ -255,11 +255,52 @@ _In the future: link your OpenAPI spec here._
 <!--_Testing strategy, tools and methods chosen, methods for acceptance criteria.
 To be detailed._-->
 
-LOLA platform will be tested with the firstly designed scenario "Recommender Systems" in collaboration with our partner Maskott. 
+<!-- LOLA platform will be tested with the firstly designed scenario "Recommender Systems" in collaboration with our partner Maskott. _-->
+
+
+_The LOLA platform is intended to be used in a use case with Maskott. However, for testing purposes in Stage 1, due to confidentiality concerns, we will use an open-source dataset instead._
+
+Stage 1 will be tested with [OULAD](https://www.nature.com/articles/sdata2017171) (Open University Learning Analytics Dataset), which has been adapted to the xAPI format. The objective of this stage is to demonstrate that the selected techniques are relevant for executing a recommendation system scenario.
+
+The focus is to validate that the system functions correctly in a standalone setup, running a scenario locally and ensuring correct data integration.
+
+The testing strategy will involve a combination of automated and manual tests. The approach will include unit tests, which focus on verifying core components such as Trax-LRS, Harbor, and standalone scenario execution; integration tests, which validate the interaction between components, including API responses and end-to-end process execution; and performance and error handling tests.
+
+
+**Remarque:** To execute these tests, access to LOLA's GitLab (INRIA space) is required. A guest account can be requested via email `azim.roussanaly@loria.fr`. This access allows contributors to:
+- retrieve necessary scripts and configurations,
+- deploy and test scenarios in the sandbox,
 
 ### Internal unit tests
 
 We can achieve specific unit tests with the sandbox application we provide. This sandbox is mainly used to validate scenarios and algorithm. In order to effectively do unit testing on the platform, a defined dataset as well as a specific scenario have to be created. 
+
+To ensure the correct functioning of the LOLA platform, unit tests will focus on three key components: Trax-LRS, the algorithm execution, and the scenario validation within LOLA-sandbox.
+
+#### Trax-LRS
+
+A core component responsible for storing and managing datasets in xAPI format.
+**Test cases:**
+- verify that dataset can be uploaded successfully in xAPI format,
+- ensure that uploaded datasets can be retrieved and read correctly,
+- test error handling when attempting to retrieve nonexistent datasets.
+
+#### Algorithm execution
+
+A component ensuring that a recommendation algorithm can be correctly executed within the sandbox environment.
+**Test cases:**
+- verify that the recommendation algorithm can process test data and return expected outputs,
+- ensure that the evaluation metrics are generated correctly,
+- test error handling when an invalid algorithm container is provided.
+
+#### Scenario validation
+
+A component responsible for running a scenario locally using LOLA-sandbox
+**Test cases:**
+- ensure that the scenario can be executed in a standalone environment,
+- verify that the system correctly integrates with Trax-LRS to fetch datasets,
+- test error handling when the dataset is missing or improperly formatted.
+
 
 ### Component-level testing
 
