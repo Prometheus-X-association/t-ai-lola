@@ -266,10 +266,13 @@ The focus is to validate that the system functions correctly in a standalone set
 
 The testing strategy will involve a combination of automated and manual tests. The approach will include unit tests, which focus on verifying core components such as Trax-LRS, Harbor, and standalone scenario execution; integration tests, which validate the interaction between components, including API responses and end-to-end process execution; and performance and error handling tests.
 
+To better understand the interaction between components in LOLA during testing, the following diagram illustrates the relationship between Trax-LRS, Harbor, the scenario execution process, and the configuration management
+![Relation between components](img/diagram.jpg)
 
-**Remarque:** To execute these tests, access to LOLA's GitLab (INRIA space) is required. A guest account can be requested via email `azim.roussanaly@loria.fr`. This access allows contributors to:
-- retrieve necessary scripts and configurations,
-- deploy and test scenarios in the sandbox,
+**Remarque:** To execute these tests, access to LOLA's GitLab (INRIA space) is required. A guest account can be requested via email `azim.roussanaly@loria.fr`.
+
+
+
 
 ### Internal unit tests
 
