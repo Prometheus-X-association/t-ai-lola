@@ -1,14 +1,15 @@
 # Trustworthy AI: algorithm assessment BB – LOLA
 
-_Short description of the BB._
+<!--_Short description of the BB._-->
+LOLA is an autonomous platform designed to audit AI algorithms using datasets shared by the EdTech community. The platform allows users to experiment with algorithms across different datasets and benchmark multiple algorithms on the same dataset. The main challenges addressed by LOLA include transparency, security, and innovation in algorithm evaluation.
 
 ## Design Document
 See the design document [here](docs/).
 
 ## Building instructions
-_Describe how to build the BB._
 
-E.g.: `docker build -t <bb name>:latest .` or `npm install` 
+To build the LOLA system, follow these steps:
+
 
 ## Running instructions
 _Describe how to run the BB._
