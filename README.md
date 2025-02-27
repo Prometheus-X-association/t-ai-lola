@@ -171,7 +171,7 @@ Ensure that LOLA-Sandbox and all required services are running correctly.
     99454f8c3fec   mysql:5.7.31            "docker-entrypoint.s…"   26 minutes ago   Up 26 minutes   0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp   trax_db
     ```
 
-    2. **You have images of algorithms and scenarios from Harbor**
+2. **You have images of algorithms and scenarios from Harbor**
 
     ```sh
     docker images
