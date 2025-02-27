@@ -260,12 +260,13 @@ To be detailed._-->
 
 _The LOLA platform is intended to be used in a use case with Maskott. However, for testing purposes in Stage 1, due to confidentiality concerns, we will use an open-source dataset instead._
 
-Stage 1 will be tested with [OULAD](https://www.nature.com/articles/sdata2017171) (Open University Learning Analytics Dataset), which has been adapted to the xAPI format. The objective of this stage is to demonstrate that the selected techniques are relevant for executing a recommendation system scenario.
+Stage 1 will be tested with [OULAD](https://www.nature.com/articles/sdata2017171) (Open University Learning Analytics Dataset), which has been adapted to the xAPI format. The objective of this stage is to demonstrate that the selected techniques are relevant for executing a scenario.
 
 The focus is to validate that the system functions correctly in a standalone setup, running a scenario locally and ensuring correct data integration.
 
 The testing strategy will involve a combination of automated and manual tests. The approach will include unit tests, which focus on verifying core components such as Trax-LRS, Harbor, and standalone scenario execution; integration tests, which validate the interaction between components, including API responses and end-to-end process execution.
-To better understand the interaction between components in LOLA during testing, the following diagram illustrates the relationship between Trax-LRS, Harbor, the scenario execution process, and the configuration management
+To better understand the interaction between components in LOLA during testing, the following diagram illustrates the relationship between Trax-LRS, Harbor, the scenario execution process, and the configuration management.
+
 ![Relation between components](img/diagram.jpg)
 
 **Remarque:** To execute these tests, access to LOLA's GitLab (INRIA space) is required. A guest account can be requested via email `azim.roussanaly@loria.fr`.
@@ -289,9 +290,9 @@ A core component responsible for storing and managing datasets in xAPI format.
 
 #### Algorithm execution
 
-A component ensuring that a recommendation algorithm can be correctly executed within the sandbox environment.
+A component ensuring that an algorithm can be correctly executed within the sandbox environment.
 **Test cases:**
-- verify that the recommendation algorithm can process test data and return expected outputs,
+- verify that the algorithm can process test data and return expected outputs,
 - ensure that the evaluation metrics are generated correctly,
 - test error handling when an invalid algorithm container is provided.
 
