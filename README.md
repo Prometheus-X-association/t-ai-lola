@@ -159,7 +159,8 @@ To ensure the correct functioning of the LOLA platform, unit tests will focus on
 ## Component-level testing
 ### Setup test environment
 Ensure that LOLA-Sandbox and all required services are running correctly.
-    1. **Trax-LRS is running**
+
+1. **Trax-LRS is running**
     ```sh
     docker ps
     ```
