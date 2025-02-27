@@ -163,6 +163,7 @@ Ensure that LOLA-Sandbox and all required services are running correctly.
     ```sh
     docker ps
     ```
+    
     ```sh
     CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                  NAMES
     664cef73b46f   phpmyadmin/phpmyadmin   "/docker-entrypoint.…"   26 minutes ago   Up 26 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp                trax_phpmyadmin
