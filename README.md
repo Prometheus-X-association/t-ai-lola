@@ -49,15 +49,15 @@ python -m pip install .
     
 2. **Build docker images or get Docker images from Loria forge**
 
-Download images on the Loria forge (note that you need a connection to the Inria VPN):
+    Download images on the Loria forge (note that you need a connection to the Inria VPN):
 
-    ```sh
-    docker pull harbor.loria.fr/lola/trax_admin:latest
-    docker tag harbor.loria.fr/lola/trax_admin:latest trax_trax:latest
+   ```sh
+   docker pull harbor.loria.fr/lola/trax_admin:latest
+   docker tag harbor.loria.fr/lola/trax_admin:latest trax_trax:latest
 
-    docker pull harbor.loria.fr/lola/trax_client:latest
-    docker tag harbor.loria.fr/lola/trax_admin:latest trax_client:latest
-    ```
+   docker pull harbor.loria.fr/lola/trax_client:latest
+   docker tag harbor.loria.fr/lola/trax_admin:latest trax_client:latest
+   ```
     
     - **trax_admin** or **trax_trax** : is the classic trax image used to upload and consult data.  
     - **trax_client** : is an image based on `trax_trax` but with an edition in its apache server that disable modification of the database. In fact, with `trax_client`, you can only see your data, not edit them. The web interface is also unavailable (login in web interface needs POST).  
@@ -89,14 +89,14 @@ Download images on the Loria forge (note that you need a connection to the Inria
     You can now connect to http://localhost:80 and use your admin credential.
 
 4. **Upload xapi data to the LRS.**
-```sh
-curl --request POST localhost:80/trax/ws/xapi/statements \
- --header 'X-Experience-API-Version: 1.0.3' \
- --header 'Content-Type: application/json' \
- --header 'Accept: application/json' \
- -u testsuite:password \
- --data "@oulad-data.json"
-```
+    ```sh
+    curl --request POST localhost:80/trax/ws/xapi/statements \
+     --header 'X-Experience-API-Version: 1.0.3' \
+     --header 'Content-Type: application/json' \
+     --header 'Accept: application/json' \
+     -u testsuite:password \
+     --data "@oulad-data.json"
+    ```
 ## Running instructions
 _Describe how to run the BB._
 
