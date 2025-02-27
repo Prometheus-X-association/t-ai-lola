@@ -264,8 +264,7 @@ Stage 1 will be tested with [OULAD](https://www.nature.com/articles/sdata2017171
 
 The focus is to validate that the system functions correctly in a standalone setup, running a scenario locally and ensuring correct data integration.
 
-The testing strategy will involve a combination of automated and manual tests. The approach will include unit tests, which focus on verifying core components such as Trax-LRS, Harbor, and standalone scenario execution; integration tests, which validate the interaction between components, including API responses and end-to-end process execution; and performance and error handling tests.
-
+The testing strategy will involve a combination of automated and manual tests. The approach will include unit tests, which focus on verifying core components such as Trax-LRS, Harbor, and standalone scenario execution; integration tests, which validate the interaction between components, including API responses and end-to-end process execution.
 To better understand the interaction between components in LOLA during testing, the following diagram illustrates the relationship between Trax-LRS, Harbor, the scenario execution process, and the configuration management
 ![Relation between components](img/diagram.jpg)
 
