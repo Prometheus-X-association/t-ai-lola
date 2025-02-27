@@ -82,7 +82,7 @@ python -m pip install .
     ```sh
     make ps
     ```
-    ```
+    ```sh
     trax_db           docker-entrypoint.sh --def ...   Up      0.0.0.0:3306->3306/tcp,:::3306->3306/tcp, 33060/tcp
     trax_phpmyadmin   /docker-entrypoint.sh apac ...   Up      0.0.0.0:8080->80/tcp,:::8080->80/tcp
     trax_trax         docker-php-entrypoint apac ...   Up      443/tcp, 0.0.0.0:80->80/tcp
@@ -163,7 +163,7 @@ Ensure that LOLA-Sandbox and all required services are running correctly.
     ```sh
     docker ps
     ```
-    ```
+    ```sh
     CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                  NAMES
     664cef73b46f   phpmyadmin/phpmyadmin   "/docker-entrypoint.…"   26 minutes ago   Up 26 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp                trax_phpmyadmin
     b62398881ffa   trax_trax               "docker-php-entrypoi…"   26 minutes ago   Up 22 minutes   0.0.0.0:80->80/tcp, 443/tcp                            trax_trax
