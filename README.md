@@ -16,7 +16,7 @@ To build the LOLA system, follow these steps:
 The test repository contains all necessary files to validate the LOLA system, including data (Trax-LRS setup), algorithms, scenarios, and configuration files.
 
 ```sh
-git clone [https://gitlab.inria.fr/lola/test-repository.git](https://gitlab.inria.fr/okuksa/stage1-test.git)
+git clone https://gitlab.inria.fr/okuksa/stage1-test.git
 cd stage1-test
 ```
 
