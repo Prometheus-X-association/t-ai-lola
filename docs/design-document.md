@@ -260,7 +260,11 @@ To be detailed._-->
 
 _The LOLA platform is intended to be used in a use case with Maskott. However, for testing purposes in Stage 1, due to confidentiality concerns, we will use an open-source dataset instead._
 
-Stage 1 will be tested with [OULAD](https://www.nature.com/articles/sdata2017171) (Open University Learning Analytics Dataset), which has been adapted to the xAPI format. The objective of this stage is to demonstrate that the selected techniques are relevant for executing a scenario.
+Stage 1 will be tested with [OULAD](https://www.nature.com/articles/sdata2017171) (Open University Learning Analytics Dataset), which has been adapted to the xAPI format. 
+<!-- added by azim : 2025-03-02 -->
+This dataset is used by a simple AI algorithm to predict educational resources to recommend to learners based on their digital traces on the Open University (UK) learning platform.
+As this is a demonstration, computed performance indicators are reduced to a few precision metrics.
+The objective of this stage is to demonstrate that the selected techniques are relevant for executing a scenario.
 
 The focus is to validate that the system functions correctly in a standalone setup, running a scenario locally and ensuring correct data integration.
 
