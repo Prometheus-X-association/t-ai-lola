@@ -3,213 +3,236 @@
 <!--_Short description of the BB._-->
 LOLA is an autonomous platform designed to audit AI algorithms using datasets shared by the EdTech community. The platform allows users to experiment with algorithms across different datasets and benchmark multiple algorithms on the same dataset. The main challenges addressed by LOLA include transparency, security, and innovation in algorithm evaluation.
 
+This project sets up an xAPI Learning Record Store (LRS) using TRAX, loads OULAD dataset into it, and executes a LOLA Sandbox scenario for recommendation testing.
+
+The system consists of:
+- Trax LRS – a Laravel-based Learning Record Store (LRS) for storing xAPI data
+- LOLA Sandbox – a scenario execution framework for recommendation algorithms
+- Docker & Makefile Automation – automated setup and execution using Docker and Makefiles
+
+    
 ## Design Document
 See the design document [here](docs/).
 
 ## Building instructions
 
-**Note:** This program works only on Linux 64bits and MacOS (not tested).
+**1. Clone the repository**
 
-To build the LOLA system, follow these steps:
-### 1. Clone the repository
-
-The test repository contains all necessary files to validate the LOLA system, including data (Trax-LRS setup), algorithms, scenarios, and configuration files.
-
-```sh
+```
 git clone https://gitlab.inria.fr/okuksa/stage1-test.git
 cd stage1-test
 ```
 
-This repository includes two main directories and README file:
-- `/data` – contains Trax-LRS and the OULAD dataset
-- `/sandbox_workdir` – includes algorithms, scenarios, workdir (results), and the configuration file for LOLA-Sandbox
-- `README.md` - where you can check how to use it
+**2. Connect to Inria’s Internal Network (VPN)**
 
-### 2. Install LOLA-Sandbox
-Note: A python environment is recommanded (not required) for sandbox to avoid polluting base environment with dependencies. You can use conda/miniconda or  venv
-```sh
-cd /tmp
-git clone git@gitlab.inria.fr:lola/lola-sandbox.git
-cd lola-sandbox
-conda create -y -n my_env python=3.10
-conda activate my_env
-python -m pip install .
+**Important:** To download the required TRAX Docker images, you must be connected to Inria's internal network. This can be done via VPN.
+
+### How to connect to Inria VPN
+- download and install Cisco AnyConnect VPN Client (available at: https://vpn.inria.fr)
+- open Cisco AnyConnect and enter the server address:
+    ``` vpn.inria.fr ```
+- login with your Inria credentials
+
+**3. Download TRAX Docker images**
+
+After connecting to the VPN, run the following commands to download and tag the TRAX images:
+
+```
+docker pull harbor.loria.fr/lola/trax_admin:latest
+docker tag harbor.loria.fr/lola/trax_admin:latest trax_trax
+
+docker pull harbor.loria.fr/lola/trax_client:latest
+docker tag harbor.loria.fr/lola/trax_admin:latest trax_client
 ```
 
-### 3. Install and configure Trax-LRS
-1. **Create the environment file for the service.**
-
-    ```sh
-    make env
-    ```
-    
-    This command create a `.env` and a `.envrc` files at the root of the repository. This file contains all data required by the service to work. You can edit all parameters if you need.  
-      
-    **Note:** If you move the project (change directory), you have to remove the `.env` file and re-generate the `.env` file with `make env`.
-    
-2. **Build docker images or get Docker images from Loria forge**
-
-    Download images on the Loria forge (note that you need a connection to the Inria VPN):
-
-   ```sh
-   docker pull harbor.loria.fr/lola/trax_admin:latest
-   docker tag harbor.loria.fr/lola/trax_admin:latest trax_trax:latest
-
-   docker pull harbor.loria.fr/lola/trax_client:latest
-   docker tag harbor.loria.fr/lola/trax_admin:latest trax_client:latest
-   ```
-    
-    - **trax_admin** or **trax_trax** : is the classic trax image used to upload and consult data.  
-    - **trax_client** : is an image based on `trax_trax` but with an edition in its apache server that disable modification of the database. In fact, with `trax_client`, you can only see your data, not edit them. The web interface is also unavailable (login in web interface needs POST).  
-
-3. **Run the service and setup for the first run**
-
-    ```sh
-    make up
-    ```
-    
-    Now you can set up the first run:
-    
-    ```sh
-    make trax_initdb
-    make trax_create_client
-    make trax_create_admin
-    ```
-    This initialise the sql database. Next lines create account for the web interface (admin account) and for http client (client account). Please do not forget to **SAVE** your **credentials** and **passwords** displayed on your prompt.
-      
-    Without editing configuration, your services should be available:
-    
-    ```sh
-    make ps
-    ```
-    ```sh
-    trax_db           docker-entrypoint.sh --def ...   Up      0.0.0.0:3306->3306/tcp,:::3306->3306/tcp, 33060/tcp
-    trax_phpmyadmin   /docker-entrypoint.sh apac ...   Up      0.0.0.0:8080->80/tcp,:::8080->80/tcp
-    trax_trax         docker-php-entrypoint apac ...   Up      443/tcp, 0.0.0.0:80->80/tcp
-    ```
-    
-    You can now connect to http://localhost:80 and use your admin credential.
-
-4. **Upload xapi data to the LRS**
-    ```sh
-    curl --request POST localhost:80/trax/ws/xapi/statements \
-     --header 'X-Experience-API-Version: 1.0.3' \
-     --header 'Content-Type: application/json' \
-     --header 'Accept: application/json' \
-     -u testsuite:password \
-     --data "@oulad-data.json"
-    ```
 
     
 ## Running instructions
-1. **Move the sandbox_workdir folder to $HOME**
-    ```sh
-    mv sandbox_workdir $HOME/
-    ```
-2. **Run the scenario using LOLA-Sandbox**
-   ```sh
-   cd $HOME/sandbox_workdir
-   lola-sandbox run --lrs-host http://localhost:80 -w workdir -C recommandation_params.json
-   ```
+**1. Run the project**
+
+Run the following command in the project root directory:
+```
+make up
+```
+
+This command:
+- starts Trax LRS using docker-compose
+- loads the OULAD dataset automatically into TRAX
+- installs LOLA Sandbox locally
+- executes the recommendation scenario
+
+**2. Verify running services**
+
+Check if the containers are running:
+```
+docker ps
+```
 
 ## Example usage
-_Describe how to check some basic functionality of the BB._
-E.g.:
 
-Send the following requests to the designated endpoints:
-| Endpoint      | Example input | Expected output   |
-| ------------- | ------------- | ----------------- |
-| /hello        | World         | 200, Hello World! |
-|               |               |                   |
-|               |               |                   |
+**1. Access TRAX Web Interface**
+
+- open http://localhost:80 in a browser
+- login with admin credentials (generated during setup)
+
+**2. Inspect results**
+
+The LOLA Sandbox execution results are stored in `/sandbox_wdir/workdir`
 
 ## Unit testing
-To ensure the correct functioning of the LOLA platform, unit tests will focus on three key components: Trax-LRS, the algorithm execution, and the scenario validation within LOLA-sandbox.
-
+To ensure the correct functioning of the LOLA platform, unit tests will focus on three key components: installing Trax LRS, uploading data to Trax LRS and scenario execution.
 
 ### Setup test environment
+If you’ve already run **building and running instructions**, skip this step
+
+Check if services are running:
+```
+docker ps
+
+Result:
+b0c388f68312   phpmyadmin/phpmyadmin   "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp                trax_phpmyadmin
+98fc9e3959c6   trax_trax               "docker-php-entrypoi…"   2 minutes ago   Up 2 minutes   0.0.0.0:80->80/tcp, 443/tcp                            trax_trax
+b5c6f9853f77   mysql:8.0               "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes   0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp   trax_db
+```
+
+```
+docker images
+
+Result:
+curlimages/curl                    latest    5dce198cca46   3 weeks ago     28.1MB
+phpmyadmin/phpmyadmin              latest    0276a66ce322   5 weeks ago     571MB
+mysql                              8.0       6616596982ed   6 weeks ago     764MB
+harbor.loria.fr/lola/trax_client   latest    5e7cb9a86b4f   4 years ago     662MB
+harbor.loria.fr/lola/trax_admin    latest    7fe95b918e45   4 years ago     662MB
+trax_client                        latest    7fe95b918e45   4 years ago     662MB
+trax_trax                          latest    7fe95b918e45   4 years ago     662MB
+```
+Otherwise, follow these:
+
+**1. Trax installing**
+
+Download TRAX Docker images via  Inria VPN:
+```
+docker pull harbor.loria.fr/lola/trax_admin:latest
+docker tag harbor.loria.fr/lola/trax_admin:latest trax_trax
+
+docker pull harbor.loria.fr/lola/trax_client:latest
+docker tag harbor.loria.fr/lola/trax_admin:latest trax_client
+```
+
+Installing trax:
+```
+cd data/trax
+make create_trax
+```
+
+**2. Lola-sandbox installing (scenario executer)**
+
+Installing lola-sandbox in the project root
+
+```
+make install_lola_sandbox
+```
+
 ### Run tests
-1. **Trax-LRS**
 
-    Uploading data to Trax-LRS
-    ```sh
-    curl --request POST localhost:80/trax/ws/xapi/statements --header 'X-Experience-API-Version: 1.0.3' --header 'Content-Type: application/json' --header 'Accept: application/json' -u testsuite:password --data "@oulad-data.json"
-    ```
-    Checking that the data is successfully uploaded to Trax-LRS
-    ```sh
-    curl --request GET localhost:80/trax/ws/xapi/statements --header 'X-Experience-API-Version: 1.0.3' --header 'Content-Type: application/json' --header 'Accept: application/json' -u testsuite:password
-    ```
+**1. For Trax LRS (upload data to Trax LRS):**
+```
+cd data/trax
+make upload_data
+```
 
-2. **Algorithm execution**
-    Test uploading an algorithm to Harbor:
-    ```sh
-    docker tag my_algorithm:latest harbor.loria.fr/lola/my_algorithm:latest
-    docker push harbor.loria.fr/lola/my_algorithm:latest
-    ```
+**2. For scenario execution - lola-sandbox (after Trax data is uploaded!):**
+In the root of the project:
+```
+make run_sandbox
+```
 
-   Test pulling and running an algorithm from Harbor:
-   ```sh
-   docker pull harbor.loria.fr/lola/svdpp_recom:latest
-   docker run --rm harbor.loria.fr/lola/svdpp_recom:latest
-   ```
 ### Expected results
-**Trax-LRS** successfully stores and retrieves datasets.
-**Algorithms** are correctly uploaded, pulled, and executed from Harbor.
+**1. Trax LRS:**
+
+- open [http://localhost:80]
+- login with the admin credentials shown in the terminal
+Example (your credential will look different), 
+```
++-----------------+-----------------+
+| Identifier      | Password        |
++-----------------+-----------------+
+| admin@trax.test | -0iNq[3').DY)$z |
++-----------------+-----------------+
+```
+- navigate to "Statements" and verify that oulad-data.json data is loaded
+
+**2. Lola-sandbox (scenario executor)**
+You should see in the terminal following result:
+
+```
+executor >  local (8)
+[7c/c9b36b] process > requestData     [100%] 1 of 1 ✔
+[3b/6779b5] process > svd_train       [100%] 1 of 1 ✔
+[17/b2fc3d] process > svd_test (1)    [100%] 1 of 1 ✔
+[fe/dd09d8] process > svd_eval (1)    [100%] 1 of 1 ✔
+[d1/324c2f] process > userModel       [100%] 1 of 1 ✔
+[20/d2fd2e] process > userTest (1)    [100%] 1 of 1 ✔
+[7a/bab146] process > userEval (1)    [100%] 1 of 1 ✔
+[b8/214adb] process > mergeResProcess [100%] 1 of 1 ✔
+
+2025-03-07 09:18:45,198:INFO:Results and data of the run stored in '/home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a'
+2025-03-07 09:18:45,199:INFO:Result files should be in :
+2025-03-07 09:18:45,199:INFO:  /home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a/b8/214adb1fde548e5840f52071154514/output.json
+```
+
+isit the specified directory (in our case /home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a/b8/214adb1fde548e5840f52071154514/output.json) and view the results in the output.json folder
 
 ## Component-level testing
 ### Setup test environment
-Ensure that LOLA-Sandbox and all required services are running correctly.
+Check if services are running:
+```
+docker ps
 
-1. **Trax-LRS is running**
-    ```sh
-    docker ps
-    ```
-    
-    ```sh
-    CONTAINER ID   IMAGE                   COMMAND                  CREATED          STATUS          PORTS                                                  NAMES
-    664cef73b46f   phpmyadmin/phpmyadmin   "/docker-entrypoint.…"   26 minutes ago   Up 26 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp                trax_phpmyadmin
-    b62398881ffa   trax_trax               "docker-php-entrypoi…"   26 minutes ago   Up 22 minutes   0.0.0.0:80->80/tcp, 443/tcp                            trax_trax
-    99454f8c3fec   mysql:5.7.31            "docker-entrypoint.s…"   26 minutes ago   Up 26 minutes   0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp   trax_db
-    ```
+Result:
+b0c388f68312   phpmyadmin/phpmyadmin   "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp                trax_phpmyadmin
+98fc9e3959c6   trax_trax               "docker-php-entrypoi…"   2 minutes ago   Up 2 minutes   0.0.0.0:80->80/tcp, 443/tcp                            trax_trax
+b5c6f9853f77   mysql:8.0               "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes   0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp   trax_db
+```
 
-2. **You have images of algorithms and scenarios from Harbor**
+```
+docker images
 
-    ```sh
-    docker images
-    ```
-    ```sh
-    harbor.loria.fr/lola/recommandation            1.1.0_switchable   3f006208d82e   2 years ago     1.35GB
-    harbor.loria.fr/lola/svdpp_recom               latest             1b032219cb1b   2 years ago     1.1GB
-    lola.lhs.loria.fr:4443/sisr_user/svdpp_recom   latest             1b032219cb1b   2 years ago     1.1GB
-    harbor.loria.fr/lola/test_recom                latest             2c6adb930d4f   2 years ago     1.1GB
-    lola.lhs.loria.fr:4443/sisr_user/test_recom    latest             2c6adb930d4f   2 years ago     1.1GB
-    ```
+Result:
+curlimages/curl                    latest    5dce198cca46   3 weeks ago     28.1MB
+phpmyadmin/phpmyadmin              latest    0276a66ce322   5 weeks ago     571MB
+mysql                              8.0       6616596982ed   6 weeks ago     764MB
+harbor.loria.fr/lola/trax_client   latest    5e7cb9a86b4f   4 years ago     662MB
+harbor.loria.fr/lola/trax_admin    latest    7fe95b918e45   4 years ago     662MB
+trax_client                        latest    7fe95b918e45   4 years ago     662MB
+trax_trax                          latest    7fe95b918e45   4 years ago     662MB
+```
+Otherwise, follow the building instructions.
+
 ### Run tests
-Run your scenario with lola-sandbox
-
-    ```sh
-    cd $HOME/sandbox_wrkdir
-    lola-sandbox run --lrs-host http://localhost:80 -w workdir -C recommandation_params.json
-    ```
-
+Simply run:
+```
+make up
+```
 
 ### Expected results
+You should see in the terminal following result:
 
-```sh
-Launching /home/lap/sandbox_wdir/scenarios/recommandation/main.nf [Ra72661fb-db59-49c3-9b95-80e151028d45] DSL2 - revision: e75d58603e
-
-executor >  local (8)
-[04/90b533] process > requestData     [100%] 1 of 1 ✔
-[b2/3151a2] process > svd_train       [100%] 1 of 1 ✔
-[49/1b424a] process > svd_test (1)    [100%] 1 of 1 ✔
-[c1/76c22e] process > svd_eval (1)    [100%] 1 of 1 ✔
-[0d/d0252e] process > userModel       [100%] 1 of 1 ✔
-[3d/5745a0] process > userTest (1)    [100%] 1 of 1 ✔
-[d0/1c22b9] process > userEval (1)    [100%] 1 of 1 ✔
-[7f/7184d4] process > mergeResProcess [100%] 1 of 1 ✔
-
-2025-02-28 00:18:37,366:INFO:Results and data of the run stored in '/home/lap/sandbox_wdir/workdir/Ra72661fb-db59-49c3-9b95-80e151028d45'
-2025-02-28 00:18:37,367:INFO:Result files should be in :
-2025-02-28 00:18:37,367:INFO:  /home/lap/sandbox_wdir/workdir/Ra72661fb-db59-49c3-9b95-80e151028d45/7f/7184d4e6fe9103cb7c7221bb66aa18/output.json
 ```
-Visit the specified directory (in our case `/home/lap/sandbox_wdir/workdir/Ra72661fb-db59-49c3-9b95-80e151028d45/7f/7184d4e6fe9103cb7c7221bb66aa18/output.json`) and view the results in the output.json folder
+executor >  local (8)
+[7c/c9b36b] process > requestData     [100%] 1 of 1 ✔
+[3b/6779b5] process > svd_train       [100%] 1 of 1 ✔
+[17/b2fc3d] process > svd_test (1)    [100%] 1 of 1 ✔
+[fe/dd09d8] process > svd_eval (1)    [100%] 1 of 1 ✔
+[d1/324c2f] process > userModel       [100%] 1 of 1 ✔
+[20/d2fd2e] process > userTest (1)    [100%] 1 of 1 ✔
+[7a/bab146] process > userEval (1)    [100%] 1 of 1 ✔
+[b8/214adb] process > mergeResProcess [100%] 1 of 1 ✔
+
+2025-03-07 09:18:45,198:INFO:Results and data of the run stored in '/home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a'
+2025-03-07 09:18:45,199:INFO:Result files should be in :
+2025-03-07 09:18:45,199:INFO:  /home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a/b8/214adb1fde548e5840f52071154514/output.json
+```
+
+isit the specified directory (in our case /home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a/b8/214adb1fde548e5840f52071154514/output.json) and view the results in the output.json folder
