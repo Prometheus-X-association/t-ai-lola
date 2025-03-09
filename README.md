@@ -23,8 +23,20 @@ cd t-ai-lola
 ```
 
 ## Running instructions
+
+**1. Trax setup and uploading data**
 ```
-make up_all
+cd /data/trax
+make up
+cd ../..
+```
+**2. Lola-sandbox setup and scenario execution**
+
+**Note:** you need to have installed Python and Nextflow
+
+```
+cd sandbox_wdir
+make up
 ```
 
 ## Example usage
