@@ -24,20 +24,16 @@ cd t-ai-lola
 
 ## Running instructions
 
-**1. Trax setup and uploading data**
 ```
-cd /data/trax
-make up
-cd ../..
+make up_all
 ```
-**2. Lola-sandbox setup and scenario execution**
 
-**Note:** you need to have installed Python and Nextflow
-
+**Note:** If you have message in terminal
 ```
-cd sandbox_wdir
-make up
+Error response from daemon: container [some id] is not running
+Waiting for MySQL to start...
 ```
+wait for a while, it's meaning your MySQL is installing.
 
 ## Example usage
 
