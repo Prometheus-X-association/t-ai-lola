@@ -1,0 +1,3 @@
+[submodule "trax-docker-api"]
+	path = trax-docker-api
+	url = git@gitlab.inria.fr:lola/back-end/trax-docker-api.git

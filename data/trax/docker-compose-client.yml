@@ -1,0 +1,12 @@
+version: '2.4'
+
+# https://github.com/trax-project/trax-lrs
+
+services:
+  trax_client:
+    build:
+      context: 'build'
+      dockerfile: Dockerfile_client
+    volumes:
+      - ${TRAX_ENV}:/var/www/html/traxlrs/.env
+    restart: ${RESTART_SERVICES}
