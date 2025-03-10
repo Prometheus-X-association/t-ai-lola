@@ -18,7 +18,7 @@ See the design document [here](docs/).
 **Clone the repository**
 
 ```
-git clone https://github.com/Prometheus-X-association/t-ai-lola.git
+git clone git@github.com:Prometheus-X-association/t-ai-lola.git
 cd t-ai-lola
 ```
 
@@ -27,7 +27,7 @@ cd t-ai-lola
 **1. Setup TRAX and uploadging data**
 
 ```
-cd trax/data
+cd data/trax
 make up
 cd ../..
 ```
