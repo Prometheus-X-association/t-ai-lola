@@ -46,22 +46,7 @@ xxxxx          phpmyadmin     Up 1 minute        0.0.0.0:8080->80/tcp   trax_php
 
 **Verify upload**
 
-After successful download, you should see the following types of credentials in the terminal
-
-The first one, which is responsible for logging in to the site:
-
-| username  | password  |
-| ------ | ------ |
-| admin@trax.lrs    |    somePassword     |
-
-And the second one, which is responsible for uploading data through the Api to Trax LRS:
-
-| username  | password  |
-| ------ | ------ |
-| testsuite    |    password     |
-
-
-Log in to TRAX via http://localhost:80 using your admin credentials, then:
+Log in to TRAX via http://localhost:80, then:
 - Navigate to `Statements`
 - You should see oulad-data.json loaded
 
