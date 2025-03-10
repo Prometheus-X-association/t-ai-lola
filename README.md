@@ -24,8 +24,17 @@ cd t-ai-lola
 
 ## Running instructions
 
+**1. Setup TRAX and uploadging data**
+
 ```
-make up_all
+cd trax/data
+make up
+cd ../..
+```
+**2. Setup Lola-sandbox and scenario execution**
+```
+cd sandbox_wdir
+make up
 ```
 
 **Note:** If you have message in terminal
