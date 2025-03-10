@@ -13,6 +13,15 @@ The project consists of two main components:
 ## Design Document
 See the design document [here](docs/).
 
+# Requirements
+
+This program works only on Linux 64bits and MacOS (not tested). Nextflow does not work with full capabilities on Windows system's.
+
+- python >= 3.10 (used for the sandbox)
+- pip >= 22.0 (to install python dependencies. See [Installation](#installation) to set-up python environment)
+- nextflow >= 22.04 (see [Nextflow - Installation](https://www.nextflow.io/index.html#GetStarted))
+- docker >= 20.10.18 (see [Docker - installation](https://docs.docker.com/get-docker/))
+
 ## Building instructions
 
 **Clone the repository**
