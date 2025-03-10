@@ -37,13 +37,6 @@ cd sandbox_wdir
 make up
 ```
 
-**Note:** If you have message in terminal
-```
-Error response from daemon: container [some id] is not running
-Waiting for MySQL to start...
-```
-wait for a while, it's meaning your MySQL is installing.
-
 ## Example usage
 
 **1. Access TRAX Web Interface**
