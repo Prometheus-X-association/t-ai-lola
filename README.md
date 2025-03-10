@@ -15,7 +15,7 @@ See the design document [here](docs/).
 
 # Requirements
 
-This program works only on Linux 64bits and MacOS (not tested). Nextflow does not work with full capabilities on Windows system's.
+This program works only on Linux 64bits and MacOS. Nextflow does not work with full capabilities on Windows system's.
 
 - python >= 3.10 (used for the sandbox)
 - pip >= 22.0 (to install python dependencies. See [Installation](#installation) to set-up python environment)
