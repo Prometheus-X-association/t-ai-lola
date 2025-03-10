@@ -13,27 +13,38 @@ The project consists of two main components:
 ## Design Document
 See the design document [here](docs/).
 
+# Requirements
+
+This program works only on Linux 64bits and MacOS (not tested). Nextflow does not work with full capabilities on Windows system's.
+
+- python >= 3.10 (used for the sandbox)
+- pip >= 22.0 (to install python dependencies. See [Installation](#installation) to set-up python environment)
+- nextflow >= 22.04 (see [Nextflow - Installation](https://www.nextflow.io/index.html#GetStarted))
+- docker >= 20.10.18 (see [Docker - installation](https://docs.docker.com/get-docker/))
+
 ## Building instructions
 
 **Clone the repository**
 
 ```
-git clone https://github.com/Prometheus-X-association/t-ai-lola.git
+git clone git@github.com:Prometheus-X-association/t-ai-lola.git
 cd t-ai-lola
 ```
 
 ## Running instructions
 
-```
-make up_all
-```
+**1. Setup TRAX and uploadging data**
 
-**Note:** If you have message in terminal
 ```
-Error response from daemon: container [some id] is not running
-Waiting for MySQL to start...
+cd data/trax
+make up
+cd ../..
 ```
-wait for a while, it's meaning your MySQL is installing.
+**2. Setup Lola-sandbox and scenario execution**
+```
+cd sandbox_wdir
+make up
+```
 
 ## Example usage
 
