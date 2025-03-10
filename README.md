@@ -28,7 +28,7 @@ This program works only on Linux 64bits and MacOS (not tested). Nextflow does no
 
 ```
 git clone git@github.com:Prometheus-X-association/t-ai-lola.git
-cd t-ai-lola
+cd t-ai-lola/stage1-test
 ```
 
 ## Running instructions
