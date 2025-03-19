@@ -1,6 +1,6 @@
 # Introduction
 
-This project consists of two main components: 
+The project **Stage1-test** consists of two main components: 
 - Trax LRS: A Laravel-based Learning Record Store that manages and stores xAPI data.
 - LOLA Sandbox: A framework for executing scenarios to test Machine learning models for resource recommendation within a virtual learning environment. The OULAD dataset is used (see [OULAD-Documentation](https://archive.ics.uci.edu/dataset/349/open+university+learning+analytics+dataset))
 
@@ -21,8 +21,8 @@ The project requires the following software to be installed before installing Tr
 **Clone the repository**
 
 ```
-git clone git@github.com:Chahrazed-Labba/stage1-test.git
-cd stage1-test
+git clone git@github.com:Prometheus-X-association/t-ai-lola.git
+cd t-ai-lola/stage1-test
 ```
 
 # Running instructions
@@ -31,7 +31,7 @@ Before proceeding, ensure that the Docker daemon is active.
 
 ## 1. Trax installation
 
-Run the following command in the project root directory:
+Run the following command in the project directory (t-ai-lola/stage1-test) :
 ```
 cd data
 make up
@@ -55,7 +55,7 @@ Log in using the credentials provided during the installation of Trax, which you
 Please note that you should use your own credentials to log in; the ones displayed here are for illustrative purposes only. 
 
 ## 2. Lola-sandbox setup
-Run the following command in the project root directory:
+Run the following command in the project directory (t-ai-lola/stage1-test):
 ```
 cd sandbox_wdir
 make up
@@ -86,4 +86,4 @@ The output from the execution scenario, which includes a file containing precisi
 
 To access this file, navigate to stage1-test/sandbox_wdir/workdir/ and look for the file named after the ID of your process. For instance, in this example, the file is named **cd**.
 
-For additional details on the recommendation scenario, please check this ((see [Documentation](https://github.com/Chahrazed-Labba/stage1-test/blob/main/sandbox_wdir/scenarios/recommandation/README.md))).
+For additional details on the recommendation scenario, please check this ((see [Documentation](https://github.com/Prometheus-X-association/t-ai-lola/blob/main/stage1-test/sandbox_wdir/scenarios/recommandation/README.md))).
