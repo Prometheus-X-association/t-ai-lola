@@ -1,8 +1,0 @@
-juin-28 11:35:29.416 [main] DEBUG nextflow.cli.Launcher - $> nextflow -c nextflow_docker.config run main.nf '--lrsHost=http://garimpeiro12.loria.fr' --lrsPort=81
-juin-28 11:35:29.494 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 22.04.0
-juin-28 11:35:29.520 [main] DEBUG nextflow.cli.Launcher - Operation aborted
-nextflow.exception.AbortOperationException: Cannot find script file: main.nf
-	at nextflow.cli.CmdRun.getScriptFile(CmdRun.groovy:391)
-	at nextflow.cli.CmdRun.run(CmdRun.groovy:284)
-	at nextflow.cli.Launcher.run(Launcher.groovy:480)
-	at nextflow.cli.Launcher.main(Launcher.groovy:639)

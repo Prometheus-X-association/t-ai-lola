@@ -1,6 +1,0 @@
-.env
-.envrc
-data/*
-.env.trax
-tmp/*
-__pycache__
