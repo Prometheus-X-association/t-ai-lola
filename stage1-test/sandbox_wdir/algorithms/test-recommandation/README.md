@@ -1,7 +1,5 @@
 # Algorithm for tests Data for Recommandation scenario
 
-Use this algorithm with [recommendation new version](https://gitlab.inria.fr/lola/scenarios/recommendation_new_version)
-
 ## Requirements
 
 Use the Dockerfile or install environment with dependencies (see Dockerfile for information)
