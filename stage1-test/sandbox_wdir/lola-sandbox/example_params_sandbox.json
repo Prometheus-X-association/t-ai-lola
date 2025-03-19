@@ -1,0 +1,25 @@
+{
+  "scenario_path": "/home/my-user/my_scenario/",
+  "scenario_parameters": {
+    "fcp": "fcp",
+    "mae": "mae",
+    "mse": "mse",
+    "rmse": "rmse",
+    "datasetName": "oulad"
+  },
+  "algorithms": [
+    {
+      "algorithm_path": "/home/my-user/algo/generate-model/",
+      "nf_variable": "userModel",
+      "parameters": {
+        "knn_k": "40",
+        "knn_k_min": "1"
+      }
+    },
+    {
+      "algorithm_path": "/home/my-user/algo/test-model",
+      "nf_variable": "userTest",
+      "parameters": {}
+    }
+  ]
+}
