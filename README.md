@@ -1,182 +1,89 @@
-# Trustworthy AI: algorithm assessment BB – LOLA
+# Introduction
 
-<!--_Short description of the BB._-->
-LOLA is an autonomous platform designed to audit AI algorithms using datasets shared by the EdTech community. The platform allows users to experiment with algorithms across different datasets and benchmark multiple algorithms on the same dataset. The main challenges addressed by LOLA include transparency, security, and innovation in algorithm evaluation.
+This project consists of two main components: 
+- Trax LRS: A Laravel-based Learning Record Store that manages and stores xAPI data.
+- LOLA Sandbox: A framework for executing scenarios to test Machine learning models for resource recommendation within a virtual learning environment. The OULAD dataset is used (see [OULAD-Documentation](https://archive.ics.uci.edu/dataset/349/open+university+learning+analytics+dataset))
 
-This project sets up an xAPI Learning Record Store (LRS) using TRAX, loads OULAD dataset into it, and executes a LOLA Sandbox scenario for recommendation testing.
+The project leverages Docker and Makefile automation to streamline setup and operations, ensuring a reproducible environment across different systems (Ununtu and MacOS). Docker encapsulates all dependencies within containers, simplifying management and deployment, while Makefiles automate repetitive tasks such as building, running, and testing the application. 
 
-The project consists of two main components:
-1. Trax LRS (Learning Record Store) – stores and manages xAPI data
-2. LOLA Sandbox – runs recommendation scenarios based on algorithms
-
-    
-## Design Document
-See the design document [here](docs/).
 
 # Requirements
 
-This program works only on Linux 64bits and MacOS. Nextflow does not work with full capabilities on Windows system's.
+This program is compatible with Linux 64-bit and MacOS systems. Please note that while the program can operate on Windows, Nextflow may not function with full capabilities on Windows environments (not recommanded).
 
-- python >= 3.10 (used for the sandbox)
-- pip >= 22.0 (to install python dependencies. See [Installation](#installation) to set-up python environment)
-- nextflow >= 22.04 (see [Nextflow - Installation](https://www.nextflow.io/index.html#GetStarted))
-- docker >= 20.10.18 (see [Docker - installation](https://docs.docker.com/get-docker/))
+The project requires the following software to be installed before installing Trax-LRS and lola-sandbox : 
 
-## Building instructions
+- Nextflow (>= 22.04): Essential for workflow management. Installation details can be found on the Nextflow website (see [Nextflow - Installation](https://www.nextflow.io/index.html#GetStarted)).
+-  Docker (>= 20.10.18): Necessary for containerization. Installation instructions are available on the Docker website ((see [Docker - installation](https://docs.docker.com/get-docker/))).
+
+# Installation & Setup
 
 **Clone the repository**
 
 ```
-git clone git@github.com:Prometheus-X-association/t-ai-lola.git
-cd t-ai-lola/stage1-test
+git clone git@github.com:Chahrazed-Labba/stage1-test.git
+cd stage1-test
 ```
 
-## Running instructions
+# Running instructions
 
-**1. Setup TRAX and uploadging data**
+Before proceeding, ensure that the Docker daemon is active.
 
-```
-cd data/trax
-make up
-cd ../..
-```
-**2. Setup Lola-sandbox and scenario execution**
-```
-cd sandbox_wdir
-make up
-```
-
-## Example usage
-
-**1. Access TRAX Web Interface**
-
-- open http://localhost:80 in a browser
-- login with admin credentials (generated during setup)
-
-**2. Inspect results**
-
-The LOLA Sandbox execution results are stored in `/sandbox_wdir/workdir`
-
-## Unit testing
-To ensure the correct functioning of the LOLA platform, unit tests will focus on two key components: uploading data to Trax LRS and scenario execution.
-
-### Setup test environment
-If you've already run the setup instructions, verify services are running
-
-```
-docker ps
-```
-
-Expected result
-```
-b0c388f68312   phpmyadmin/phpmyadmin   "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp                trax_phpmyadmin
-98fc9e3959c6   trax_trax               "docker-php-entrypoi…"   2 minutes ago   Up 2 minutes   0.0.0.0:80->80/tcp, 443/tcp                            trax_trax
-b5c6f9853f77   mysql:8.0               "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes   0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp   trax_db
-```
-
-
-Otherwise, follow **building** and **running instructions**.
-
-### Run tests
-
-**1. For Trax LRS (upload data to Trax LRS):**
-```
-cd data/trax
-make upload_data
-```
-
-**2. For scenario execution - lola-sandbox (after Trax data is uploaded!):**
-
-```
-cd sandbox_wdir
-make run_sandbox
-```
-
-### Expected results
-**1. Trax LRS:**
-
-- open [http://localhost:80]
-- login with the admin credentials shown in the terminal
-Example (your credential will look different), 
-```
-+-----------------+-----------------+
-| Identifier      | Password        |
-+-----------------+-----------------+
-| admin@trax.test | -0iNq[3').DY)$z |
-+-----------------+-----------------+
-```
-- navigate to "Statements" and verify that oulad-data.json data is loaded
-
-**2. Lola-sandbox (scenario executor)**
-You should see in the terminal following result:
-
-```
-executor >  local (8)
-[7c/c9b36b] process > requestData     [100%] 1 of 1 ✔
-...
-
-2025-03-07 09:18:45,199:INFO:Result files should be in :
-2025-03-07 09:18:45,199:INFO:  /home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a/b8/214adb1fde548e5840f52071154514/output.json
-```
-
-isit the specified directory (in our case /home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a/b8/214adb1fde548e5840f52071154514/output.json) and view the results in the output.json folder
-
-## Component-level testing
-### Setup test environment
-
-The run tests will setup test environment by itself.
-
-**Note: ** A python environment is recommanded (not required) for sandbox to avoid polluting base environment with dependencies. You can use [conda/miniconda](https://www.anaconda.com/docs/main) or  venv
-
-### Conda environment installation
-Quick installation of conda on Linux x68 to manage Python environment.
-For more information on conda, see the official documentation https://docs.conda.io or miniconda
-**Note: ** This tuto show the installation of miniconda instead of conda. Miniconda is just a lighter version of Conda.
-
-```
-wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh -O ~/miniconda.sh
-bash ~/miniconda.sh -b -p $HOME/miniconda
-$HOME/miniconda/bin/conda init bash
-echo auto_activate_base: false >> ~/.condarc
-echo 'export PATH=$PATH:$HOME/miniconda/bin' >> ~/.bashrc
-source ~/.bashrc
-```
-
-### Run tests
 ## 1. Trax installation
 
 Run the following command in the project root directory:
 ```
-cd /data/trax
+cd data
 make up
 ```
+
 This command:
 - starts Trax LRS using docker-compose
 - loads the OULAD dataset automatically into TRAX
 
-## 2. Lola-sandbox setup
+To confirm that the data has been successfully uploaded to Trax-LRS, please navigate to http://localhost/login. 
 
-### Lola-sanbox installation and scenario execution
-
-**Note:**
-- If Conda is detected, the system will automatically install dependencies inside a Conda environment
-- If Conda is not installed, dependencies will be installed system-wide
+Log in using the credentials provided during the installation of Trax, which you can find displayed in the Terminal as shown below :
 
 ```
-cd /sandbox_wdir
++-----------------+------------+
+| Identifier      | Password   |
++-----------------+------------+
+| admin@trax.test | ]w>#4YOLdP |
++-----------------+------------+
+```
+Please note that you should use your own credentials to log in; the ones displayed here are for illustrative purposes only. 
+
+## 2. Lola-sandbox setup
+Run the following command in the project root directory:
+```
+cd sandbox_wdir
 make up
 ```
+# Expected results
 
-### Expected results
+If the installation proceeds successfully, you should see output similar to the following, at the end of installation, in your terminal:
 
 ```
+N E X T F L O W  ~  version 22.10.4
+Launching `../stage1-test/sandbox_wdir/scenarios/recommandation/main.nf` [Rc4f80af3-7ad9-452c-ae60-824297a8c6ba] DSL2 - revision: e75d58603e
 executor >  local (8)
-[7c/c9b36b] process > requestData     [100%] 1 of 1 ✔
-...
+[89/8388b4] process > requestData     [100%] 1 of 1 ✔
+[23/7a317b] process > svd_train       [100%] 1 of 1 ✔
+[96/e6d1cd] process > svd_test (1)    [100%] 1 of 1 ✔
+[f9/3f74bb] process > svd_eval (1)    [100%] 1 of 1 ✔
+[fc/891bac] process > userModel       [100%] 1 of 1 ✔
+[be/70218c] process > userTest (1)    [100%] 1 of 1 ✔
+[a5/c6bc6b] process > userEval (1)    [100%] 1 of 1 ✔
+[cd/ff9f09] process > mergeResProcess [100%] 1 of 1 ✔
 
-2025-03-07 09:18:45,199:INFO:Result files should be in :
-2025-03-07 09:18:45,199:INFO:  /home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a/b8/214adb1fde548e5840f52071154514/output.json
+INFO:Results and data of the run stored in '../stage1-test/sandbox_wdir/workdir/Rc4f80af3-7ad9-452c-ae60-824297a8c6ba'
+2025-03-18 14:49:13,455:INFO:Result files should be in :
+2025-03-18 14:49:13,456:INFO:  ../stage1-test/sandbox_wdir/workdir/Rc4f80af3-7ad9-452c-ae60-824297a8c6ba/cd/ff9f09205fb71caaf8b7756f7f3ac7/output.json
+
 ```
+The output from the execution scenario, which includes a file containing precision indicators (json file) used to evaluate the performance of the machine learning recommendation models, is generated in the final process called **mergeResProcess**. 
 
-isit the specified directory (in our case /home/lap/Documents/stage1/stage1-test/sandbox_wdir/workdir/Rc7a39c82-f0a5-4133-bc4d-3d3a055c059a/b8/214adb1fde548e5840f52071154514/output.json) and view the results in the output.json folder
+To access this file, navigate to stage1-test/sandbox_wdir/workdir/ and look for the file named after the ID of your process. For instance, in this example, the file is named **cd**.
 
+For additional details on the recommendation scenario, please check this ((see [Documentation](https://github.com/Chahrazed-Labba/stage1-test/blob/main/sandbox_wdir/scenarios/recommandation/README.md))).
