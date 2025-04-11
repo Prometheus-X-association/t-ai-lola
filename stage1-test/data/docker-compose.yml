@@ -4,7 +4,7 @@ services:
     image: mysql:8.0
     command: --default-authentication-plugin=mysql_native_password
     container_name: ${COMPOSE_DB_NAME}
-    user: "${DOCKER_COMPOSE_UID}:${DOCKER_COMPOSE_GID}"
+    # user: "${DOCKER_COMPOSE_UID}:${DOCKER_COMPOSE_GID}"
     volumes:
       - ${DB_DATA_DIR}:/var/lib/mysql
     environment:
