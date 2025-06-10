@@ -1,0 +1,12 @@
+__pycache__
+lolapi/__pycache__
+.vscode
+.mypy_cache
+.env
+/.scannerwork/
+/.nextflow*
+/.coverage
+/cov_html/
+/docs/references/
+/site/
+/build/

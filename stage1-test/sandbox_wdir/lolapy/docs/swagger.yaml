@@ -1,0 +1,658 @@
+---
+swagger: "2.0"
+info:
+  title: Lolapy
+  version: 1.3.1
+  description: "API Documentation for Lolapy. API for lola project.\n\nRequests labelled with [ASYNC REQUEST] are request executed in asynchronous way. They will returns immediatly 200 if the request is well formatted and will process the long task in background. Most of the time, they send a request to the frontend for success/error"
+paths:
+  /version:
+    get:
+      tags:
+      - "lolapy"
+      summary: "Get the version of lolapy"
+      description: "Used to print version of the API"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: string
+        400:
+          description: "Invalid status value"
+  /ping_lolapy:
+    get:
+      tags:
+      - "lolapy"
+      summary: "Check if lolapy works"
+      responses:
+        200:
+          description: "successful operation"
+  /test_log:
+    get:
+      tags:
+      - "lolapy"
+      summary: "Check if different levels of logs works"
+      responses:
+        200:
+          description: "successful operation"
+  /test_async_log:
+    get:
+      tags:
+      - "lolapy"
+      summary: "Check if different levels of logs works in asynchonous way [ASYNC REQUEST]"
+      description: "Use to check if concurrency works for logs"
+      responses:
+        200:
+          description: "successful operation"
+  /health:
+    get:
+      tags:
+        - "lolapy"
+      summary: "Return the status of the backend platform"
+      description: "Return the status of all component of the platform\n
+        Return **true** if the system is up and works. **false** otherwise.\n
+        - **async_controller**: Huey controller to run async tasks. If it does not work.\ All resource like /dataset/import or /scenario/tag/add does not work\n
+        - **sql_server**: SQL server used to store Trax dataset.\n
+        - **slurm_controller**: Used to submit scenario to the cluster server."
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "status"
+          schema:
+            $ref: "#/definitions/health_status"
+  /server/usage:
+    get:
+      tags:
+        - "server"
+      summary: "Get the usage of the computing cluster"
+      description: "Return the ressources (cpu/memory/...) used and available on the computing cluster \n
+        The **response is cached** by the backend during **60 seconds** to avoid to many computation on clusters and backend servers\n\n
+        Each value can be integer or null. Null means there is a problem when fetching data. Consults logs of the backend to fix the problem.\n
+
+        **memory** values are expressed in MB (MegaBytes)
+        "
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "status"
+          schema:
+            $ref: "#/definitions/server_usage"
+  /dataset/get:
+    post:
+      tags:
+      - "dataset"
+      summary: "Get information on XAPI dataset"
+      description: "Get five statements of the dataset and multiple information \
+        such as number of actors or number of verbs."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "dataset information"
+        required: true
+        schema:
+          $ref: "#/definitions/get_dataset"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/dataset_info_response"
+        400:
+          description: "Wrong request"
+        404:
+          description: "Dataset does not exist"
+        403:
+          description: "Permission Denied on the dataset"
+  /dataset/import:
+    post:
+      tags:
+      - "dataset"
+      summary: "Import a XAPI file into Database [ASYNC REQUEST]"
+      description: "Import an XAPI into a Trax server. The request takes the filename in entry.\
+        The backend is able to re-construct the full path of the XAPI file and import it in Trax"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        schema:
+            type: object
+            required:
+              - dataset
+            properties:
+              dataset:
+                type: string
+                description: "filename of the dataset"
+      responses:
+        200:
+          description: "successful operation"
+  /dataset/remove:
+    post:
+      tags:
+      - "dataset"
+      summary: "Remove an XAPI dataset"
+      description: "Remove the database associated with the dataset"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "dataset information"
+        required: true
+        schema:
+          $ref: "#/definitions/get_dataset"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Wrong request"
+        404:
+          description: "Dataset does not exist"
+        403:
+          description: "Permission Denied on the dataset"
+  /algorithm/add:
+    post:
+      tags:
+        - "algorithm"
+      summary: "Install a new algorithm on the backend [ASYNC REQUEST]"
+      description: "From a algorithm_hash, and a git repository, try to clone the repo, and pull docker dependency"
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            required:
+              - algorithm_hash
+              - algorithm_url_repository
+            properties:
+              algorithm_hash:
+                type: string
+                description: "Hash unique of the algorithm. Start with a A (like Algorithm)"
+              algorithm_url_repository:
+                type: string
+                example: "https://github-token-256:z65a@github.com/project/repo.git"
+                description: "URL of the repository containing algorithm_recipe.json"
+              git_version:
+                type: string
+                default: "master"
+                example: "1.0.0"
+                description: "Git tag to pull. [default: master]"
+      responses:
+        200:
+          description: "successful installation"
+        400:
+          description: "Wrong request"
+        500:
+          description: "Internal server error"
+  /algorithm/remove:
+    post:
+      tags:
+        - "algorithm"
+      summary: "Remove the algorithm"
+      description: "From an algorithm_hash, remove the corresponding algorithm"
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+            required:
+              - algorithm_hash
+            properties:
+              algorithm_hash:
+                type: string
+                description: "Hash unique of the algorithm. Start with a A (like Algorithm)"
+      responses:
+        200:
+          description: "Successful installation"
+        400:
+          description: "Wrong request"
+        404:
+          description: "Algorithm does not exist"
+        500:
+          description: "Internal server error"
+  /algorithm/parameters:
+    post:
+      tags:
+      - "algorithm"
+      summary: "Return the list of parameters and the Readme of a given algorithm"
+      description: "From an algorithm_hash, return the list of all parameters and the Readme of an algorithm"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+            type: object
+            required:
+              - algorithm_hash
+            properties:
+              algorithm_hash:
+                type: string
+                description: "Hash unique of the algorithm. Start with a A (like Algorithm)"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/algorithm_parameters"
+        400:
+          description: "Wrong request"
+        404:
+          description: "Algorithm does not exist"
+  /scenario/parameters:
+    post:
+      tags:
+      - "scenario"
+      summary: "Return the list of parameters and the Readme of a given scenario"
+      description: "From a tag_hash, return the list of all parameters and the Readme of a scenario"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+            type: object
+            required:
+              - tag_hash
+            properties:
+              tag_hash:
+                type: string
+                description: "Hash unique of the scenario (the tag of the scenario). Start with a T (like Tag)"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/scenario_parameters"
+        400:
+          description: "Wrong request"
+        404:
+          description: "Scenario does not exist"
+        403:
+          description: "Permission Denied on the dataset"
+  /scenario/tag/add:
+    post:
+      tags:
+        - "scenario"
+      summary: "Install a scenario with specific tag [ASYNC REQUEST]"
+      description: "Clone on the backend the scenario with the given git tag. Asynchrone request."
+      consumes:
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Information on the scenario/tag"
+        required: true
+        schema:
+            type: object
+            required:
+              - tag_hash
+              - tag_name
+              - scenario_url_repository
+            properties:
+              tag_hash:
+                type: string
+                description: "Hash unique of the scenario/tag. Start with a T (like Tag)"
+                example: "Tdfgsdfjsfsf54ds6f4sd6f4sdf"
+              tag_name:
+                type: string
+                description: "Name of the tag. It's the git tag to clone"
+                example: "1.1.0"
+              scenario_url_repository:
+                description: "The URL of the scenario repository"
+                example: "https://gitlab.inria.fr/lola/scenarios/template-scenario"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Wrong request"
+  /scenario/tag/remove:
+    post:
+      tags:
+        - "scenario"
+      summary: "Remove a scenario"
+      description: "Remove the scenario on the backend. It return the success of the operation."
+      consumes:
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Information on the scenario"
+        required: true
+        schema:
+            type: object
+            required:
+              - tag_hash
+            properties:
+              tag_hash:
+                type: string
+                description: "Hash unique of the scenario/tag. Start with a T (like Tag)"
+                example: "Tdfgsdfjsfsf54ds6f4sd6f4sdf"
+      responses:
+        200:
+          description: "Successful operation. Tag correctly removed"
+        400:
+          description: "Wrong request"
+        404:
+          description: "Tag does not exist"
+        500:
+          description: "Internal server error"
+  /scenario/execute:
+    post:
+      tags:
+        - "scenario"
+      summary: "Execute a nextflow scenario. [ASYNC REQUEST]"
+      description: "Format parameter, prepare and run a scenario with nextflow"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Information on how to run the scenario"
+        required: true
+        schema:
+          $ref: "#/definitions/execute_scenario"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Wrong request"
+  /scenario/prepare_results:
+    post:
+      tags:
+      - "scenario"
+      summary: "Prepare results file for a run [ASYNC REQUEST]"
+      description: "Generate a zip file and send the status to the frontend."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Information of the run"
+        required: true
+        schema:
+          $ref: "#/definitions/prepare_results"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Wrong request"
+        404:
+          description: "scenario does not exist"
+  /scenario/get_archive:
+    post:
+      tags:
+      - "scenario"
+      summary: "Return the archive file containing results"
+      description: "Return in response the zip file"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/zip"
+      parameters:
+      - in: "body"
+        name: "body"
+        schema:
+            type: object
+            required:
+              - run_hash
+            properties:
+              run_hash:
+                type: string
+                description: "Hash unique of the run"
+      responses:
+        200: # OK
+          description: "Result.zip archive"
+definitions:
+  health_status:
+    type: object
+    properties:
+      async_controller:
+        type: boolean
+      sql_server:
+        type: boolean
+      slurm_controller:
+        type: boolean
+  server_usage:
+    type: object
+    properties:
+      slurm_pending_job:
+        type: integer
+        nullable: true
+      slurm_running_job:
+        type: integer
+        nullable: true
+      cpu_total:
+        type: integer
+        nullable: true
+      cpu_usage:
+        type: integer
+        nullable: true
+      memory_usage:
+        type: integer
+        nullable: true
+      memory_total:
+        type: integer
+        nullable: true
+  get_dataset:
+    type: object
+    properties:
+      user:
+        type: string
+        description: "Hash unique of the user. Should start with 'U'."
+      dataset:
+        type: string
+        description: "Hash unique of the dataset. Should start with 'D'."
+  dataset_info_response:
+    properties:
+      statements_number:
+        type: integer
+        example: 123456
+      unique_actor_number:
+        type: integer
+        example: "12"
+      unique_verbs_number:
+        type: integer
+        example: "24"
+      statements:
+        type: array
+        items:
+          $ref: "#/definitions/statement"
+  prepare_results:
+    type: object
+    properties:
+      workdir:
+        type: array
+        example: "['/path_workdir_process_1', '/path_workdir_process_2']"
+        items:
+          type: string
+      run_hash:
+        type: string
+        description: "Hash unique of the run. Should start with 'R'."
+      tag_hash:
+        type: string
+        description: "Hash unique of the scenario tag. Should start with 'S'."
+  execute_scenario:
+    type: object
+    properties:
+      tag_hash:
+        type: string
+        description: "Hash unique of the scenario/tag"
+      run_hash:
+        type: string
+        description: "Hash unique of the run. Used to identify this execution"
+      user_hash:
+        type: string
+        description: "Hash unique of the user who want to run the scenario. Used to check permission on the dataset"
+      dataset_hash:
+        type: string
+        description: "Hash unique of the dataset."
+      algorithms:
+        type: array
+        description: "Algorithms to use with the scenario"
+        items:
+          $ref: "#/definitions/run_algorithm"
+      parameters:
+        type: object
+        description: "Values of parameters of the algorithm"
+        properties:
+          variable_name_1:
+            type: string
+            example: value
+          variable_name_2:
+            type: string
+            example: value
+  scenario_parameters:
+    type: object
+    properties:
+      scenario_name:
+        type: string
+        description: "Full name of the scenario"
+      docker_images:
+        type: array
+        items:
+          $ref: "#/definitions/docker_image"
+      parameters:
+        type: array
+        items:
+          $ref: "#/definitions/parameter"
+      readme:
+        type: string
+        description: "Readme of the scenario"
+      description:
+        type: string
+        description: "Information on the scenario"
+      output:
+        type: array
+        description: "Array of output files to keep at the end of the scenario"
+        items:
+          type: string
+      switchable_algorithms:
+        description: "List of 'switchable algorithms'"
+        type: array
+        items:
+          $ref: "#/definitions/switchable_algorithm"
+  run_algorithm:
+    type: object
+    properties:
+      algorithm_hash:
+        type: string
+        description: "Hash unique of the algorithm. Starts with a 'T'"
+      nf_variable:
+        type: string
+        description: "Identifier of the algorithm. Also used by the backend to expand variables of the algorithm"
+      parameters:
+        type: object
+        description: "Values of parameters of the algorithm"
+        properties:
+          variable_name_1:
+            type: string
+            example: value
+          variable_name_2:
+            type: string
+            example: value
+  algorithm_parameters:
+    type: object
+    properties:
+      parameters:
+        type: array
+        items:
+          $ref: "#/definitions/parameter"
+      readme:
+        type: string
+        description: "Readme of the algorithm"
+  parameter:
+    type: object
+    required:
+      - name
+      - description
+      - type
+    properties:
+      name:
+        description: Name of the parameter
+        type: string
+      description:
+        description: Description of what the parameter does
+        type: string
+      type:
+        description: 'Type of the parameter. ex: int|float|str|null'
+        type: string
+        enum:
+          - int
+          - float
+          - str
+          - bool
+          - choices
+      default:
+        description: Default value to the parameter
+        type: string
+      choices:
+        description: 'List of choices, must be use with ''choices'' type'
+        type: array
+        items:
+          type: string
+  docker_image:
+    type: object
+    properties:
+      harbor_url:
+        type: string
+        description: "URL where to download docker image. Can contains deploy keys if the image is on a private repository"
+      full_name:
+        type: string
+        description: "Name the image must have on the local machine. Must match the name in the nextflow definition"
+  switchable_algorithm:
+    type: object
+    properties:
+      name:
+        type: string
+        description: "Full name of the algorithm"
+      description:
+        type: string
+        description: "Description/help of the algorithm"
+      template:
+        type: string
+        description: "**Not used at this moment by the Frontend**. File to use to complete the algorithme"
+      nf_variable:
+        type: string
+        description: "Identifier of the algorithm. Also used by the backend to expand variables of the algorithm"
+  statement:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "6af1e5c7-31d2-3eb2-9725-efa1f6b8b108"
+      verb:
+        type: object
+      actor:
+        type: object
+      object:
+        type: object
+      stored:
+        type: string
+        example: "2022-04-21T10:26:28.7991Z"
+      version:
+        type: string
+        example: "1.0.0"
+      authority:
+        type: object
+      timestamp:
+        type: string
+        example: "2022-04-21T10:26:28.7991Z"

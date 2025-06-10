@@ -6,10 +6,8 @@ PYTHON_VERSION = 3.10
 # Check for Conda
 CONDA_EXISTS := $(shell which conda || echo "")
 
-# Run all processes
 up: install_lola_sandbox setup_python_env run_sandbox
 
-# Verify LOLA Sandbox is available locally
 install_lola_sandbox:
 	@echo "Checking for LOLA Sandbox..."
 	@if [ ! -d "$(ROOT_DIR)/lola-sandbox" ]; then \
@@ -18,6 +16,16 @@ install_lola_sandbox:
 		exit 1; \
 	else \
 		echo "LOLA Sandbox found at $(ROOT_DIR)/lola-sandbox."; \
+	fi
+
+install_lolapy:
+	@echo "Checking for LOLAPY..."
+	@if [ ! -d "$(ROOT_DIR)/lolapy" ]; then \
+		echo "Error: LOLAPY directory not found at $(ROOT_DIR)/lolapy."; \
+		echo "Please ensure the LOLApy repository is cloned into $(ROOT_DIR)/lolapy."; \
+	exit 1; \
+	else \
+		echo "LOLAPY found at $(ROOT_DIR)/lolapy."; \
 	fi
 
 # Setup Python environment (with Conda if available, otherwise system-wide)
@@ -31,12 +39,14 @@ setup_python_env:
 		bash -c "source '$(shell conda info --base)/etc/profile.d/conda.sh' && conda activate $(ENV_NAME) && pip install -r $(ROOT_DIR)/lola-sandbox/requirements.txt"; \
 		bash -c "source '$(shell conda info --base)/etc/profile.d/conda.sh' && conda activate $(ENV_NAME) && pip install pandas scikit-learn surprise numpy==1.23.5"; \
 		bash -c "source '$(shell conda info --base)/etc/profile.d/conda.sh' && conda activate $(ENV_NAME) && pip install -e $(ROOT_DIR)/lola-sandbox"; \
+        bash -c "source '$(shell conda info --base)/etc/profile.d/conda.sh' && conda activate $(ENV_NAME) && pip install -e $(ROOT_DIR)/lolapy"; \
 	else \
 		echo "Conda not found. Installing system-wide dependencies..."; \
 		python3 -m ensurepip --default-pip || sudo apt-get install python3-pip; \
 		pip3 install -r $(ROOT_DIR)/lola-sandbox/requirements.txt; \
 		pip3 install pandas scikit-learn surprise numpy==1.23.5; \
 		pip3 install -e $(ROOT_DIR)/lola-sandbox; \
+		pip3 install -e $(ROOT_DIR)/lolapy; \
 	fi
 
 # Run LOLA-Sandbox scenario

@@ -1,0 +1,20 @@
+FROM python:3.10-slim-buster
+MAINTAINER Philippe Noel <philippe.noel@loria.fr>
+
+ARG uid=1001
+ARG gid=1001
+ARG user=lolapy_user
+ARG group=lolapy_group
+
+RUN apt update && \
+    apt install git libffi-dev gcc -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -g ${gid} ${group} && \
+    useradd -u ${uid} -g ${group} -m ${user}
+
+COPY . /src
+WORKDIR /src
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
+ENV ENV_FILE=/src/.env.experimental
+USER ${user}:${group}
+ENTRYPOINT ["python3", "-m", "lolapy.bin.fake_app"]
