@@ -1,0 +1,2 @@
+[console_scripts]
+lola-sandbox = sandbox.app:main

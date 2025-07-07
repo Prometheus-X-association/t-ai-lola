@@ -1,0 +1,58 @@
+services:
+
+  data-importer:
+    container_name: pdc
+    build:
+      context: ./
+      dockerfile: ./data-import/Dockerfile
+    restart: ${RESTART_SERVICES}
+    tty: true
+    volumes:
+      - ${RECEIVER_DATA_DIR}:/sources/${RECEIVER_DATA_DIR}
+    depends_on:
+      - trax3
+
+  db:
+    image: mysql:8.4
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: ${TZ}
+    ports:
+      - ${PORT_MYSQL}:3306
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    restart: ${RESTART_SERVICES}
+
+  trax3:
+    container_name: trax3
+    depends_on:
+      db:
+          condition: service_healthy
+    build:
+      context: ./
+      dockerfile: ./lrs/build/Dockerfile
+    ports:
+      - ${LISTEN_ITF}:${PORT_TRAX_HTTP}:80
+    restart: ${RESTART_SERVICES}
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: ${RESTART_SERVICES}
+    ports:
+      - ${PORT_PHPMYADMIN}:80
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}

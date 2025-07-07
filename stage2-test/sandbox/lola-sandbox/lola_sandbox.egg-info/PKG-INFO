@@ -1,0 +1,31 @@
+Metadata-Version: 2.2
+Name: lola-sandbox
+Version: 1.0.4
+Summary: Sandbox tool to test/run scenario and algorithms on your local device
+Author: Philippe N.
+Author-email: philippe.noel@loria.fr
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.10
+License-File: LICENSE
+Requires-Dist: cryptography==3.4.6
+Requires-Dist: huey==2.4.0
+Requires-Dist: flasgger==0.9.5
+Requires-Dist: Flask==2.1.0
+Requires-Dist: Flask-HTTPAuth==4.2.0
+Requires-Dist: Flask-Caching==2.0.2
+Requires-Dist: gunicorn==20.0.4
+Requires-Dist: jsonschema==3.2.0
+Requires-Dist: mysql-connector==2.2.9
+Requires-Dist: paramiko==2.7.2
+Requires-Dist: pytest==6.2.4
+Requires-Dist: requests==2.25.1
+Requires-Dist: ijson==3.1.4
+Requires-Dist: pytest==6.2.4
+Requires-Dist: pytest-cov==3.0.0
+Requires-Dist: pydantic==1.10.2
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
