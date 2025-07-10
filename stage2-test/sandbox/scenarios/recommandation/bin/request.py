@@ -63,7 +63,7 @@ def fetch_xapi_data(headers: dict, params: dict, auth: tuple, url: str, port: in
     """
     if not url.startswith("http"):
         url = f"http://{url}"
-    response = requests.get(url=f"{url}:{port}/trax/ws/xapi/statements", auth=auth, headers=headers, params=params)
+    response = requests.get(url=f"{url}:{port}/trax/api/gateway/clients/default/stores/default/xapi/statements", auth=auth, headers=headers, params=params)
     if response.status_code != 200:
         raise AppError(f"Request '{response.request.url}' response: {response.status_code}. Reason: {response.text} ")
     data = response.json()
@@ -133,12 +133,13 @@ if __name__ == "__main__":
     # Define default as testsuite:password because it's the default for TRAX LRS
     # It's not a good practice to define static value in a script but this program
     # will mainly serve on the LOLA platform
+    # changed by azim
     argument_parser.add_argument(
         "-a",
         "--auth",
         metavar="user:password",
         type=str,
-        default="testsuite:password",
+        default="traxlrs:aaaaaaaa",
         help="Basic Authentication colon separated",
     )
     argument_parser.add_argument("--url", type=str, help="TRAX LRS url", required=True)
