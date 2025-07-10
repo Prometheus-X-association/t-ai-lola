@@ -71,7 +71,7 @@ def fetch_xapi_data(headers: dict, params: dict, auth: tuple, url: str, port: in
         raise AppError(f"Request '{response.request.url}' no json data. Reason: {response.text} ")
     yield data["statements"]
     while data.get("more"):
-        response = requests.get(url=data["more"], auth=auth, headers=headers, params=params)
+        response = requests.get(url=url+data["more"], auth=auth, headers=headers, params=params)
         data = response.json()
         yield data["statements"]
 
