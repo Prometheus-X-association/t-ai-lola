@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: lolapy
+Version: 1.8.0
+Summary: Backend System of the Lola Project
+Home-page: UNKNOWN
+Author: Philippe N.
+Author-email: philippe.noel@loria.fr
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.10.0
+License-File: LICENSE
+
+UNKNOWN
+

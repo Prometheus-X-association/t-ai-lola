@@ -55,7 +55,7 @@ class ConfigSwitchableAlgorithm(BaseModel):
     nf_variable: str
     parameters: dict[str, int | str] | None
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def expand_algorithm_path(cls, values):
         """Expand fullpath of `algorithm_path` in the object
 
@@ -77,7 +77,7 @@ class ConfigJson(BaseModel):
     scenario_parameters: dict[str, int | str]
     algorithms: list[ConfigSwitchableAlgorithm]
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def expand_scenario_path(cls, values):
         """Expand fullpath of `scenario_path` in the object
 
