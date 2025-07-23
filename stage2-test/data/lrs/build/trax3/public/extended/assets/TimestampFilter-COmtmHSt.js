@@ -1,1 +1,0 @@
-import{_ as r}from"./TextInput-Bd33mpYb.js";import{o as t,b as i}from"./app-BqYB4w7h.js";const s={__name:"TimestampFilter",props:{id:{type:String,required:!0}},setup(e){return(o,a)=>(t(),i(r,{id:e.id,placeholder:"2020-12-31 23:59:59"},null,8,["id"]))}};export{s as _};

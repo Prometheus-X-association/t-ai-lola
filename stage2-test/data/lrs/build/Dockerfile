@@ -32,7 +32,8 @@ RUN docker-php-ext-enable  \
     pdo_pgsql
 
 #copy trax3 source code & .env.trax
-COPY lrs/build/trax3 /var/www/trax3/
+RUN git clone https://github.com/trax-project/trax3-starter-lrs.git /var/www/trax3
+#COPY lrs/build/trax3 /var/www/trax3/
 COPY .env.trax /var/www/trax3/.env
 WORKDIR /var/www/trax3/
 RUN chmod -R 775 bootstrap/cache storage
