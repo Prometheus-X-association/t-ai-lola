@@ -1,0 +1,8 @@
+{{ form_start(form) }}
+{{ form_row(form.name, {'label': 'dashboard.groupe.form.nom'|trans}) }}
+{{ form_row(form.description, {'label': 'dashboard.groupe.form.description'|trans}) }}
+{{ form_row(form.users, {'label': 'dashboard.groupe.form.liste_utilisateurs'|trans}) }}
+<button class="btn btn-success float-right btn-block">
+    {{ button_label|default('dashboard.groupe.form.btn_enregistrer'|trans) }}
+</button>
+{{ form_end(form) }}

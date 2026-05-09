@@ -1,0 +1,227 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} HashObjet {% endblock %}
+
+{% block content%}
+      
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-hashtag fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.hash_objet.index.titre{% endtrans %}</span>
+        </div>
+    </div>
+
+    <br><div class="accordion" id="accordionExample">
+      <div class="card">
+        <div class="card-header" id="headingOne">
+          <h2 class="mb-0">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-size:25px;">
+              {% trans %}dashboard.hash_objet.index.Collapsible_1{% endtrans %}
+            </button>
+          </h2>
+        </div>
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+          <br><div class="table-responsive"><br>
+            <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>{% trans %}dashboard.hash_objet.index.th_titre{% endtrans %}</th>
+                  <th>{% trans %}dashboard.hash_objet.index.th_etat{% endtrans %}</th> 
+                  <th>{% trans %}dashboard.hash_objet.index.th_hash{% endtrans %}</th>   
+                </tr>
+              </thead>
+              <tbody>    
+                  {% for dataset in datasets %}
+                  <tr>
+                  <td> {{dataset.name}} </td>
+                  <td> {{dataset.status}} </td>
+                  <td> {{dataset.hash}} </td>
+                  </tr>
+                  {% endfor %} 
+              </tbody>    
+            </table>     
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" id="headingTwo">
+        <h2 class="mb-0">
+          <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style="font-size:25px;">
+            {% trans %}dashboard.hash_objet.index.Collapsible_2{% endtrans %}
+          </button>
+        </h2>
+      </div>
+      <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+        <br><div class="table-responsive"><br>
+          <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+            <thead> 
+                <tr>
+                <th>{% trans %}dashboard.hash_objet.index.th_template_scenario{% endtrans %}</th>
+                <th>{% trans %}dashboard.hash_objet.index.th_tags{% endtrans %}</th> 
+                <th>{% trans %}dashboard.hash_objet.index.th_dataset{% endtrans %}</th> 
+                <th>{% trans %}dashboard.hash_objet.index.th_hash{% endtrans %}</th> 
+                </tr>
+            </thead>
+            <tbody>
+                {% for scenario in scenarios %}
+                <tr>
+                <td> {{scenario.metascenario.name}} </td>
+                <td> {{scenario.tag.name}} </td>
+                <td> {{scenario.dataset.name}} </td>
+                <td> {{scenario.hash}} </td>
+                </tr>
+                {% endfor %} 
+            </tbody>  
+          </table>     
+      </div>
+    </div>
+  </div>
+
+    <div class="card">
+      <div class="card-header" id="headingThree">
+        <h2 class="mb-0">
+          <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" style="font-size:25px;">
+            {% trans %}dashboard.hash_objet.index.Collapsible_3{% endtrans %}
+          </button>
+          </h2>
+      </div>
+      <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+        <br><div class="table-responsive">
+          <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+            <thead>
+              <tr>
+                <th>{% trans %}dashboard.hash_objet.index.th_nom{% endtrans %} </th>
+                <th>{% trans %}dashboard.hash_objet.index.th_prenom{% endtrans %}</th> 
+                <th>{% trans %}dashboard.hash_objet.index.th_email{% endtrans %}</th>  
+                <th>{% trans %}dashboard.hash_objet.index.th_profile{% endtrans %}</th> 
+                <th>{% trans %}dashboard.hash_objet.index.th_hash{% endtrans %}</th> 
+              </tr>    
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                  <td> {{user.firstname}} </td>
+                  <td> {{user.lastname}} </td>
+                  <td> {{user.email}} </td>
+                  <td>
+                       {{ user.roles|map(role => user.getRole(role))|join(', ', '') }}
+                            {% if user.upgradeRequest %}
+                                <span class="badge badge-info float-right">Upgrade</span>
+                            {% endif %}</td> 
+                  <td> {{user.hash}} </td>
+                </tr>
+                {% endfor %} 
+            </tbody>    
+          </table>     
+        </div>
+      </div>
+    </div>    
+
+  <div class="card">
+    <div class="card-header" id="headingFour">
+      <h2 class="mb-0">
+        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour" style="font-size:25px;">
+          {% trans %}dashboard.hash_objet.index.Collapsible_4{% endtrans %}
+        </button>
+      </h2>
+    </div>
+    <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
+      <br><div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>{% trans %}dashboard.hash_objet.index.th_template_scenario{% endtrans %}</th> 
+              <th>{% trans %}dashboard.hash_objet.index.th_titre{% endtrans %}</th> 
+              <th>{% trans %}dashboard.hash_objet.index.th_version{% endtrans %}</th> 
+              <th>{% trans %}dashboard.hash_objet.index.th_etat{% endtrans %}</th>
+              <th>{% trans %}dashboard.hash_objet.index.th_hash{% endtrans %}</th>    
+            </tr>
+          </thead>
+          <tbody>
+              {% for tag in tags %}
+              <tr>
+              <td> {{tag.metascenario.name}} </td>
+              <td> {{tag.name}} </td>
+              <td> {{tag.version}} </td>
+              <td> {{tag.status}} </td>
+              <td> {{tag.hash}} </td>
+              </tr>
+              {% endfor %}
+          </tbody>    
+        </table>     
+    </div>
+  </div>
+</div>
+
+  <div class="card">
+    <div class="card-header" id="headingFive">
+      <h2 class="mb-0">
+        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive" style="font-size:25px;">
+          {% trans %}dashboard.hash_objet.index.Collapsible_5{% endtrans %}
+        </button>
+      </h2>
+    </div>
+    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
+      <br><div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>{% trans %}dashboard.hash_objet.index.th_template_scenario{% endtrans %}</th> 
+              <th>{% trans %}dashboard.hash_objet.index.th_tags{% endtrans %}</th> 
+              <th>{% trans %}dashboard.hash_objet.index.th_dataset{% endtrans %}</th> 
+              <th>{% trans %}dashboard.hash_objet.index.th_etat{% endtrans %}</th> 
+              <th>{% trans %}dashboard.hash_objet.index.th_hash{% endtrans %}</th>  
+            </tr>
+          </thead>
+          <tbody> 
+            {% for run in runs %}
+              <tr>
+              <td> {{run.scenario.metascenario.name}} </td>
+              <td> {{run.scenario.tag.name}} </td>
+              <td> {{run.scenario.dataset.name}} </td>
+              <td> {{run.status}} </td>
+              <td> {{run.hash}} </td>
+              </tr>
+            {% endfor %}     
+          </tbody>    
+        </table>     
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" id="headingSix">
+      <h2 class="mb-0">
+        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix" style="font-size:25px;">
+          {% trans %}dashboard.hash_objet.index.Collapsible_6{% endtrans %}
+        </button>
+      </h2>
+    </div>
+    <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordionExample">
+      <br><div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>{% trans %}dashboard.hash_objet.index.th_algorithm{% endtrans %}</th>
+              <th>{% trans %}dashboard.hash_objet.index.th_version{% endtrans %}</th> 
+              <th>{% trans %}dashboard.hash_objet.index.th_etat{% endtrans %}</th>
+              <th>{% trans %}dashboard.hash_objet.index.th_hash{% endtrans %}</th>    
+            </tr>
+          </thead>
+          <tbody>
+              {% for algorithmVersion in algorithmsVersion %}
+              <tr>
+              <td> {{ algorithmVersion.algorithm }} </td>
+              <td> {{algorithmVersion.name}} </td>
+              <td> {{algorithmVersion.status}} </td>
+              <td> {{algorithmVersion.hash}} </td>
+              </tr>
+              {% endfor %}
+          </tbody>    
+        </table>     
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

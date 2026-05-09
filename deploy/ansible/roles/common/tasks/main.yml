@@ -1,0 +1,33 @@
+- name: Update package cache (Debian/Ubuntu)
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+
+- name: Update package cache (RedHat/CentOS)
+  yum:
+    update_cache: yes
+  when: ansible_os_family == "RedHat"
+
+- name: Upgrade all packages (Debian/Ubuntu)
+  apt:
+    upgrade: dist
+  when: ansible_os_family == "Debian"
+
+- name: Upgrade all packages (RedHat/CentOS)
+  yum:
+    name: '*'
+    state: latest
+  when: ansible_os_family == "RedHat"
+
+- name: Install common utilities
+  package:
+    name:
+      - git
+      - curl
+      - wget
+      - vim
+      - htop
+      - make
+      - sshpass
+    state: present

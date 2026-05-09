@@ -1,0 +1,42 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Indicateurs - Modification {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-chart-line fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">Modification de l'indicateur <strong>{{ output.name }}</strong></span>
+        </div>
+        <a href="{{ path('dashboard_output_index') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-arrow-left"></i>
+            Retour à la liste des indicateurs
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-8">
+            {{ include('dashboard/output/_form.html.twig', {'button_label': 'Modifier'}) }}
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Indicateur
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Modification d'un indicateur</h5>
+                    <p class="card-text">
+                        Lorem Ipsum on lihtsalt proovitekst, mida kasutatakse printimis- ja ladumistööstuses. 
+                        See on olnud tööstuse põhiline proovitekst juba alates 1500. aastatest, mil tundmatu 
+                        printija võttis hulga suvalist teksti, et teha trükinäidist. Lorem Ipsum ei ole ainult
+                        viis sajandit säilinud, vaid on ka edasi kandunud elektroonilisse trükiladumisse, jäädes
+                        sealjuures peaaegu muutumatuks. See sai tuntuks 1960. aastatel Letraset'i lehtede 
+                        väljalaskmisega, ja hiljuti tekstiredaktoritega nagu Aldus PageMaker, mis sisaldavad 
+                        erinevaid Lorem Ipsumi versioone.
+                    </p>
+                </div>
+            </div>            
+        </div>
+    </div>
+
+{% endblock %}

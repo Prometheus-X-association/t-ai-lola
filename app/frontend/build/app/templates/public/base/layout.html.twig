@@ -1,0 +1,24 @@
+{% extends "public/base/base.html.twig" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+
+    {% if error is defined and error is not null %}
+
+        <div class="alert alert-danger">
+            {#TODO : solution temporaire en attendant d'avoir une gestion des erreurs et logs global #}
+            {% if error.messageKey == "Invalid CSRF token." %}
+                Une erreur est survenue lors de la soumission du formulaire. Veuillez vider le cache de votre navigateur ou utiliser un onglet privé.
+            {% else %}
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            {% endif %}
+        </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    {{ include("public/base/footer.html.twig") }}
+
+{% endblock %}
+

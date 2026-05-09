@@ -1,0 +1,7 @@
+slurm_role: "both"  # can be 'client', 'server', or 'both'
+nfs_server_ip: ""
+slurm_cluster_name: "cluster-lola"
+nfs_user: "lolauser"
+nfs_mount_path: "/home/lolauser/nf-workdir"
+arch_ip: ""
+harbor_ssl: false

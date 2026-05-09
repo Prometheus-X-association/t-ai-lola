@@ -1,0 +1,136 @@
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path("dashboard_accueil") }}">
+        <div class="sidebar-brand-icon">
+            <i class="fas fa-cogs"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Lola</div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item active">
+        <a class="nav-link" href="{{ path("dashboard_accueil") }}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>{% trans %}dashboard.left_menu.dashboard{% endtrans %}</span></a>
+    </li>
+
+    {% if is_granted('ROLE_PROFIL_2') %}
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_dataset_index") }}">
+                <i class="fas fa-fw fa-database"></i>
+                <span>{% trans %}dashboard.left_menu.dataset{% endtrans %}</span>
+            </a>
+        </li>
+    {% endif %}
+   
+    {% if is_granted('ROLE_PROFIL_2') %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_metascenario_index") }}">
+                <i class="fas fa-fw fa-scroll"></i>
+                <span>{% trans %}dashboard.left_menu.template-scenario{% endtrans %}</span>
+            </a>
+        </li>
+    {% endif %}
+    {% if is_granted('ROLE_PROFIL_2') %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_scenario_index") }}">
+                <i class="fas fa-tasks"></i>
+                <span>{% trans %}dashboard.left_menu.scenario{% endtrans %}</span>
+            </a>
+        </li>
+    {% endif %}
+    {% if is_granted('ROLE_PROFIL_2') %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_run_index") }}">
+                <i class="fas fa-tachometer-alt"></i> 
+                <span>{% trans %}dashboard.left_menu.run{% endtrans %}</span>
+            </a>
+        </li>
+    {% endif %}
+    {% if is_granted('ROLE_PROFIL_4') %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_algorithm_index") }}">
+                <i class="fas fa-fw fa-code"></i>
+                <span>{% trans %}dashboard.left_menu.algorithme{% endtrans %}</span>
+            </a>
+        </li>
+    {% endif %}
+    {% if is_granted('ROLE_PROFIL_4') %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_output_index") }}">
+                <i class="fas fa-fw fa-chart-line"></i>
+                <span>{% trans %}dashboard.left_menu.indicateur{% endtrans %}</span>
+            </a>
+        </li>
+    {% endif %}
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Admin
+        </div>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_group_index") }}">
+                <i class="fas fa-fw fa-users"> </i> 
+                <span>{% trans %}dashboard.left_menu.groupes{% endtrans %}</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_user_index") }}">
+                <i class="fas fa-fw fa-user"> </i> 
+                <span>{% trans %}dashboard.left_menu.utilisateurs{% endtrans %}</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_termsofuse_index") }}">
+                <i class="fas fa-file-signature"></i> 
+                <span>{% trans %}dashboard.left_menu.termsofuse{% endtrans %}</span></a>
+        </li>
+
+        {% if is_granted('ROLE_ADMIN_SISR') %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path("dashboard_apilog_index") }}">
+                    <i class="fas fa-fw fa-list"> </i>
+                    <span>{% trans %}dashboard.left_menu.lolapy_logs{% endtrans %}</span></a>
+            </li>
+        {% endif %}
+        <!-- Option Hash/Objet pour les utilisateurs ADMIN SISR-->
+         {% if is_granted('ROLE_ADMIN_SISR') %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{ path("dashboard_hash_index") }}">
+                <i class="fas fa-hashtag"></i>
+                <span>{% trans %}dashboard.left_menu.hash_objet{% endtrans %}</span>
+            </a>
+        </li>
+    {% endif %}
+        
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+    {% endif %}
+
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
+    <!-- Sidebar Message -->
+    <div class="sidebar-card">
+        <i class="fas fa-user-tag fa-3x"></i> 
+        <p class="text-center mb-2 mt-3">{% trans %}dashboard.left_menu.demande_nouveau_profil{% endtrans %}</p>
+        <a class="btn btn-success btn-sm" href="{{ path("dashboard_upgrade") }}">{% trans %}dashboard.left_menu.voir_les_profils{% endtrans %}</a>
+    </div>
+
+</ul>
+<!-- End of Sidebar -->

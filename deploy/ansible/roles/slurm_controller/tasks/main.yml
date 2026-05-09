@@ -1,0 +1,123 @@
+- name: Install Slurm dependencies (Debian/Ubuntu)
+  apt:
+    name:
+      - munge
+      - libmunge-dev
+      - libmunge2
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Slurm dependencies (RedHat/CentOS)
+  yum:
+    name:
+      - munge
+      - munge-libs
+      - munge-devel
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Create munge key directory
+  file:
+    path: /etc/munge
+    state: directory
+    owner: munge
+    group: munge
+    mode: '0700'
+
+- name: Check if munge key exists
+  stat:
+    path: /etc/munge/munge.key
+  register: munge_key
+
+- name: Generate munge key if not exists
+  command: create-munge-key
+  when: not munge_key.stat.exists
+
+- name: Set munge key permissions
+  file:
+    path: /etc/munge/munge.key
+    owner: munge
+    group: munge
+    mode: '0400'
+
+- name: Start and enable munge service
+  systemd:
+    name: munge
+    state: started
+    enabled: yes
+
+- name: Install Slurm packages (Debian/Ubuntu)
+  apt:
+    name:
+      - slurm-client
+      - slurm-wlm
+      - slurmctld
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Slurm packages (RedHat/CentOS)
+  yum:
+    name:
+      - slurm
+      - slurm-slurmctld
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Create Slurm configuration directory
+  file:
+    path: /etc/slurm
+    state: directory
+    mode: '0755'
+
+- name: Create Slurm log directory
+  file:
+    path: /var/log/slurm
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: '0755'
+
+- name: Create Slurm spool directory
+  file:
+    path: /var/spool/slurm
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: '0755'
+
+- name: Create Slurm state directory
+  file:
+    path: /var/spool/slurmctld
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: '0755'
+
+- name: Deploy Slurm configuration
+  template:
+    src: slurm.conf.j2
+    dest: /etc/slurm/slurm.conf
+    owner: slurm
+    group: slurm
+    mode: '0644'
+  notify: restart slurmctld
+
+- name: Start and enable slurmctld
+  systemd:
+    name: slurmctld
+    state: started
+    enabled: yes
+
+- name: Fetch munge key from controller
+  fetch:
+    src: /etc/munge/munge.key
+    dest: /tmp/munge.key
+    flat: yes
+  run_once: yes
+
+- name: Fetch slurm.conf from controller
+  fetch:
+    src: /etc/slurm/slurm.conf
+    dest: /tmp/slurm.conf
+    flat: yes
+  run_once: yes

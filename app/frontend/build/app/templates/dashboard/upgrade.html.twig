@@ -1,0 +1,114 @@
+{% extends "dashboard/base/layout.html.twig" %}
+
+{% block content %}
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{% trans %}dashboard.upgrade.index.titre{% endtrans %}</h1>
+    </div>
+    {% if app.user.upgradeRequest is not null and app.user.upgradeRequest is defined %}
+        <div class="alert alert-warning ml-4 mr-4">
+            Vous avez une demande de mise à niveau (<em>{{ app.user.getProfilFromRole(app.user.upgradeRequest) }}</em>) en attente.
+        </div>
+    {% endif %}
+    <div class="row">
+
+
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        {% trans %}dashboard.upgrade.index.profil2{% endtrans %}
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100">
+                            <ul class="list-group list-group-flush">
+                                {% trans %}dashboard.upgrade.index.profil2_details{% endtrans %}
+                            </ul>
+                        </div>      
+                    </div>
+                    <a href="{{ path("dashboard_user_upgrade", {'profil': constant('\\App\\Entity\\User::ROLE_PROFIL_2')|lower}) }}" 
+                       class="btn btn-primary btn-lg btn-block mt-auto">
+                        {% trans %}dashboard.upgrade.index.btn_register{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        {% trans %}dashboard.upgrade.index.profil3{% endtrans %}
+                    </div>
+                </div>                
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100">
+                            <ul class="list-group list-group-flush">
+                                {% trans %}dashboard.upgrade.index.profil3_details{% endtrans %}
+                            </ul>
+                        </div>                        
+                    </div>
+                    {#                    <a href="{{ path("dashboard_user_upgrade", {'profil': constant('\\App\\Entity\\User::ROLE_PROFIL_3')|lower|replace({'_':''})}) }}" #}
+                    <a href="{{ path("dashboard_user_upgrade", {'profil': constant('\\App\\Entity\\User::ROLE_PROFIL_3')|lower}) }}" 
+                       class="btn btn-info btn-lg btn-block mt-auto">
+                        {% trans %}dashboard.upgrade.index.btn_register{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        {% trans %}dashboard.upgrade.index.profil4{% endtrans %}
+                    </div>
+                </div>                
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100">
+                            <ul class="list-group list-group-flush">
+                                {% trans %}dashboard.upgrade.index.profil4_details{% endtrans %}
+                            </ul>
+                        </div>                        
+                    </div>
+                    {#                    <a href="{{ path("dashboard_user_upgrade", {'profil': constant('\\App\\Entity\\User::ROLE_PROFIL_4')|lower|replace({'_':''})}) }}" #}
+                    <a href="{{ path("dashboard_user_upgrade", {'profil': constant('\\App\\Entity\\User::ROLE_PROFIL_4')|lower}) }}" 
+                       class="btn btn-success btn-lg btn-block mt-auto">
+                        {% trans %}dashboard.upgrade.index.btn_register{% endtrans %}
+                    </a>                
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        {% trans %}dashboard.upgrade.index.profil5{% endtrans %}
+                    </div>
+                </div>                 
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100">
+                            <ul class="list-group list-group-flush">
+                                {% trans %}dashboard.upgrade.index.profil5_details{% endtrans %}
+                            </ul>
+                        </div>                        
+                    </div>
+                    {#                    <a href="{{ path("dashboard_user_upgrade", {'profil': constant('\\App\\Entity\\User::ROLE_PROFIL_5')|lower|replace({'_':''})}) }}" #}
+                    <a href="{{ path("dashboard_user_upgrade", {'profil': constant('\\App\\Entity\\User::ROLE_PROFIL_5')|lower}) }}" 
+                       class="btn btn-warning btn-lg btn-block mt-auto">
+                        {% trans %}dashboard.upgrade.index.btn_register{% endtrans %}
+                    </a>                
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

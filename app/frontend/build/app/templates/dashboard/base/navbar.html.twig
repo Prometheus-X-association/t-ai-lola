@@ -1,0 +1,137 @@
+<!-- Topbar -->
+<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+    <!-- Sidebar Toggle (Topbar) -->
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    {% if not lolapy.isLolapyReady() %}
+        <div class="alert alert-warning mb-0">
+            <i class="fas fa-exclamation-triangle"> </i> 
+            {% trans %}dashboard.navbar.lolapy_inaccessible{% endtrans %}
+        </div>
+    {% endif %}
+
+    <!-- Topbar Navbar -->
+    <ul class="navbar-nav ml-auto">
+
+        {% if app.user.groups|length > 0 %}
+            <!-- Groups -->
+
+            <li class="nav-item">
+                <a class="nav-link">
+                    <span class="text-gray-600 mr-2">
+                        <strong>{% trans %}dashboard.navbar.groupes{% endtrans %}</strong>  
+                    </span> 
+                    <span class="text-primary">
+                        {% for group in app.user.groups %}
+                            <span class="badge badge-info">{{ group.name }}</span>
+                        {% endfor %}
+                    </span>
+                </a>
+            </li> 
+        {% endif %}
+
+        <div class="topbar-divider d-none d-sm-block"></div>
+
+        <!-- User Information -->
+        <li class="nav-item">
+            <a class="nav-link">
+                <span class="text-gray-600">
+                    <strong>{{ app.user.firstname }} {{ app.user.lastname }}</strong> - 
+                    <span class="text-primary"><em>{{ app.user.roles|map(role => app.user.getRole(role))|join(', ', '') }}</em></span>
+                </span>
+            </a>
+        </li> 
+        <div class="topbar-divider d-none d-sm-block"></div>
+
+        <!-- Lolapy Information -->
+        <li class="nav-item">
+            {% if app_env == "dev" %}
+                {% set lolapyParameters = lolapy.getLolapyParameters() %}
+                <a class="nav-link" href="#"
+                   data-container="body" 
+                   data-toggle="popover" 
+                   data-placement="bottom" 
+                   title="<strong>Lolapy configuration</strong>" 
+                   data-content="<strong>IP</strong> : {{ lolapyParameters["LOLAPY_API_ADRESS"] }} <br /> <strong>Port</strong> : {{ lolapyParameters["LOLAPY_API_PORT"] }} <br /> <strong>Fake</strong> : {{ lolapyParameters["LOLAPY_API_FAKE"] }} <br /> ">
+                    {{ lolapy.isLolapyReady() ? "<span class='text-success font-weight-bold'> Lolapy <i class='fas fa-power-off'> </i></span>" : "<span class=''> Lolapy <i class='fas fa-power-off'> </i></span>"}}
+                </a>
+            {% else %}
+                <a class="nav-link" href="#">
+                    {{ lolapy.isLolapyReady() ? "<span class='text-success font-weight-bold'> Lolapy <i class='fas fa-power-off'> </i></span>" : "<span class=''> Lolapy <i class='fas fa-power-off'> </i></span>"}}
+                </a>
+            {% endif %}
+        </li>
+        
+        <div class="topbar-divider d-none d-sm-block"></div>
+        
+        <!-- Run en cours -->
+{#        <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle text-gray-600" href="#" id="alertsDropdown" role="button"
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Runs &nbsp;
+                <i class="fas fa-cogs fa-fw"></i>
+                <span class="badge badge-danger badge-counter">3+</span>
+            </a>
+            <!-- Dropdown - Runs -->
+            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                 aria-labelledby="alertsDropdown">
+                <h6 class="dropdown-header">
+                    Liste des derniers runs
+                </h6>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                    <div class="mr-3">
+                        <div class="icon-circle bg-primary">
+                            <i class="fas fa-file-alt text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="small text-gray-500">December 12, 2019</div>
+                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
+                    </div>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                    <div class="mr-3">
+                        <div class="icon-circle bg-success">
+                            <i class="fas fa-donate text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="small text-gray-500">December 7, 2019</div>
+                        $290.29 has been deposited into your account!
+                    </div>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="#">
+                    <div class="mr-3">
+                        <div class="icon-circle bg-warning">
+                            <i class="fas fa-exclamation-triangle text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="small text-gray-500">December 2, 2019</div>
+                        Spending Alert: We've noticed unusually high spending for your account.
+                    </div>
+                </a>
+                <a class="dropdown-item text-center small" href="{{ path('dashboard_run_index') }}">Voir tous les runs</a>
+            </div>
+        </li>
+
+        <div class="topbar-divider d-none d-sm-block"></div>
+#}
+        <li class="nav-item">
+            <a class="nav-link text-primary btn btn-sm font-weight-light" title="Lola (site public)" target="_blank" href="{{ path('homepage') }}">
+                <b>Lola <i class="fas fa-external-link-alt"></i></b>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger btn btn-sm" title="Se déconnecter" href="{{ path('app_logout') }}">
+                <b>{% trans %}dashboard.navbar.deconnexion{% endtrans %} <i class="red fas fa-sign-out-alt"> </i></b>
+            </a>
+        </li>
+
+    </ul>
+
+</nav>
+<!-- End of Topbar -->

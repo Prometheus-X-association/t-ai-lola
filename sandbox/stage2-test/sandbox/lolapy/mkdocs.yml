@@ -1,0 +1,38 @@
+site_name: Lolapy Docs
+
+theme:
+  name: "material"
+  palette:
+    - scheme: default
+      primary: green
+
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py  #
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          selection:
+            filters: []  # reset filter to show class/method started with _
+          options:
+            show_signature_annotations: yes
+            show_if_no_docstring: yes
+            show_root_heading: yes
+            merge_init_into_class: yes
+          paths: [lolapy]
+markdown_extensions:
+    - toc:
+        permalink: "#"
+nav:
+  - Lolapy Docs: index.md
+  - Algorithm: \#algorithm
+  - Scenario: \#scenario
+  - Dataset: \#dataset
+  - Nextflow: \#nextflow
+  - Slurm: \#slurm
+  - Tools: \#tools
+extra_css:
+  - references/css/style.css

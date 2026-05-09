@@ -1,0 +1,42 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Utilisateur - Modification {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-users fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.user.edit.modifier_utilisateur{% endtrans %}<strong>{{ user }}</strong></span>
+        </div>
+        <a href="{{ path('dashboard_user_index') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-arrow-left"></i>
+            {% trans %}dashboard.user.edit.btn_retour{% endtrans %}
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-8">
+            {{ form_start(form) }}
+            {#            {{ form_widget(form) }}#}
+            {{ form_row(form.lastname, {'label': 'dashboard.user.edit.nom'|trans}) }}
+            {{ form_row(form.firstname, {'label': 'dashboard.user.edit.prenom'|trans}) }}
+            {{ form_row(form.email, {'label': 'dashboard.user.edit.email'|trans}) }}
+            {{ form_row(form.roles, {'label': 'dashboard.user.edit.liste_roles'|trans}) }}
+            <button class="btn btn-success float-right btn-block">
+                {{ button_label|default('dashboard.user.edit.btn_modifier'|trans) }}
+            </button>            
+            {{ form_end(form) }}
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> {% trans %}dashboard.user.edit.aide_titre{% endtrans %}
+                </div>
+                <div class="card-body">
+                    {% trans %}dashboard.user.edit.aide{% endtrans %}
+                </div>
+            </div>                
+        </div>
+    </div>
+
+{% endblock %}

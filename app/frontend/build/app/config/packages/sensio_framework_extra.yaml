@@ -1,0 +1,7 @@
+sensio_framework_extra:
+    router:
+        annotations: true
+    view: 
+        annotations: true
+    request:
+        converters: true        

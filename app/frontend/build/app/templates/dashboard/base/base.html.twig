@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+
+        <title>Lola - {% block title %}{% trans %}dashboard.title.accueil{% endtrans %}{% endblock %}</title>
+
+        <!-- Bootstrap -->
+        <link href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+
+        <!-- Font Awesome -->
+        <link href="{{ asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+
+        <!-- Datatable -->
+        <link href="{{ asset('node_modules/datatables/media/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+
+        <!-- select2 -->
+        <link href="{{ asset('node_modules/select2/dist/css/select2.min.css') }}" rel="stylesheet">
+
+        <!-- css from template -->
+        <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
+
+        {% block stylesheets %}{% endblock %}
+    </head>
+
+    <!-- Page Content -->
+    <body id="page-top">
+
+        {% block body %}{% endblock %}
+
+        <!-- jQuery -->
+        <script src="{{ asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
+
+        <!-- Popper.js -->
+        <script src="{{ asset('node_modules/popper.js/dist/umd/popper.min.js') }}"></script>
+
+        <!-- Bootstrap -->
+        <script src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+
+        <!-- Datatable -->
+        <script src="{{ asset('node_modules/datatables/media/js/jquery.dataTables.min.js') }}"></script>
+
+        <!-- font-awesome -->
+        <script src="{{ asset('node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}" crossorigin="anonymous"></script>
+
+        <!-- select2 -->
+        <script src="{{ asset('node_modules/select2/dist/js/select2.min.js') }}"></script>
+
+        <!-- markdown-it -->
+        <script src="{{ asset('node_modules/markdown-it/dist/markdown-it.min.js') }}"></script>
+
+        {% block javascript %}{% endblock %}
+
+        <!-- JS from template -->
+        <script src="{{ asset('js/dashboard.js') }}"></script>
+
+        <!-- JS Lola -->
+        <script src="{{ asset('js/lola.js') }}"></script>
+        
+    </body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+
+        <title>Lola - {% block title %}Accueil{% endblock %}</title>
+
+        <!-- Bootstrap -->
+        <link href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+        <!-- Font Awesome -->
+        <link href="{{ asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+        <!-- Template -->
+        <link href="{{ asset('css/public.css') }}" rel="stylesheet">
+
+        {% block stylesheets %}{% endblock %}
+    </head>
+
+    <body>
+        {% block body %}{% endblock %}
+        
+        <!-- jQuery -->
+        <script src="{{ asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
+        
+        <!-- Bootstrap -->
+        <script src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+        
+        <!-- jQuery -->
+        <script src="{{ asset('js/lola_public.js') }}"></script>
+
+        {% block javascript %}{% endblock %}
+    </body>
+</html>

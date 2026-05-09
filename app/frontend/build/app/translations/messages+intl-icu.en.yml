@@ -1,0 +1,509 @@
+dashboard:
+    accueil:
+        titre: Home
+        connexion: Connection
+        inscription: Register
+        btn_dashboard: Access to the dashboard
+        btn_compte: My account
+        btn_connexion: Login
+        btn_deconnexion: Logout
+        btn_lola_site_publique: Access to the Lola public site
+        password: password
+        email: email
+        prenom: First name
+        nom: Last name
+        institution: Institution
+        fonction: Function
+        voir_conditions: See Terms & Conditions
+        accepter_conditions: Accept Terms & Conditions
+    title:
+        accueil: Home
+    navbar:
+        groupes: Groups
+        deconnexion: Logout
+        lolapy_inaccessible: <em>Lolapy</em> service is unavailable.
+    left_menu:
+        dashboard: Dashboard
+        dataset: Dataset
+        scenario: Scenario
+        run: Run
+        algorithme: Algorithm
+        indicateur: Indicator
+        template-scenario: Template-scenario
+        groupes: Groups
+        utilisateurs: Users
+        lolapy_logs: Lolapy Logs
+        demande_nouveau_profil: Ask an upgrade to new profile
+        voir_les_profils: See profiles
+        termsofuse: Terms of use
+        hash_objet: Hash / Object
+    runs:
+        index:
+            titre: List of runs
+            btn_liste_scenario: List of scenarios
+            btn_details: Details
+            btn_resultats: Results
+            th_date_creation: Creation date
+            th_status: Status
+            th_scenario: Scenario
+            th_tag: Tag
+            th_dataset: Dataset
+            th_acun_run: No run available
+        details:
+            titre: Details of the run
+            btn_retour: Return to the list of runs
+            user: User
+            date: Date
+            hash: Run Hash
+            scenario: Scenario
+            tag: Tag
+            dataset: Dataset
+            parametre: Parameters
+            telecharger_resultats: Download results
+            resultats_non_disponible: Results not available
+            maj: Update
+            log_run: Run logs
+            statistiques: Statistics
+            datetime: Datetime
+            type: Type
+            nomProcess : Process Name
+            evenement: Event
+            erreur: Error
+            config_lolapy: Lolapy configuration
+            rapport_erreur: Error report
+
+    algorithm:
+        index: 
+            modal_body_processing: >
+                <em>The version is being created.<br>Are you sure you want to delete it?</em>
+            modal_body_error: >
+                <em>Are you sure you want to delete it?</em>
+            modal_title_version1: >   
+                <strong><em>Deletion in progress of the version</strong></em> 
+            modal_title_version2: >
+                <strong><em>of the algorithm</strong></em>
+    user:
+        index:
+            titre: User Administration
+            btn_demande_maj: See profil update
+            th_nom: Last name
+            th_prenom: First name
+            th_email: Email
+            th_profile: Profile
+            th_groupe: Groups
+            th_date_creation: Creation date
+            th_date_modification: Modification date
+            th_derniere_connexion: Last connection
+            th_hash: Hash
+            non_defini: Undefined
+            modifier: Edit
+            desactiver: Disable
+            activer: Enable
+            modal_maj_profile_titre: List of profile update requests
+            modal_maj_profile_pas_maj: No update request
+            modal_maj_profile_refuser: Decline
+            modal_maj_profile_accepter: Authorize
+            modal_maj_profile_fermer: Close
+        edit:
+            titre: Edit
+            modifier_utilisateur: "Edit user "
+            nom: Last name
+            prenom: First name
+            email: Email
+            liste_roles: list of profils
+            btn_modifier: Validate modification
+            btn_retour: Return to the list of users
+            aide_titre: Modification of the user
+            aide: >
+                <p class="card-text">
+                    Edit information of a user. <br>These information can be edited later.<br>
+                    Edit information of a scenario does not break links to existing permissions, runs ,dataset, etc.
+                </p>
+    groupe:
+        index:
+            titre: Groups administration
+            btn_ajout_groupe: Add a group
+            btn_modifier: Edit
+            btn_supprimer: Delete
+            th_nom: Name of the group
+            th_description: Description
+            th_utilisateur: Users
+            th_date_creation: Creation date
+            th_date_modification: Modification date
+            non_defini: Undefined
+            aucun_groupe: No groups
+        new:
+            title: Group creation
+            btn_retour: Return to the list of groups
+            btn_ajouter: Create the group
+            aide_titre: Create a new group
+            aide: >
+                    <p class="card-text">
+                        Le nom du groupe est requis. Tous les utilisateurs de Lola sont présent dans la liste <em>utilisateur</em>
+                    </p>
+                    <hr>
+                    <h5 class="card-title">Informations sur les groupes</h5>
+                    <p class="card-text">
+                        Les groupes permettent de faire un partages de datasets avec plusieurs utilisateur de Lola.
+                    </p>
+        edit:
+            title: Group modification
+            modification_group: Modification of the group
+            btn_retour: Return to the list of group
+            btn_modifier: Validate modification
+            aide_titre: Modification of the group
+            aide: >
+                    <p class="card-text">
+                        Le nom du groupe est requis. Tous les utilisateurs de Lola sont présent dans la liste <em>utilisateur</em>
+                    </p>
+                    <hr>
+                    <h5 class="card-title">Informations sur les groupes</h5>
+                    <p class="card-text">
+                        Les groupes permettent de faire un partages de datasets avec plusieurs utilisateur de Lola.
+                    </p>
+        form:
+            nom: Name of the group
+            description: Description
+            liste_utilisateurs: List of users
+            btn_enregistrer: Save
+    upgrade:
+        index:
+            titre: Upgrade of your profile account
+            btn_register: Register
+            profil2: >
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        Datasets and scenarios
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">Profile 2</div>
+            profil2_details: >
+                    <li class="list-group-item">Create private dataset</li>
+                    <li class="list-group-item">Show shared datasets</li>
+                    <li class="list-group-item">View public scenarios</li>
+                    <li class="list-group-item">Run scenario</li>
+            profil3: >
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                        Shared datasets
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">Profile 3</div>
+            profil3_details: >
+                    <li class="list-group-item"><strong>Profile 2 +</strong></li>
+                    <li class="list-group-item">Share dataset</li>
+                    <li class="list-group-item">Statistics on datasets usage</li>
+            profil4: >
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                        Scenario, algorithms and indicators
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">Profile 4</div>
+            profil4_details: >
+                    <li class="list-group-item"><strong>Profile 3 +</strong></li>
+                    <li class="list-group-item">Create scenarios</li>
+                    <li class="list-group-item">Scenario visualization</li>
+                    <li class="list-group-item">Create algorithms</li>
+                    <li class="list-group-item">Algorithm visualization</li>
+                    <li class="list-group-item">Create indicators</li>
+                    <li class="list-group-item">Indicators visualization</li>
+            profil5: >
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                        Template-scenario
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">Profile 5</div>
+            profil5_details: >
+                    <li class="list-group-item"><strong>Profile 4 +</strong></li>
+                    <li class="list-group-item">Create Template-scenarios</li>
+    metascenario:
+        index:
+            titre: Template-scenario Administration
+            btn_ajout_metascenario: Add a template-scenario
+            btn_visualiser_run: Show runs
+            btn_create_scenario: Create a scenario
+            btn_create_tag: Create new tag
+            btn_public_partage: Public share
+            btn_public_partage_supprimer: Remove public share
+            btn_modifier: Edit
+            btn_activer: Enable
+            btn_desactiver: Disable
+            btn_confirmer: confirm deletion
+            btn_annuler: cancel
+            th_titre: Title
+            th_tags: Tags
+            th_url: URL Repository
+            th_description: Description
+            th_date_creation: Creation date
+            th_date_modification: Modification date
+            aucun_scenario: No template-scenario available
+            modal_titre: Tag creation for the template-scenario
+            modal_git_tag: Git Tag
+            modal_git_tag_doc: Git tag on the repository. The platform will clone the git repository with the given tag.
+            modal_variant: Variant
+            modal_variant_doc: TODO
+            modal_version: version
+            modal_version_doc: Name of the version on the lola platform. Can be the same as the git tag.
+            modal_btn_ajouter: Create this tag
+            modal_body_processing: >
+                <em>The Tag is being created.<br>Are you sure you want to delete it?</em>
+            modal_body_error: >
+                <em>Are you sure you want to delete it?</em>
+            modal_title_tag1: >   
+                <strong><em>Deletion in progress of the tag</strong></em> 
+            modal_title_tag2: >
+                <strong><em>of the template-scenario</strong></em>
+        new:
+            title: Creation
+            creation_metascenario: Template-scenario creation
+            btn_retour: Return to the list of template-scenario
+            btn_ajouter: Create the template-scenario
+            aide_titre: Create a new template-scenario
+            aide: >
+                <p class="card-text">
+                    Set a <b>name</b>, a <b>gitlab repository</b> and a <b>description</b> to the new dataset. <br> These information can be edited later. <br><br>If the <b>git repository</b> is not public, you should use deploy key/token to allow the platform to download it. See <a href='https://docs.github.com/en/developers/overview/managing-deploy-keys'>github deploy token</a> or <a href='https://docs.gitlab.com/ee/user/project/deploy_tokens/'>gitlab deploy token</a>
+
+                </p>
+        edit:
+            title: Modification
+            modification_metascenario: Modification of the template-scénario
+            btn_retour: Return to the list of template-scénarios
+            btn_modifier: Validate modification
+            aide_titre: Modification of the template-scénario
+            aide: >
+                <p class="card-text">
+                    Modifier le nom et la description d'un scénario. Ces informations peuvent être éditées plus tard. <br>
+                    Modifier les informations d'un scénario ne créé par de conflit avec les runs ou les datasets existants.
+                </p>
+    scenario:
+        index:
+            titre: Scenario Administration
+            btn_ajout_scenario: Add a scenario
+            btn_visualiser_run: Show runs
+            btn_executer_scenario: Run the scenario
+            btn_create_tag: Create new tag
+            btn_liste_runs: Runs list
+            btn_execute: Execute
+            btn_parametre: Parameters
+            btn_public_partage: Public share
+            btn_public_partage_supprimer: Remove public share
+            btn_modifier: Edit
+            btn_activer: Enable
+            btn_desactiver: Disable
+            btn_Detail: Details
+            th_template_scenario: Template-scenario
+            th_titre: Title
+            th_tag: Tags
+            th_dataset: Dataset
+            th_date_creation: Creation date
+            th_date_modification: Modification date
+            aucun_scenario: No scenario available
+            modal_titre: Tag creation for the scenario
+            modal_git_tag: Git Tag
+            modal_git_tag_doc: Git tag on the repository. The platform will clone the git repository with the given tag.
+            modal_variant: Variant
+            modal_variant_doc: TODO
+            modal_version: version
+            modal_version_doc: Name of the version on the lola platform. Can be the same as the git tag.
+            modal_btn_ajouter: Create this tag
+            modal_btn_fermer: Close
+            non_defini: Undefined
+        new:
+            title: Creation
+            creation_scenario: Scenario creation
+            btn_retour: Return to the list of scenario
+            btn_ajouter: Create the scenario
+            aide_titre: Create a new scenario
+            aide: >
+                <p class="card-text">
+                    Set a <b>name</b>, a <b>gitlab repository</b> and a <b>description</b> to the new dataset. <br> These information can be edited later. <br><br>If the <b>git repository</b> is not public, you should use deploy key/token to allow the platform to download it. See <a href='https://docs.github.com/en/developers/overview/managing-deploy-keys'>github deploy token</a> or <a href='https://docs.gitlab.com/ee/user/project/deploy_tokens/'>gitlab deploy token</a>
+
+                </p>
+        edit:
+            title: Modification
+            modification_dataset: Modification of the scenario
+            btn_retour: Return to the list of scenario
+            btn_modifier: Validate modification
+            aide_titre: Modification of the scenario
+            aide: >
+                <p class="card-text">
+                    Edit name and description of the scenario. <br>These information can be edited later.<br>
+                    Edit information of a scenario does not break links to existing run or dataset.
+                </p>
+        form:
+            nom: Name
+            description: Description
+            repo_git: Git repository url
+            btn_enregistrer: Save
+        creation_etape1:
+            titre: Scenario creation - Step 1
+            btn_retour_templatescenario: Return to the list of template-scenario
+            btn_retour_scenario: Return to the list of scenario
+            tag_selection: Select the tag
+            dataset_selection: Select the dataset
+            btn_selectionner: Select
+            btn_fermer: Close
+            cree_par: Created by
+            prive: Private
+            public: Public
+            btn_validation: "Step 2 : parameters"
+        creation_etape2:
+            titre: Scenario configuration
+            btn_retour_templatescenario: Return to the list of template-scenario
+            btn_retour_scenario: Return to the list of scenario
+            parametres: Parameters
+            aucun_parametre: No parameters
+            chargement: Loading...
+            miseajour_scenario: Update the scenario
+            creer_scenario: Create a new scenario
+    dataset:
+        index:
+            titre: Dataset Administration
+            btn_ajout_dataset: New Dataset
+            btn_aide: Help
+            th_partage: Share
+            th_etat: Status
+            th_titre: Title
+            th_date_creation: Date of creation
+            th_derniere_modification: Last modification
+            partage_non: Not shared
+            partage_global: Public shared
+            partage_global_message: Share the dataset with all users
+            partage_groupe: Group shared
+            logs: Logs
+            non_defini: Undefined
+            btn_modifier: Edit
+            btn_supprimer: Delete
+            btn_bordereau: Bordereau
+            btn_partage: Share
+            btn_partage_supprimer: Delete sharing
+            btn_partager: Share
+            btn_details: Details
+            btn_recipe: XAPI Recipe
+            message_aucune_action: Shared dataset, no action available
+            btn_fermer: Close
+            option_de_partage: Share options
+            aucun_groupe: No group
+            aucun_dataset: No dataset
+            date_creation: Date of creation
+            modale_aide_titre: How to send dataset on Lola platform ?
+            modale_aide: >
+                <div class="card mb-2">
+                    <h5 class="card-header text-white bg-primary">Requirements</h5>
+                    <div class="card-body">
+                        <ul>
+                            <li>data_prepare tool to encrypt and send data;</li>
+                            <li>an XAPI dataset;</li>
+                            <li>a bordereau downloadable on application platform (see part 1).</li>
+                        </ul>
+                    </div>
+                    <h5 class="card-header text-white bg-primary">Data_prepare, the tool to send data on Lola platform</h5>
+                    <div class="card-body">
+                        Download <a href="https://gitlab.inria.fr/lola/data_prepare/-/releases" target="_blank"><strong>Data_prepare <i class="fas fa-external-link-alt"></i></strong></a>.
+                    </div>
+                    <h5 class="card-header text-white bg-primary">Step by step:</h5>
+                    <div class="card-body">
+                        <p><strong><u>1. Register XAPI dataset and download bordereau</u></strong></p>
+                        This step must be done on lola application platform. Click on "Add dataset" in "Dataset" tab. In the new window, you can set the name of the new dataset, its information and access permission. These information can be edit later. After validation, the bordereau is available.
+                        <hr />
+                        <p><strong><u>2. Download the bordereau</u></strong></p>
+                        In the "Dataset", click on "Bordereau" to download the file.
+                        <hr />
+                        <p><strong><u>3. Send files with data_prepare tool</u></strong></p>
+                        Open data_prepare tool on your system. Set path for bordereau and for the dataset file (XAPI format). You must set the path where to store the compressed/encrypted file in case of transfert failure. Click on "Encrypt" to start the compression/encryption. After the success, click on "Transfer to Lola-platform".                         <hr />
+                        <p><strong><u>4. Check the status in the Lola application platform</u></strong></p>
+                        The status of the dataset will be updated after few minutes in the platform application. Note that it can takes time, depending of the size of the XAPI file and the server occupation.
+                    </div>
+                </div>
+        new:
+            title: New
+            creation_dataset: Dataset creation
+            btn_retour: Return to the list of dataset
+            btn_ajouter: Create the dataset
+            aide_titre: Create a new dataset
+            aide: >
+                <p class="card-text">
+                    Set a name and a description to the new dataset. <br>These information can be edited later.
+                </p>
+        edit:
+            title: Modification
+            modification_dataset: Modification of the dataset
+            btn_retour: Return to the list of dataset
+            btn_modifier: Validate modification
+            aide_titre: Modification of the dataset
+            aide: >
+                <p class="card-text">
+                    Edit name and description of the dataset. <br>These information can be edited later.
+                    Edit information of a dataset does not break links to existing run or scenario.
+                </p>
+        form:
+            nom: Name
+            description: Description
+            recipe: XAPI Recipe
+            recipe_link: XAPI Recipe link
+            btn_enregistrer: Save
+        controller:
+            flash_dataset_ajoute: Dataset added
+            flash_dataset_modifie: Dataset edited
+            flash_suppression_erreur: Internal server error when deleting the dataset. API not available
+            flash_suppression_confirmation: Dataset removed
+            flash_partage_erreur: No permission to do this
+            flash_partage_suppression: Le dataset {dataset_name} n'est plus partagé avec le groupe {group_name}
+            flash_partage_ajout: Le dataset {dataset_name} a été partagé avec le groupe {group_name}
+    termsofuse:
+        index:
+            titre: Terms of use
+            btn_ajout_termsofuse: New
+            th_date_creation: Date of creation
+            th_derniere_modification: Last modification
+            non_defini: Undefined
+            aucun_termsofuse: No terms of use available
+            btn_fermer: Fermer
+            btn_set_active: Set active
+            btn_details: Details
+        new:
+            title: New
+            creation_termsofuse: Terms of use creation
+            btn_retour: Return to the list of terms of use
+            btn_ajouter: Create the terms of use
+            aide_titre: Create a new terms of use
+            aide: >
+                <p class="card-text">
+                    ... <br>
+                    ...
+                </p>
+        edit:
+            title: Modification
+            modification_termsofuse: Modification of the terms of use
+            btn_retour: Return to the list of terms of use
+            btn_modifier: Validate modification
+            aide_titre: Modification of the terms of use
+            aide: >
+                <p class="card-text">
+                    ... <br>
+                    ...
+                </p>
+        form:
+            description: Description
+            btn_enregistrer: Enregistrer
+
+
+
+    hash_objet:
+        index:
+            titre: Hash / Object
+            Collapsible_1: Hash / Dataset
+            Collapsible_2: Hash / Scenario
+            Collapsible_3: Hash / User
+            Collapsible_4: Hash / Tag
+            Collapsible_5: Hash / Run
+            Collapsible_6: Hash / Algorithm
+            th_titre: Title
+            th_etat: Status
+            th_hash: Hash
+            th_template_scenario: Template-scenario
+            th_tags: Tag
+            th_dataset: Dataset
+            th_nom: Last name
+            th_prenom: First name
+            th_email: Email
+            th_profile: Profile
+            th_sftp_hash: Sftp_Hash
+            th_version: Version
+            th_algorithm: Algorithm
+
+

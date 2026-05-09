@@ -1,0 +1,55 @@
+version: '2.4'
+
+services:
+
+  db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    user: "${DOCKER_COMPOSE_UID}:${DOCKER_COMPOSE_GID}"
+    volumes:
+      - ${DB_DATA_DIR}:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Europe/Paris
+    restart: ${RESTART_SERVICES:-no}
+    
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.1.3
+    depends_on:
+      - db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      APACHE_HTTP_PORT_NUMBER: 9010
+      PMA_HOST: db
+      PMA_PORT: 3306
+      TZ: Europe/Paris
+    command: /bin/bash -c "sed -i \"s/80/$$APACHE_HTTP_PORT_NUMBER/g\" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && /docker-entrypoint.sh apache2-foreground"
+    restart: ${RESTART_SERVICES:-no}
+    ports: 
+      - 8081:9010
+  app:
+    image: frontend
+    build:
+      context: 'build'
+    volumes:
+    #  - ${APACHE_ROOT_DIR}:/var/www/html
+      - .env:/var/www/html/.env
+    environment:
+      TZ: Europe/Paris
+    restart: ${RESTART_SERVICES:-no}
+    ports:
+      - 8080:80
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - sftp_data:/home/aziz/upload
+    ports:
+      - 2222:22
+    command:
+      - aziz:password:1001
+
+volumes:
+  sftp_data: 

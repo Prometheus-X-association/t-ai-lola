@@ -1,0 +1,29 @@
+- name: Create lolauser
+  user:
+    name: lolauser
+    state: present
+    create_home: yes
+    shell: /bin/bash
+    comment: "Lola User"
+
+- name: Set password for lolauser (optional)
+  user:
+    name: lolauser
+    password: "{{ lolauser_password }}"
+  when: lolauser_password is defined
+
+- name: Create .ssh directory for lolauser
+  file:
+    path: /home/lolauser/.ssh
+    state: directory
+    owner: lolauser
+    group: lolauser
+    mode: '0700'
+
+- name: Add sudo privileges for lolauser
+  lineinfile:
+    path: /etc/sudoers.d/lolauser
+    line: 'lolauser ALL=(ALL) NOPASSWD:ALL'
+    create: yes
+    mode: '0440'
+    validate: 'visudo -cf %s'

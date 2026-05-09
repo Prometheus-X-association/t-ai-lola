@@ -1,0 +1,334 @@
+#!/usr/bin/env python3
+
+"""Module for scenario(s)"""
+
+from __future__ import annotations
+from pathlib import Path
+import json
+
+import pydantic
+from pydantic import BaseModel, validator
+
+from lolapy.scenario import errors
+from lolapy.scenario.template import ScenarioTemplate
+from lolapy.tools import settings
+from lolapy.algorithm.algorithm import ParameterAvailableTypes
+from lolapy.tools.docker import DockerImage
+
+import pydantic.json
+
+pydantic.json.ENCODERS_BY_TYPE[Path] = str
+
+class CONST_SCENARIO:
+    """Store constant information for scenario"""
+
+    scenario_recipe_file = "params.json"
+    nextflow_main = "main.nf"
+
+
+class SwitchableAlgorithm(BaseModel):
+    """Store information of switchable algorithm.
+
+    Attributes:
+        name: Name of the algorithm. Generic name should be used.
+        description: Short description of the role of this algorithm.
+        template: Relative [Path] of the template used for the algorithm.
+            The root path is the root of the scenario
+        nf_variable: Reference used in the scenario AND the algorithm to identify which one to use
+    """
+
+    name: str
+    description: str
+    template: Path
+    nf_variable: str
+
+
+class ScenarioParameter(BaseModel):
+    """Store information for parameters in the scenario recipe.
+
+    Attributes:
+        name: Name of the parameter.
+        description: Short description of the scenario
+        type: Type of the parameter (int, string, etc ...). Instance of [ParameterAvailableType]
+        default: Default value of the parameter. This field is not required
+        choices: The user will choose only one value of the list of element. If choices is list[str], then
+            type must be set to 'choices'
+    """
+
+    name: str
+    description: str
+    choices: list[str] | None = None
+    default: str | None = None
+    type: ParameterAvailableTypes
+
+    @validator("choices")
+    def check_choices(cls, value):
+        """Validate value of choices field.
+
+        Validate only if its None (non-set) or a list[str]
+
+        Args:
+            value: special arg from pydantic. Here, it's the value of choices field.
+        Returns:
+            None | list[str]: Returns the value of `value` after validation.
+        Raises:
+            AlgorithmParameterFieldWrongFormat: If there is a miss-match between `type` field
+                and `choices` field.
+        """
+
+        def is_list_str(lst) -> bool:
+            """Check if `lst` is type list[str].
+
+            Args:
+                lst: the value to test
+            Returns:
+                bool: True if `lst` is list[str]. False otherwise
+            """
+            if not isinstance(lst, str) and all(isinstance(elem, str) for elem in lst):
+                return True
+            return False
+
+        if value == None or not is_list_str(value):
+            raise errors.ScenarioParameterFieldWrongFormat(
+                field="choices",
+                value=value,
+                additionnal_msg="Parameter field 'choices' must be none if the parameter type is not 'choices', or a list[str]",
+            )
+        return value
+
+    @validator("type", pre=True)
+    def check_type(cls, value, values):
+        """Check if 'type' field is correct."""
+
+        # Check that the choices field is validated if type is choices
+        if value == "choices":
+            if not "choices" in values or values["choices"] == None:
+                raise errors.ScenarioParameterFieldWrongFormat(
+                    field="choices",
+                    value=value,
+                    additionnal_msg="Parameter type 'choices' must be set with 'choices' field as list[string]",
+                )
+
+        for avail_type in ParameterAvailableTypes:
+            if avail_type.get_value() == value:
+                return avail_type
+        raise errors.ScenarioParameterFieldWrongFormat("type", value)
+
+    @classmethod
+    def from_json(cls, json_data: dict) -> Self:
+        """Build a [ScenarioParameter] from json data.
+
+        Used for tests purpose (easier than writing files everytimes)
+        Args:
+            json_data: dict: json data to deserialize
+        Returns:
+            Self: Instnace of [ScenarioParameter]
+        Raises:
+            ScenarioParameterFieldWrongFormat: if there is an error during fields validation
+            ScenarioParameterMissingField: If there is missing field(s)
+        """
+        try:
+            return ScenarioParameter(**json_data)
+        except pydantic.error_wrappers.ValidationError as e:
+            raise errors.ScenarioParameterMissingField(json_data, e)
+        except errors.ScenarioParameterFieldWrongFormat as e:
+            raise e
+
+class ScenarioRecipe(BaseModel):
+    """Read param.json file and extract data inside.
+
+    Attributes:
+        name: Name of the scenario
+        description: Short description of the scenario
+        output: List of file generated by the scenario. Only filename (not path) must be register
+        docker_images: List of [DockerImages]
+        switchable_algorithms: List of [SwitchableAlgorithm] structure
+        parameters: List of [Parameters] of the scenario
+    """
+
+    name: str
+    description: str
+    output: list[str]
+    docker_images: list[DockerImage]
+    switchable_algorithms: list[SwitchableAlgorithm]
+    parameters: list[ScenarioParameter]
+
+    @classmethod
+    def from_file(cls, scenario_recipe: Path) -> Self:
+        """Constructor of ScenarioRecipe from a json file.
+
+        Args:
+            scenario_recipe: Path: FullPath of the params.json file containing the recipe.
+        Raises:
+            pydantic.error_wrappers.ValidationError: if the file is not well formatted
+        """
+        json_data = json.load(open(scenario_recipe)) # Don't catch this !
+                                                     # The file is ensure during installation
+        try:
+            return cls(**json_data)
+        except pydantic.error_wrappers.ValidationError as e:
+            raise errors.ScenarioRecipeMissingField(scenario_data=json_data, error=e)
+
+
+class Scenario(BaseModel):
+    """Instance of Scenario
+
+    Use this structure as an entrypoint for all stuff relatd to a scenario
+
+    Attributes:
+        hash: Hash unique of the scenario
+        scenario_path: Complete Path of the scenario
+        scenario_recipe_path: Complete Path of the scenario recipe (params.json)
+        scenario_recipe: None or instance of ScenarioRecipe. Contains information on the scenario
+            If None, beware that some files can be missing too
+    """
+
+    hash: str
+    scenario_path: Path
+    scenario_recipe_path: Path
+    scenario_recipe: ScenarioRecipe | None
+
+    @classmethod
+    def from_hash(cls, scenario_hash: str, check_exists: bool = True) -> Self:
+        """Create a [Scenario] instance from its hash.
+
+        Args:
+            scenario_hash: Hash unique of the scenario
+            check_exists: If True, check if the scenario and all files exist.
+                If no, don't check anything. Default, True
+        Returns:
+            Self: Instance of [Scenario]
+        """
+        app_settings = settings.get()
+        scenario_dir: Path = app_settings.nextflow_scenario_dir
+        scenario_path = scenario_dir / scenario_hash
+        scenario_recipe = scenario_path / CONST_SCENARIO.scenario_recipe_file
+
+        tmp_scenario_instance = cls(
+                hash=scenario_hash,
+                scenario_path=scenario_path,
+                scenario_recipe_path=scenario_recipe,
+                scenario_recipe=None
+            )
+
+        if not check_exists:
+            # Return the scenario instance without any verification on files
+            return tmp_scenario_instance
+
+        tmp_scenario_instance._check_requirements()
+        # If requirements are ok, read and attribute the scenario recipe to the instance
+        tmp_scenario_instance.scenario_recipe = ScenarioRecipe.from_file(scenario_recipe)
+        return tmp_scenario_instance
+
+
+    def _check_requirements(self):
+        """Check if all requirements for a scenario match.
+
+        1. Does scenario exist ?
+        2. {params.json, main.nf} exists ?
+        3. Template files exists ?
+
+        Raises:
+            ScenarioNotExist: If the scenario directory does not exist
+            ScenarioMissingFile: If a file is missing (main.nf, params.json, ...)
+            ScenarioTemplateNotExist: If a template file listed in params.json does not exists in template dir
+        """
+        # 1. Check if scenario exist
+        if not self.scenario_path.exists():
+            raise errors.ScenarioNotExist(self.scenario_path)
+
+        # 2. Check required files
+        required_files = {
+            self.scenario_recipe_path: f"scenario recipe ({CONST_SCENARIO.scenario_recipe_file})",
+            self.scenario_path / CONST_SCENARIO.nextflow_main: f"Nextflow entrypoint ({CONST_SCENARIO.nextflow_main})"
+        }
+        for filename, file_type in required_files.items():
+            if not filename.exists():
+                raise errors.ScenarioMissingFile(scenario_name=self.scenario_path.name,
+                                                 file_path=filename.absolute().relative_to(self.scenario_path),
+                                                 file_type=file_type)
+
+        # 3. Check if template files exist
+        ## 1. Deserialize params.json
+        ## 2. Get the list of template files
+        ## 3. Check if template file exists
+        scenario_recipe: ScenarioRecipe = ScenarioRecipe.from_file(self.scenario_recipe_path)
+        try:
+            _: list[ScenarioTemplate] = [
+                ScenarioTemplate.from_path(
+                    template_file=str(switchable_algo.template), scenario_path=self.scenario_path) for switchable_algo in scenario_recipe.switchable_algorithms
+            ]
+        except errors.ScenarioTemplateNotExist as e:
+            raise e
+
+class Readme:
+    """Readme object.
+
+    Use to find and read Readme files.
+
+    Attributes:
+        file_path: Path: Path of the Readme file
+    Examples:
+        >>> my_scenario_path = Path("/home/lolauser/scenario/Sa2b309B")
+        >>> my_readme = Readme.search(my_scenario_path)
+        >>> my_readme.read()
+    """
+    def __init__(self, file_path: Path | None):
+        """Constructor of Readme object.
+
+        Args:
+            file_path: Path | None: Path of the readme file. If None, there is no
+                Readme found
+        """
+        self.file_path: Path | None = file_path
+
+    def read(self) -> str:
+        """Read the Readme file and return the content.
+
+        If self.file_path is None, return a standard message instead.
+        Returns:
+            str: Content of the Readme file or standard message if no Readme.
+        """
+
+        if not self.file_path:
+            return "No Readme file founded in scenario/algorithm."
+        try:
+            return self.file_path.read_text()
+        # If there is an error when reading file (permission or something else)
+        except IOError as e:
+            return f"Error occurs when reading Readme file '{self.file_path}': {str(e)}"
+
+    @classmethod
+    def search(cls, path: Path) -> Self:
+        """Search for Readme file in the path and return a Readme structure.
+
+        Args:
+            path: Path of the directory to search in.
+
+        Returns:
+            Readme: a Readme class
+        """
+        list_files_scenario = [
+            f for f in path.glob("*")
+        ]  # Get list of all file/directory in the scenario
+        for this_file in list_files_scenario:
+            if Readme.is_readme(this_file):
+                return cls(file_path=this_file)
+        return cls(file_path=None)
+
+    @staticmethod
+    def is_readme(filename: Path) -> bool:
+        """Return True if the file is a Readme based on its filename.
+
+        Args:
+            filename: Path: Path of the file to test
+        Returns:
+            bool: True if the file is consider as a Readme. False otherwise
+        """
+        readme_possible_extension = [".org", "", ".md", ".txt"]
+        if (
+            filename.stem.lower() == "readme"
+            and filename.suffix.lower() in readme_possible_extension
+        ):
+            return True
+        return False

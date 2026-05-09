@@ -1,0 +1,173 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Runs {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-database fa-2x sidebar-brand-icon"></i>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.runs.index.titre{% endtrans %}</span>
+        </div>
+        <span class="float-right">
+            <a class="btn btn-sm btn-primary" href="{{ path("dashboard_scenario_index") }}">
+                <i class="fas fa-cogs"></i>
+                {% trans %}dashboard.runs.index.btn_liste_scenario{% endtrans %}
+            </a>
+        </span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_algorithms" width="98%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th scope="col">{% trans %}dashboard.runs.index.th_date_creation{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.runs.index.th_status{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.runs.index.th_scenario{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.runs.index.th_dataset{% endtrans %}</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for run in runs %}
+                    <tr>
+                        <!-- colonne Creation Date -->
+                        {% if run.createdBy is not null and run.createdAt is not null%}
+                            <td data-sort="{{ run.createdAt|date('U') }}">{{ run.createdAt | date('d-m-Y H:i:s') }}</td>
+                        {% else %}
+                            <td><i>non défini</i></td>
+                        {% endif %}
+                        <!-- colonne Status -->
+                        <td>
+                            {% if run.status == constant('\\App\\Entity\\Run::STATUS_COMPLETED') %}
+                            <span class="badge badge-success">
+                            {% elseif run.status == constant('\\App\\Entity\\Run::STATUS_ERROR') %}
+                            <span class="badge badge-danger">
+                            {% else %}
+                            <span class="badge badge-secondary">
+                            {% endif %}
+                                {{ run.status }}
+                            </span>
+                        </td>
+                        <!-- colonne Template-scenario -->
+                        <td>
+                            <a href="#" data-toggle="modal" data-target="#modal_run_metascenario_{{ run.scenario.id }}">
+                            {{ run.scenario.metascenario.name }}
+                            <!-- badge du Tag -->
+                            <span class="badge badge-info">{{ run.scenario.tag.name }}</span>
+                            </a>
+                        </td>
+                        <!-- colonne Dataset -->
+                        <td>
+                            {% if run.scenario.dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                                <a href="#" id="button_modal_dataset_{{ run.scenario.dataset.hash }}" data-toggle="modal" data-target="#modal_dataset_detail_{{ run.scenario.dataset.hash }}" data-hash="{{ run.scenario.dataset.hash }}">
+                                {{ run.scenario.dataset.name }}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_run_details', {'hash': run.hash}) }}">
+                                <i class="fas fa-search"></i> {% trans %}dashboard.runs.index.btn_details{% endtrans %}
+                            </a>
+                            {% if run.hasOutput %}
+                                <a class="btn btn-outline-primary btn-sm" href="{{ path("dashboard_run_results", {'hash': run.hash}) }}">
+                                    <i class="fas fa-download"></i> {% trans %}dashboard.runs.index.btn_resultats{% endtrans %}
+                                </a>
+                            {% else %}
+                                <a class="btn btn-outline-primary btn-sm disabled" href="#">
+                                    <i class="fas fa-download"></i> {% trans %}dashboard.runs.index.btn_resultats{% endtrans %}
+                                </a>                                    
+                            {% endif %}
+                        </td>
+                    </tr>
+
+
+                    <!-- modal template-scenario -->
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_run_metascenario_{{run.scenario.id}}">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        <strong><em>{{ run.scenario.metaScenario.name }}</em></strong>
+                                    </h4>                                    
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="col-12" style="font-size:18px;">
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.metascenario.index.th_titre{% endtrans %}</em></strong> : {{ run.scenario.metascenario.name }} <br><br>
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.metascenario.index.th_url{% endtrans %}</em></strong> : {{ run.scenario.metascenario.urlRepository }} <br><br>
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.metascenario.index.th_description{% endtrans %}</em></strong> : {{ run.scenario.metascenario.description|raw }} <br><br>
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.metascenario.index.th_date_creation{% endtrans %}</em></strong> : {{ run.scenario.metascenario.createdAt | date('d-m-Y') }}
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.index.modal_btn_fermer{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- modal template-scenario -->
+
+
+                    <!-- modal dataset -->
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_dataset_detail_{{ run.scenario.dataset.hash }}">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        <strong><em>{{ run.scenario.dataset.name }}</em></strong>
+                                    </h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <ul class="list-group">
+                                                <a href="#" class="list-group-item list-group-item-action">
+                                                    <strong>{% trans %}dashboard.dataset.index.date_creation{% endtrans %}</strong> : {{ run.scenario.dataset.createdAt | date('d-m-Y') }}
+                                                </a>
+                                                <a href="#"
+                                                   id="modal_dataset_detail_totalstatements_{{ run.scenario.dataset.hash }}"
+                                                   class="list-group-item list-group-item-action">
+                                                </a>
+                                            </ul>
+                                        </div>
+                                        <div class="col-6">
+                                            <ul class="list-group">
+                                                <a href="#"
+                                                   id="modal_dataset_detail_uniqueactor_{{ run.scenario.dataset.hash }}"
+                                                   class="list-group-item list-group-item-action">
+                                                </a>
+                                                <a href="#"
+                                                   id="modal_dataset_detail_uniqueverb_{{ run.scenario.dataset.hash }}"
+                                                   class="list-group-item list-group-item-action">
+                                                </a>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="col-12">
+                                        <pre id="modal_dataset_detail_statements_{{ run.scenario.dataset.hash }}"></pre>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.dataset.index.btn_fermer{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- modal dataset -->
+
+                {% else %}
+                    <tr>
+                        <td colspan="4"><em>{% trans %}dashboard.runs.index.th_acun_run{% endtrans %}</em></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

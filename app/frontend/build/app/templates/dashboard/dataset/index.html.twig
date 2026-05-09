@@ -1,0 +1,304 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Datasets {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-database fa-2x sidebar-brand-icon"></i>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1"> {% trans %}dashboard.dataset.index.titre{% endtrans %}</span>
+        </div>
+        <span class="float-right">
+            <a href="{{ path('dashboard_dataset_new') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i>
+                {% trans %}dashboard.dataset.index.btn_ajout_dataset{% endtrans %}
+            </a>
+            <a class="btn btn-sm btn-primary"
+               id="link_modal_dataset_help"
+               data-toggle="modal"
+               data-target="#modal_dataset_help">
+                <i class="far fa-question-circle"></i>
+                {% trans %}dashboard.dataset.index.btn_aide{% endtrans %}
+            </a>
+        </span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th scope="col">{% trans %}dashboard.dataset.index.th_partage{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.dataset.index.th_etat{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.dataset.index.th_titre{% endtrans %} <sup><span class="badge badge-info">Size</span></sup> </th>
+                    <th scope="col">{% trans %}dashboard.dataset.index.th_date_creation{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.dataset.index.th_derniere_modification{% endtrans %}</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dataset in datasets %}
+                    <tr>
+                        <td>
+                            {{ dataset.isShared ? 'dashboard.dataset.index.partage_global'|trans : 'dashboard.dataset.index.partage_non'|trans}}
+                            {% if dataset.groups | length > 0 %}
+                                <br />{{ 'dashboard.dataset.index.partage_groupe'|trans }}
+                            {% endif %}
+                        </td>
+                        <td class="text-center text-white">
+                            {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_WAITING') %}
+                            <div class="bg-secondary">
+                            {% elseif dataset.status == constant('\\App\\Entity\\Dataset::STATUS_PROCESSING') %}
+                            <div class="bg-warning">
+                            {% elseif dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                            <div class="bg-primary">
+                            {% elseif dataset.status == constant('\\App\\Entity\\Dataset::STATUS_ERROR') %}
+                            <div class="bg-danger">
+                            {% elseif dataset.status == constant('\\App\\Entity\\Dataset::STATUS_DELETING') %}
+                            <div class="bg-danger">
+                            {% else %}
+                            <div>
+                            {% endif %}
+                                {{ dataset.status }}                                                
+                            </div>
+
+                            <hr />
+                            {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_PROCESSING') %}
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ dataset.pourcentageProgress }}%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{ dataset.pourcentageProgress }}%</div>
+                                    </div>
+                            {% endif %}
+                            <hr />
+                            <div class="text-left">
+                                <a href="#"
+                                    id="button_modal_log_{{ dataset.hash }}"
+                                    data-toggle="modal"
+                                    data-target="#modal_dataset_log_{{ dataset.hash }}"
+                                    data-hash="{{ dataset.hash }}">
+                                    <pre><i class="fas fa-chevron-right"> </i> {% trans %}dashboard.dataset.index.logs{% endtrans %}</pre>
+                                </a>
+                            </div>
+                        </td>
+                        <td> {{ dataset.name }}
+                            {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                                <!-- badge du size dataset -->
+                                <span class="badge badge-info">{{ dataset.size }}</span> 
+                            {% endif %} 
+                        </td>
+                        {% if dataset.createdBy is not null and dataset.createdAt is not null%}
+                            <td data-sort="{{ dataset.createdAt|date('U') }}">{{ dataset.createdAt | date('d-m-Y H:i:s') }}</td>
+{#                          <br /><i>({{ dataset.createdBy }})</i>#}
+                        {% else %}
+                            <td><i>non défini</i></td>
+                        {% endif %}
+                        </td>
+                        {% if dataset.updatedBy is not null and dataset.updatedAt is not null%}
+                            {% set modifiedDate = dataset.updatedAt %}
+                                {% for datasetLogs in dataset.logs %}
+                                    {% if datasetLogs.COMPLETE is defined %}
+                                        {% set finalDate = datasetLogs.COMPLETE %}
+                                        {% set modifiedDate = finalDate %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if dataset.updatedAt >=  modifiedDate %}
+                                    {% set modifiedDate = dataset.updatedAt %}
+                                {% endif %}
+                            {# Le champs lastModification est mis à jour avec le dernier COMPLETE dans la modale Logs #}
+                            <td data-sort="{{ dataset.updatedAt|date('U') }}">{{ modifiedDate | date('d-m-Y H:i:s') }}</td>
+{#                          <br /><i>({{ dataset.updatedBy }})</i>#}
+                        {% else %}
+                            <td><i>{% trans %}dashboard.dataset.index.non_defini{% endtrans %}</i></td>
+                        {% endif %}
+                        </td>
+                        <td>
+                            {% if dataset.createdBy == app.user or app.user.isAdmin %}
+                                {% if dataset.isDeletable %}
+                                    <form method="post" class="form" action="{{ path('dashboard_dataset_delete', {'id': dataset.id}) }}">
+                                {% endif %}
+                                    <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_dataset_edit', {'id': dataset.id}) }}">
+                                        <i class="fa fa-edit"></i> {% trans %}dashboard.dataset.index.btn_modifier{% endtrans %}
+                                    </a>
+                                {% if dataset.isDeletable %}
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ dataset.id) }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-times"> </i> {% trans %}dashboard.dataset.index.btn_supprimer{% endtrans %}
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                <hr />
+
+                                <a class="btn btn-outline-primary btn-sm" href="{{ path("dashboard_dataset_download", {'hash': dataset.hash}) }}">
+                                    <i class="fas fa-download"></i> {% trans %}dashboard.dataset.index.btn_bordereau{% endtrans %}
+                                </a>
+                                {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                                    <a href="#"
+                                       id="button_modal_partage_{{ dataset.hash }}"
+                                        data-toggle="modal"
+                                       data-target="#modal_dataset_partage_{{ dataset.hash }}"
+                                       data-hash="{{ dataset.hash }}"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-share-alt"></i> {% trans %}dashboard.dataset.index.btn_partage{% endtrans %}
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                            {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                                <a href="#"
+                                   id="button_modal_dataset_{{ dataset.hash }}"
+                                    data-toggle="modal"
+                                   data-target="#modal_dataset_detail_{{ dataset.hash }}"
+                                   data-hash="{{ dataset.hash }}"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-search"></i> {% trans %}dashboard.dataset.index.btn_details{% endtrans %}
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- modal logs dataset -->
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_dataset_log_{{ dataset.hash }}">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        <strong><em>{% trans %}dashboard.dataset.index.logs{% endtrans %} - {{ dataset.name }}</em></strong>
+                                    </h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="col-12 text-left bg-light">
+                                        <code>
+                                            {% for token, datasetLogs in dataset.logs %}
+                                                <kbd>--- <em>{{ token }}</em> ---</kbd>
+                                                <br />
+                                                <kbd>START</kbd> : {{ datasetLogs.START is defined ? datasetLogs.START | date('d-m-Y H:i:s') : "L'action START n'a pas été executée" }}
+                                                <br />
+                                                {% if datasetLogs.COMPLETE is defined %}
+                                                    <kbd>COMPLETE</kbd> : {{ datasetLogs.COMPLETE | date('d-m-Y H:i:s') }}
+                                                    {% set date_end = datasetLogs.COMPLETE %}
+                                                {% elseif datasetLogs.ERROR is defined  %}
+                                                    <kbd>ERROR</kbd> : {{ datasetLogs.ERROR | date('d-m-Y H:i:s') }}
+                                                    {% set date_end = datasetLogs.ERROR %}
+                                                {% endif %}
+                                                <br />
+                                                {% if date_end is defined and datasetLogs.START is defined %}
+                                                    <kbd>DURATION</kbd> : {{ date(datasetLogs.START).diff(date(date_end))|date("%H heures %i minutes %s secondes") }}
+                                                {% endif %}
+                                                <hr />
+                                            {% endfor %}
+                                        </code>
+                                        </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.dataset.index.btn_fermer{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- modal logs -->
+
+                    <!-- modal partage dataset -->
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_dataset_partage_{{ dataset.hash }}">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        <strong><em>{{ dataset.name }}</em></strong>
+                                        <blockquote class="subtitle"><h6>{% trans %}dashboard.dataset.index.option_de_partage{% endtrans %}</h6></blockquote>
+                                    </h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <ul class="list-group inline-list">
+                                        <li class="list-group-item">
+                                            <span class="text-small float-left">
+                                                <strong>{% trans %}dashboard.dataset.index.partage_global{% endtrans %}</strong><br />
+                                                <em>{% trans %}dashboard.dataset.index.partage_global_message{% endtrans %}</em>
+                                            </span>
+                                            <span class="btn float-right">
+                                                {%  if dataset.isShared %}
+                                                <a class="btn btn-danger btn-sm"
+                                                   href="{{ path("dashboard_dataset_toggle_share", {'hash': dataset.hash}) }}">
+                                                   <i class="fas fa-times"> </i> {% trans %}dashboard.dataset.index.btn_partage_supprimer{% endtrans %}
+                                                </a>
+                                                {% else %}
+                                                <a class="btn btn-success btn-sm"
+                                                   href="{{ path("dashboard_dataset_toggle_share", {'hash': dataset.hash}) }}">
+                                                   <i class="fas fa-share-alt"> </i> {% trans %}dashboard.dataset.index.btn_partager{% endtrans %}
+                                                </a>
+                                                {% endif %}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                    <hr />
+                                    <ul class="list-group inline-list">
+                                        {% for groupe in app.user.groups %}
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                <div class="col-8 text-truncate">
+                                                    <strong>{{ groupe.name }}</strong><br />
+                                                    <i class="fas fa-long-arrow-alt-right"></i>
+                                                    {{ groupe.users|map(user => user)|join(', ', ', ') }}
+                                                </div>
+                                                <div class="col-4">
+                                                    <span class="btn float-right">
+                                                        {% if groupe.hasDataset(dataset) %}
+                                                            <a class="btn btn-danger btn-sm" href="{{ path("dashboard_dataset_group_share_delete", {'hash': dataset.hash, 'group': groupe.id}) }}">
+                                                                {% trans %}dashboard.dataset.index.btn_supprimer{% endtrans %} <i class="fas fa-times"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            <a class="btn btn-success btn-sm" href="{{ path("dashboard_dataset_group_share_add", {'hash': dataset.hash, 'group': groupe.id}) }}">
+                                                                {% trans %}dashboard.dataset.index.btn_partager{% endtrans %} <i class="fas fa-check"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        {% else %}
+                                            <em>{% trans %}dashboard.dataset.index.aucun_groupe{% endtrans %}</em>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.dataset.index.btn_fermer{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- modal partage -->
+
+                {% else %}
+                    <tr>
+                        <td colspan="4"><em>{% trans %}dashboard.dataset.index.aucun_dataset{% endtrans %}</em></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- modal help -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal_dataset_help">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content p-2">
+                <div class="modal-header">
+                    <h3 class="modal-title">
+                        {% trans %}dashboard.dataset.index.modale_aide_titre{% endtrans %}
+                    </h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% trans %}dashboard.dataset.index.modale_aide{% endtrans %}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans %}dashboard.dataset.index.btn_fermer{% endtrans %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal help -->
+
+{% endblock %}

@@ -1,0 +1,7 @@
+- name: Configure Worker nodes
+  hosts: workers
+  become: yes
+  
+  roles:
+    - common
+    - slurm_worker

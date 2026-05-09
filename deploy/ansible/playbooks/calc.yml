@@ -1,0 +1,12 @@
+- name: Configure CALC servers
+  hosts: calc
+  become: yes
+  
+  roles:
+    - common
+    - docker
+    - create_user
+    - nfs_client
+    - slurm_controller
+    - slurm_worker
+    - ssh_key

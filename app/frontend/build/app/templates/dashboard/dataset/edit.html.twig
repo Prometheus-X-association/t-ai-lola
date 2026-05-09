@@ -1,0 +1,33 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Dataset - {% trans %}dashboard.dataset.edit.title{% endtrans %} {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-database fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.dataset.edit.modification_dataset{% endtrans %} <strong>{{ dataset.name }}</strong></span>
+        </div>
+        <a href="{{ path('dashboard_dataset_index') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-arrow-left"></i>
+            {% trans %}dashboard.dataset.edit.btn_retour{% endtrans %}
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-8">
+            {{ include('dashboard/dataset/_form.html.twig', {'button_label': 'dashboard.dataset.edit.btn_modifier'|trans}) }}
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> {% trans %}dashboard.dataset.edit.aide_titre{% endtrans %}
+                </div>
+                <div class="card-body">
+                    {% trans %}dashboard.dataset.edit.aide{% endtrans %}
+                </div>
+            </div>            
+        </div>
+    </div>
+
+{% endblock %}

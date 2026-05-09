@@ -1,0 +1,41 @@
+# -*- restclient -*-
+
+#
+# Execute a scenario
+#
+POST http://127.1:5000/scenario/execute
+Content-Type: application/json
+
+{
+  "tag_hash": "template-scenario",
+  "run_hash": "123456_Hash_Run",
+  "user_hash": "789_Hash_User",
+  "dataset_hash": "101112_Hash_Dataset",
+  "parameters": {
+    "max_iteration": 5
+  },
+  "algorithms": [
+    {
+      "algorithm_hash": "exemple_model",
+      "template": "templates/user_model.nf.j2",
+      "nf_variable": "userModel",
+      "parameter": {
+        "max_iteration": 5
+        }
+   }]}
+
+#
+# Get parameters of a scenario
+#
+POST http://127.1:5000/scenario/parameters
+Content-Type: application/json
+Accept: application/json
+
+{
+  "tag_hash": "template-scenario"
+}
+
+#
+# Get Health of the server
+#
+GET http://127.1:5000/health
