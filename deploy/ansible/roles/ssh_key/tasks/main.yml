@@ -1,0 +1,8 @@
+- name: Add munge key to authorized_keys
+  lineinfile:
+    path: /home/lolauser/.ssh/authorized_keys
+    line: "{{ lookup('file', '/tmp/id_rsa.pub') }}"
+    create: yes
+    owner: lolauser
+    group: lolauser
+    mode: '0600'

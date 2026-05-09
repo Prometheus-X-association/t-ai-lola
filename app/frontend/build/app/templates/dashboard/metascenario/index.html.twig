@@ -1,0 +1,332 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Méta-scénarios {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-scroll fa-2x sidebar-brand-icon"></i>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1"> {% trans %}dashboard.metascenario.index.titre{% endtrans %}</span>
+        </div>
+        {% if is_granted('ROLE_PROFIL_4') %}
+        <span class="float-right">
+            <a href="{{ path('dashboard_metascenario_new') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i>
+                {% trans %}dashboard.metascenario.index.btn_ajout_metascenario{% endtrans %}
+            </a>
+            <a href="{{ path('dashboard_run_index') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-cogs"></i>
+                {% trans %}dashboard.metascenario.index.btn_visualiser_run{% endtrans %}
+            </a>
+        </span>
+        {% endif %}
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_scenarios" width="98%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th scope="col">{% trans %}dashboard.metascenario.index.th_titre{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.metascenario.index.th_tags{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.metascenario.index.th_date_creation{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.metascenario.index.th_date_modification{% endtrans %}</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for metaScenario in metaScenarios %}
+                    <tr>
+                        <td>
+                            {{ metaScenario.name }} <span class="badge badge-primary badge-pill float-right">{{ metaScenario.isPublic ? 'Public' : 'Privé'}}</span>
+                            {% if metaScenario.urlRepository %}
+                                <hr />
+                                <a href="{{ metaScenario.urlRepositoryNoToken }}" target="_blank">
+                                    {{ metaScenario.urlRepositoryNoToken }} <i class="fas fa-external-link-alt"> </i>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for tag in metaScenario.tags %}
+                                {% if tag.status == constant('\\App\\Entity\\Tag::STATUS_PROCESSING') %}
+                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_tag1{{ tag.hash }}" title="Le tag est en cours de création, cliquer pour plus d'information." class="text-warning">
+                                        <i class="fas fa-info-circle"> </i>
+                                        {{ tag.name }}
+                                    </a>
+                                {% elseif tag.status == constant('\\App\\Entity\\Tag::STATUS_ERROR') %}
+                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_tag2{{ tag.hash }}" title="Le tag est en erreur, cliquer pour plus d'information." class="text-danger">
+                                        <i class="fas fa-times-circle"> </i>
+                                        {{ tag.name }}
+                                    </a>
+                                {% elseif tag.status == constant('\\App\\Entity\\Tag::STATUS_AVAILABLE') %}
+                                    <a class="text-success" role="button" data-toggle="tooltip" data-placement="right" title="Le tag est disponible.">
+                                        <i class="fas fa-info-circle"> </i>
+                                        {{ tag.name }}
+                                    </a>
+                                {% endif %}
+                                <br />
+                            {% endfor %}
+                        </td>
+                        <td data-sort="{{ metaScenario.createdAt|date('U') }}">{{ metaScenario.createdAt | date('d-m-Y H:i:s') }}
+                            {% if metaScenario.createdBy is not null and metaScenario.createdAt is not null%}  
+                                <br /><i>({{ metaScenario.createdBy }})</i>
+                            {% else %}
+                                <i>{% trans %}dashboard.dataset.index.non_defini{% endtrans %}</i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if metaScenario.updatedBy is not null and metaScenario.updatedAt is not null%}
+                                {{ metaScenario.updatedAt | date('d-m-Y H:i:s') }}
+                                <br /><i>({{ metaScenario.updatedBy }})</i>
+                            {% else %}
+                                <i>{% trans %}dashboard.dataset.index.non_defini{% endtrans %}</i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if metaScenario.isActive %}
+                                {% if metaScenario.tags|length > 0 %}
+                                    <a class="btn btn-outline-dark btn-sm" href="{{ path('dashboard_metascenario_prepare', {'id': metaScenario.id}) }}">
+                                        <i class="fa fa-cogs"></i> {% trans %}dashboard.metascenario.index.btn_create_scenario{% endtrans %}
+                                    </a>
+                                {% else %}
+                                    <a class="btn btn-outline-dark btn-sm disabled" href="#">
+                                        <i class="fas fa-cogs"></i> {% trans %}dashboard.metascenario.index.btn_create_scenario{% endtrans %}
+                                    </a>
+                                {% endif %}
+                                {% if metaScenario.createdBy == app.user or app.user.isAdmin %}
+                                    <a class="btn btn-outline-dark btn-sm" href="#" data-toggle="modal" data-target="#modal_tag_{{metaScenario.id}}">
+                                        <i class="fas fa-tags"></i> {% trans %}dashboard.metascenario.index.btn_create_tag{% endtrans %}
+                                    </a>
+                                    <hr />
+                                    {%  if metaScenario.isPublic %}
+                                        <a href="{{ path("dashboard_metascenario_toggle_public", {'id': metaScenario.id}) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-lock"></i> {% trans %}dashboard.metascenario.index.btn_public_partage_supprimer{% endtrans %}
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path("dashboard_metascenario_toggle_public", {'id': metaScenario.id}) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-lock-open"></i> {% trans %}dashboard.metascenario.index.btn_public_partage{% endtrans %}
+                                        </a>
+                                    {% endif %}
+                                    <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_metascenario_edit', {'id': metaScenario.id}) }}">
+                                        <i class="fa fa-edit"></i> {% trans %}dashboard.metascenario.index.btn_modifier{% endtrans %}
+                                    </a>
+                                    <a href="{{ path("dashboard_metascenario_toggle_active", {'id': metaScenario.id}) }}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-times"></i> {% trans %}dashboard.metascenario.index.btn_desactiver{% endtrans %}
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                {% if metaScenario.createdBy == app.user or app.user.isAdmin %}
+                                    <a href="{{ path("dashboard_metascenario_toggle_active", {'id': metaScenario.id}) }}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-check"></i> {% trans %}dashboard.metascenario.index.btn_activer{% endtrans %}
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                <!-- modal Execution scenario -->
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal_execution_{{metaScenario.id}}">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">
+                                    Execution du scénario <em>{{ metaScenario.name }}</em>
+                                </h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Choix de la version
+                                            </div>
+                                            <div class="card-body">
+                                                {% for tag in metaScenario.tags %}
+                                                    {% if tag.status == constant('\\App\\Entity\\Tag::STATUS_AVAILABLE') %}
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="scenario_execution_tag_hash_{{ metaScenario.id }}" id="{{ tag.hash }}" value="{{ tag.hash }}">
+                                                            <label class="form-check-label" for="{{ tag.hash }}">{{ tag.name }}</label>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Choix du dataset
+                                            </div>
+                                            <div class="card-body">
+                                                {% for dataset in userDatasets %}
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="scenario_execution_dataset_hash_{{ metaScenario.id }}" id="{{ dataset.hash }}" value="{{ dataset.hash }}">
+                                                        <label class="form-check-label" for="{{ dataset.hash }}">{{ dataset.name }}</label>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <br />
+                                <button id="scenario_execution_validation_etape1_{{ metaScenario.id }}" data-scenario="{{ metaScenario.id }}" type="button" class="btn btn-primary btn-sm btn-block">Valider</button>
+
+                                <div class="d-none" id="scenario_execution_parametres_{{ metaScenario.id }}">
+                                    <hr />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    Saisie des paramêtres
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="loader_{{ metaScenario.id }}" class="d-none">
+                                                        <div class="col-md-12">
+                                                            <h3>
+                                                                <center>
+                                                                    <i class="fa fa-spinner fa-spin fa-lg"></i>
+                                                                    En cours de chargement...
+                                                                </center>
+                                                            </h3>
+                                                        </div>
+                                                    </div>
+                                                    <span id="scenario_execution_parametres_form_{{ metaScenario.id }}" class="d-none">
+                                                        Aucun paramètre à saisir.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- modal Execution scenario -->
+
+                <!-- modal création tag -->
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal_tag_{{metaScenario.id}}">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">
+                                    <em>{{ metaScenario.name }}</em>
+                                    <footer class="blockquote-footer">{% trans %}dashboard.metascenario.index.modal_titre{% endtrans %}</footer>
+                                </h4>
+
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ path("dashboard_metascenario_tag_new") }}" method="POST">
+                                    <input type="hidden" name="meta_scenario_id" value="{{ metaScenario.id }}" />
+                                    <label for="name" class="font-weight-bold">{% trans %}dashboard.metascenario.index.modal_git_tag{% endtrans %}</label>
+                                    <input type="text" id="name" name="tag_name" class="form-control" aria-describedby="versionHelpBlock">
+                                    <small id="versionHelpBlock" class="form-text text-muted">
+                                        {% trans %}dashboard.metascenario.index.modal_git_tag_doc{% endtrans %}
+                                    </small>
+                                    <hr />
+                                    <label for="version" class="font-weight-bold">{% trans %}dashboard.metascenario.index.modal_version{% endtrans %}</label>
+                                    <input type="text" id="version" name="tag_version" class="form-control" aria-describedby="tagHelpBlock">
+                                    <small id="tagHelpBlock" class="form-text text-muted">
+                                        {% trans %}dashboard.metascenario.index.modal_version_doc{% endtrans %}
+                                    </small>
+                                    <hr />
+                                    <button type="submit" class="btn btn-success btn-block">{% trans %}dashboard.metascenario.index.modal_btn_ajouter{% endtrans %}</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- modal création tag -->
+
+                <!-- modal suppression tag en PROCESSING-->
+                {% for tag in metaScenario.tags %}
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal_suppression_tag1{{ tag.hash }}">
+                        <div class="modal-dialog modal-dialog-scrollable" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        {% trans %}dashboard.metascenario.index.modal_title_tag1{% endtrans %}
+                                        <strong style="color:#0099cc;"><em>{{ tag.name }}</strong></em><br>
+                                        {% trans %}dashboard.metascenario.index.modal_title_tag2{% endtrans %}
+                                        <strong style="color:#0099cc;"><em>{{ tag.metascenario.name  }}</strong></em> 
+                                    </h5>                                    
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="col-12" style="font-size:18px;">
+                                        {% trans %}dashboard.metascenario.index.modal_body_processing{% endtrans %}
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button onclick="window.location.href = '{{ path("dashboard_metascenario_tag_delete", {'hash': tag.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_confirmer{% endtrans %}</button>
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_annuler{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                    {% endfor %}
+                <!-- modal suppression tag -->
+
+
+
+                 <!-- modal suppression tag en ERROR -->
+                {% for tag in metaScenario.tags %}
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal_suppression_tag2{{ tag.hash }}">
+                    <div class="modal-dialog modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    {% trans %}dashboard.metascenario.index.modal_title_tag1{% endtrans %} 
+                                    <strong style="color:#0099cc;"><em>{{ tag.name }}</strong></em><br>
+                                    {% trans %}dashboard.metascenario.index.modal_title_tag2{% endtrans %} 
+                                    <strong style="color:#0099cc;"><em>{{ tag.metascenario.name  }}</strong></em> 
+                                </h5>                                    
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="col-12">
+                                    {% if tag.log  %}
+                                        <div class="format_json" style="font-size:18px; color:black;">
+                                            {{ tag.log|replace({'\\n': '<br>'})|raw }}
+                                        </div><br>                                   
+                                    {% endif %}
+                                    <h5 class="text-danger">
+                                        {% trans %}dashboard.metascenario.index.modal_body_error{% endtrans %} 
+                                    </h5> 
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="window.location.href = '{{ path("dashboard_metascenario_tag_delete", {'hash': tag.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_confirmer{% endtrans %}</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_annuler{% endtrans %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    {% endfor %}
+                <!-- modal suppression tag -->
+
+            {% else %}
+                <tr>
+                    <td colspan="4"><em>{% trans %}dashboard.metascenario.index.aucun_scenario{% endtrans %}</em></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+
+{% endblock %}

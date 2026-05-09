@@ -1,0 +1,318 @@
+{% extends "dashboard/base/layout.html.twig" %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-database fa-2x sidebar-brand-icon"></i>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.runs.details.titre{% endtrans %}</span>
+        </div>
+        <span class="float-right">
+            <a class="btn btn-sm btn-primary" href="{{ path("dashboard_run_index") }}">
+                <i class="fas fa-cogs"></i>
+                {% trans %}dashboard.runs.details.btn_retour{% endtrans %}
+            </a>
+        </span>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-4 mb-5">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            {% trans %}dashboard.runs.details.titre{% endtrans %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            Status
+                            {% if run.status == constant('\\App\\Entity\\Run::STATUS_COMPLETED') %}
+                            <span id="run_status" class="badge badge-success">
+                            {% elseif run.status == constant('\\App\\Entity\\Run::STATUS_ERROR') %}
+                            <span id="run_status" class="badge badge-danger">
+                            {% else %}
+                            <span id="run_status" class="badge badge-secondary">
+                            {% endif %}
+                                {{ run.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>{% trans %}dashboard.runs.details.user{% endtrans %}</strong> : <em>{{ run.createdBy }}</em></li>
+                                <li class="list-group-item"><strong>{% trans %}dashboard.runs.details.date{% endtrans %}</strong> : <em>{{ run.createdAt | date('d-m-Y H:i:s') }}</em></li>
+                                <li class="list-group-item"><strong>{% trans %}dashboard.runs.details.hash{% endtrans %}</strong> : <em>{{ run.hash }}</em></li>
+                                <li class="list-group-item">
+                                    <strong>{% trans %}dashboard.runs.details.scenario{% endtrans %}</strong> : <em>{{ run.scenario.metascenario.name }}</em>
+                                    <span class="badge badge-primary">{{ run.scenario.metascenario.isPublic ? "Public" : "Privé" }}</span>
+                                </li>
+                                <li class="list-group-item"><strong>{% trans %}dashboard.runs.details.tag{% endtrans %}</strong> : <em>{{ run.scenario.tag.name }}</em></li>
+                                <li class="list-group-item"><strong>{% trans %}dashboard.runs.details.dataset{% endtrans %}</strong> : <em>{{ run.scenario.dataset.name }}</em></li>
+                                <li class="list-group-item">
+                                    <strong>{% trans %}dashboard.runs.details.parametre{% endtrans %}</strong>
+                                    <pre class="format_json">{{ run.scenario.parametres | json_encode() }}</pre>
+                                    <hr />
+                                    {% for scenarioAlgorithm in run.scenario.scenarioAlgorithms %}
+                                        <strong>{{ scenarioAlgorithm.nfVariable }}</strong> - 
+                                        {{ scenarioAlgorithm.algorithmVersion.algorithm.name }} ({{ scenarioAlgorithm.algorithmVersion.name }})
+                                        <pre class="format_json">
+                                            {{ scenarioAlgorithm.parametres| json_encode() }}
+                                        </pre>
+                                    {% endfor %}                                    
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% if run.hasOutput %}
+                        <a href="{{ path("dashboard_run_results", {'hash': run.hash}) }}" class="btn btn-primary btn-lg btn-block mt-auto" id="btn_run_download_results">
+                            <i class="fas fa-download"></i> <span id="btn_resultat_text">{% trans %}dashboard.runs.details.telecharger_resultats{% endtrans %}</span>
+                        </a>
+                    {% else %}
+                        <a href="{{ path("dashboard_run_results", {'hash': run.hash}) }}" class="btn btn-primary btn-lg btn-block mt-auto disabled" id="btn_run_download_results">
+                            <i class="fas fa-download"></i> <span id="btn_resultat_text">{% trans %}dashboard.runs.details.resultats_non_disponible{% endtrans %}</span>
+                        </a>                        
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8 mb-5">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            {% trans %}dashboard.runs.details.maj{% endtrans %} : <span id="update_date">{{ "now" | date('d/m/Y, H:i:s') }}</span>
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{% trans %}dashboard.runs.details.log_run{% endtrans %}</div>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100 run_log_table_overflow620">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{% trans %}dashboard.runs.details.datetime{% endtrans %}</th>
+                                        <th scope="col">{% trans %}dashboard.runs.details.type{% endtrans %}</th>
+                                        <th scope="col">{% trans %}dashboard.runs.details.nomProcess{% endtrans %}</th>
+                                        <th scope="col">{% trans %}dashboard.runs.details.evenement{% endtrans %}</th>
+                                        <th scope="col">{% trans %}dashboard.runs.details.erreur{% endtrans %}</th>
+                                        <th scope="col">{% trans %}dashboard.runs.details.statistiques{% endtrans %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="runlogs_table">
+                                    {% for runLog in runLogs %}
+                                        <tr>
+                                            <td>{{ runLog.time | date('d/m/Y, H:i:s') }}</td>
+                                            <td><span class="badge badge-primary">{{ runLog.type }}</span></td>
+                                            <td>{{ runLog.nomProcess }}</td>
+                                            <td>
+                                                {% if runLog.event == constant('\\App\\Entity\\RunLogs::EVENT_ERROR') %}
+                                                <span class="badge badge-danger">
+                                                {% elseif runLog.event == constant('\\App\\Entity\\RunLogs::EVENT_DONE') %}
+                                                <span class="badge badge-success">
+                                                {% elseif runLog.event == constant('\\App\\Entity\\RunLogs::EVENT_RUN') %}
+                                                <span class="badge badge-info">
+                                                {% else %}
+                                                <span class="badge badge-secondary">
+                                                {% endif %}
+                                                    {{ runLog.event }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if runLog.type == constant('\\App\\Entity\\RunLogs::TYPE_WORKFLOW') and runLog.event == constant('\\App\\Entity\\RunLogs::EVENT_ERROR') %}
+                                                    {{runLog.error}}                                                    
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if runLog.type == constant('\\App\\Entity\\RunLogs::TYPE_PROCESS') and runLog.event == constant('\\App\\Entity\\RunLogs::EVENT_DONE') %}
+                                                    <a href="#" data-toggle="modal" data-target="#modal_statistics_{{ runLog.id }}">
+                                                    {% trans %}dashboard.runs.details.statistiques{% endtrans %}
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                            <td> <br><br> </td>
+                                        </tr>
+
+                                        <!-- modal statistics in the case of a process in done -->
+                                            <div class="modal" tabindex="-1" role="dialog" id="modal_statistics_{{ runLog.id }}">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">
+                                                                <strong><em>{% trans %}dashboard.runs.details.config_lolapy{% endtrans %}</em></strong>
+                                                            </h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <pre class="format_json">
+                                                                {{ runLog.statistic | json_encode() }}
+                                                            </pre>                    
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <!-- modal statistics in the case of a process in done -->
+
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{%  block javascript %}
+    {% if run.status != constant('\\App\\Entity\\Run::STATUS_COMPLETED') and run.status != constant('\\App\\Entity\\Run::STATUS_ERROR')%}
+        <script>
+            var interval = 2000;
+            function refreshRunDetails() {
+                if( (!$("#run_status").hasClass("badge-success") || $("#btn_run_download_results").hasClass("disabled")) && (!$("#run_status").hasClass("badge-danger")) )  {
+                
+                    $.ajax({
+                        type: 'GET',
+                        url: "./ajax/logs/{{ run.hash }}",
+                        dataType: 'json',
+                        success: function (data) {
+                            // console.log(data[0]);
+                            // update details time
+                            let date = new Date();
+                            date = date.toLocaleDateString("fr-FR", {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour:  "2-digit",
+                                minute:  "2-digit",
+                                second:  "2-digit",
+                            });
+                            $("#update_date").html(date);
+
+                            if(data[0]) {
+                                // update run status
+                                $("#run_status").html(data[0].run_status);
+                                $("#run_status").removeClass("badge-success");
+                                $("#run_status").removeClass("badge-danger");
+                                $("#run_status").removeClass("badge-secondary");
+                                if(data[0].run_status === "ERROR") {
+                                    $("#run_status").addClass("badge-danger");
+                                }
+                                else if(data[0].run_status === "COMPLETED") {
+                                    $("#run_status").addClass("badge-success");
+                                }
+                                else {
+                                    $("#run_status").addClass("badge-secondary");
+                                }
+                                if(data[0].run_output) {
+                                    $("#btn_run_download_results").removeClass("disabled");
+                                    $("#btn_resultat_text").html("{% trans %}dashboard.runs.details.telecharger_resultats{% endtrans %}");
+                                }
+                            }
+                            // update runlogs table
+                            $("#runlogs_table").html("");
+
+                            let txt = "";
+                            for (runLogs in data) {
+                                let time = new Date(data[runLogs].datetime.date);
+                                time = time.toLocaleDateString("fr-FR", {
+                                    year: "numeric",
+                                    month: "2-digit",
+                                    day: "2-digit",
+                                    hour:  "2-digit",
+                                    minute:  "2-digit",
+                                    second:  "2-digit",
+                                });
+                                let type = data[runLogs].type;
+                                let nomProcess = data[runLogs].nomProcess;
+                                let event = data[runLogs].event;
+                                let error = data[runLogs].error || "";
+                                let statistics = JSON.stringify(data[runLogs].statistics);
+
+                                txt += `
+                                    <tr>
+                                        <td> ${time} </td>
+                                        <td><span class="badge badge-primary"> ${type} </span></td>
+                                        <td> ${nomProcess} </td>
+                                `;
+                                if( event === "{{ constant('\\App\\Entity\\RunLogs::EVENT_ERROR') }}" ) {
+                                    txt += `<td><span class="badge badge-danger">${event}</span></td>`;
+                                }
+                                else if( event === "{{ constant('\\App\\Entity\\RunLogs::EVENT_DONE') }}" ) {
+                                    txt += `<td><span class="badge badge-success">${event}</span></td>`;
+                                }
+                                else if( event === "{{ constant('\\App\\Entity\\RunLogs::EVENT_RUN') }}" ) {
+                                    txt += `<td><span class="badge badge-info">${event}</span></td>`;
+                                }
+                                else {
+                                    txt += `<td><span class="badge badge-secondary">${event}</span></td>`;
+                                }
+
+                                txt += `
+                                        <td> ${error} </td>
+                                `;
+
+                                if( type === "{{ constant('\\App\\Entity\\RunLogs::TYPE_PROCESS') }}" && event === "{{ constant('\\App\\Entity\\RunLogs::EVENT_DONE') }}" ) {
+                                    txt += `<td><a href="#" data-toggle="modal" data-target="#modal_statistics_${nomProcess}">
+                                                    Statistics
+                                                </a>
+                                                <div class="modal" tabindex="-1" role="dialog" id="modal_statistics_${nomProcess}">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">
+                                                                    <strong><em>{% trans %}dashboard.runs.details.config_lolapy{% endtrans %}</em></strong>
+                                                                </h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                    ${statistics}                      
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            `;
+                                }
+                                else {
+                                    txt += ` `;
+                                }
+                                txt += `
+                                        <td> <br><br> </td>
+                                    </tr>
+                                `;   
+                            }
+                            $("#runlogs_table").html(txt);
+
+                        },
+                        complete: function (data) {
+                            // Schedule the next
+                            setTimeout(refreshRunDetails, interval);
+                        }
+                    });
+                }
+            }
+                
+            setTimeout(refreshRunDetails, interval);
+        </script>        
+
+    {% endif %}
+
+{% endblock %}
+
+

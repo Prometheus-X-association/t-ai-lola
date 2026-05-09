@@ -1,0 +1,13 @@
+{{ form_start(form) }}
+{{ form_row(form.name, {'label': 'dashboard.dataset.form.nom'|trans}) }}
+{{ form_row(form.description, {'label': 'dashboard.dataset.form.description'|trans}) }}
+
+<button class="btn btn-success float-right btn-block">
+    {{ button_label|default('dashboard.dataset.form.btn_enregistrer'|trans) }}
+</button>
+{{ form_end(form) }}
+
+{% block javascript %}
+    <!-- select2 -->
+    <script src="{{ asset('node_modules/tinymce/tinymce.min.js') }}"></script>
+{% endblock %}

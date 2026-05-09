@@ -1,0 +1,34 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Groupes - Modification {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-users fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.groupe.edit.modification_group{% endtrans %} <strong>{{ group.name }}</strong></span>
+        </div>
+        <a href="{{ path('dashboard_group_index') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-arrow-left"></i>
+            {% trans %}dashboard.groupe.edit.btn_retour{% endtrans %}
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-8">
+            {{ include('dashboard/group/_form.html.twig', {'button_label': 'dashboard.groupe.edit.btn_modifier'|trans}) }}
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> {% trans %}dashboard.groupe.edit.title{% endtrans %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{% trans %}dashboard.groupe.edit.modification_group{% endtrans %}</h5>
+                    {% trans %}dashboard.groupe.edit.aide{% endtrans %}
+                </div>
+            </div>                
+        </div>
+    </div>
+
+{% endblock %}

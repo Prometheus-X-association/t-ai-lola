@@ -1,0 +1,95 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Terms of use {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-database fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1"> {% trans %}dashboard.termsofuse.index.titre{% endtrans %}</span>
+        </div>
+        <span class="float-right">
+            <a href="{{ path('dashboard_termsofuse_new') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> 
+                {% trans %}dashboard.termsofuse.index.btn_ajout_termsofuse{% endtrans %}
+            </a>
+        </span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_termsofuses" width="98%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th scope="col">{% trans %}dashboard.termsofuse.index.th_date_creation{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.termsofuse.index.th_derniere_modification{% endtrans %}</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for termsOfUse in termsOfUses %}
+                    {%  if termsOfUse.isActive %}
+                        <tr class="table-success">
+                    {% else %}
+                        <tr>
+                    {% endif %}
+                        {% if termsOfUse.createdBy is not null and termsOfUse.createdAt is not null%}
+                            <td data-sort="{{ termsOfUse.createdAt|date('U') }}">{{ termsOfUse.createdAt | date('d-m-Y H:i:s') }}</td>
+                        {% else %}
+                            <td><i>non défini</i></td>
+                        {% endif %}
+                        </td>
+                        {% if termsOfUse.updatedBy is not null and termsOfUse.updatedAt is not null%}
+                            <td data-sort="{{ termsOfUse.updatedAt|date('U') }}">{{ termsOfUse.updatedAt | date('d-m-Y H:i:s') }}</td>
+                        {% else %}
+                            <td><i>{% trans %}dashboard.termsofuse.index.non_defini{% endtrans %}</i></td>
+                        {% endif %}
+                        </td>                        
+                        <td>
+                            <a href="#"  class="btn btn-outline-primary btn-sm"
+                                id="button_modal_{{ termsOfUse.id }}" 
+                                data-toggle="modal" 
+                                data-target="#modal_{{ termsOfUse.id }}">
+                                <i class="fas fa-search"> </i> 
+                                {% trans %}dashboard.termsofuse.index.btn_details{% endtrans %}
+                            </a>
+                            {% if not termsOfUse.isActive %}
+                                <a href="{{ path("dashboard_termsofuse_active", {'id': termsOfUse.id}) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-check"></i> {% trans %}dashboard.termsofuse.index.btn_set_active{% endtrans %}
+                                </a>
+                            {% endif %}                                
+                        </td>
+                    </tr> 
+                                        
+                    <!-- modal terms of use details -->
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_{{ termsOfUse.id }}">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        <strong>{% trans %}dashboard.termsofuse.index.titre{% endtrans %}</strong>
+                                    </h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {{ termsOfUse.description | raw }}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.termsofuse.index.btn_fermer{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- modal -->                                               
+
+            {% else %}
+                <tr>
+                    <td colspan="4"><em>{% trans %}dashboard.termsofuse.index.aucun_termsofuse{% endtrans %}</em></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

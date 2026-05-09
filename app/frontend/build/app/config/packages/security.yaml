@@ -1,0 +1,54 @@
+security:
+    access_decision_manager:
+        strategy: unanimous
+
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+
+    role_hierarchy:
+        ROLE_ADMIN_SISR: [ROLE_ADMIN, ROLE_PROFIL_5]
+        ROLE_ADMIN: [ROLE_PROFIL_5]
+        ROLE_PROFIL_2 : [ROLE_PROFIL_1]
+        ROLE_PROFIL_3 : [ROLE_PROFIL_1, ROLE_PROFIL_2]
+        ROLE_PROFIL_4 : [ROLE_PROFIL_1, ROLE_PROFIL_2, ROLE_PROFIL_3]
+        ROLE_PROFIL_5 : [ROLE_PROFIL_1, ROLE_PROFIL_2, ROLE_PROFIL_3, ROLE_PROFIL_4]
+
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: lazy
+            provider: app_user_provider
+            user_checker: App\Security\UserChecker
+            guard:
+                authenticators:
+                    - App\Security\LoginFormAuthenticator
+            logout:
+                path: app_logout
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        # Access only for "admin" users
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # Access to all authenticated users
+        - { path: ^/dashboard, roles: IS_AUTHENTICATED_FULLY }
+        # API access is only for the Lolapy server
+        - { path: ^/api, roles: IS_AUTHENTICATED_ANONYMOUSLY, ips: ['%env(LOLAPY_API_ADRESS)%'], methods: [POST, GET] }
+        - { path: ^/api, allow_if: "'%env(ENABLE_API_ACCESS_CONTROL)%' == 'false'" }
+        - { path: ^/api, roles: ROLE_NO_ACCESS }

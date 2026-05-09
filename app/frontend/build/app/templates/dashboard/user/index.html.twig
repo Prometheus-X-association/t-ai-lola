@@ -1,0 +1,229 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Utilisateurs {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-users fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.user.index.titre{% endtrans %}</span>
+        </div>
+        <a class="btn btn-sm btn-primary" 
+           id="link_modal_user_upgrade" 
+           data-toggle="modal" 
+           data-target="#modal_user_upgrade">
+            <i class="fas fa-user-tag"></i>
+            {% trans %}dashboard.user.index.btn_demande_maj{% endtrans %}
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_users" width="95%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th scope="col">{% trans %}dashboard.user.index.th_nom{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.user.index.th_prenom{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.user.index.th_email{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.user.index.th_profile{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.user.index.th_groupe{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.user.index.th_date_creation{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.user.index.th_date_modification{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.user.index.th_derniere_connexion{% endtrans %}</th>
+                    {% if is_granted('ROLE_ADMIN_SISR') %} <th scope="col">Details</th> {% endif %}
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in listUsers %}
+                    <tr>
+                        <td>{{ user.firstname }}</td>
+                        <td>{{ user.lastname }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {{ user.roles|map(role => user.getRole(role))|join(', ', '') }}
+                            {% if user.upgradeRequest %}
+                                <span class="badge badge-info float-right">Upgrade</span>
+                            {% endif %}
+                        </td>
+                        <td>{% for group in user.groups %}
+                                <!-- lien pour infos de chaque groupe d'appartenance-->
+                                <a href="#" data-toggle="modal" data-target="#modal_group_parametre_{{ group.id }}"> {{ group.name }}</a>
+                                {% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        </td>
+                            {% if user.createdBy is not null and user.createdAt is not null%}
+                                <td data-sort="{{ user.createdAt|date('U') }}">{{ user.createdAt | date('d-m-Y H:i:s') }}</td>
+{#                                <br /><i>({{ user.createdBy }})</i>#}
+                            {% else %}
+                                <td><i>{% trans %}dashboard.user.index.non_defini{% endtrans %}</i></td>
+                            {% endif %}
+                        </td>
+                            {% if user.updatedBy is not null and user.updatedAt is not null%}
+                                <td data-sort="{{ user.updatedAt|date('U') }}">{{ user.updatedAt | date('d-m-Y H:i:s') }}</td>
+{#                                <br /><i>({{ user.updatedBy }})</i>#}
+                            {% else %}
+                                <td><i>{% trans %}dashboard.user.index.non_defini{% endtrans %}</i></td>
+                            {% endif %}
+                        </td> 
+                            {% if user.lastLoginAt is not null %}
+                                <td data-sort="{{ user.lastLoginAt|date('U') }}">{{ user.lastLoginAt | date('d-m-Y H:i:s') }}</td>
+                            {% else %}
+                                <td><i>{% trans %}dashboard.user.index.non_defini{% endtrans %}</i></td>
+                            {% endif %}
+                        </td>
+                        {% if is_granted('ROLE_ADMIN_SISR') %}
+                            <td>
+                                <a href="#" id="link_modal_user_token" data-toggle="modal" data-target="#modal_user_detail_{{ user.id }}">Tokens</a>
+                            </td>
+                        {% endif %}
+                        <td>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_user_edit', {'id': user.id}) }}">
+                                    <i class="fa fa-edit"></i> {% trans %}dashboard.user.index.modifier{% endtrans %}
+                                </a> 
+                                {%  if user.isActive %}
+                                    <a href="{{ path("dashboard_user_disable", {'id': user.id}) }}" class="btn btn-outline-danger btn-sm"><i class="fas fa-user-times"></i> {% trans %}dashboard.user.index.desactiver{% endtrans %}</a>
+                                {% else %}
+                                    <a href="{{ path("dashboard_user_enable", {'id': user.id}) }}" class="btn btn-outline-success btn-sm"><i class="fas fa-user-check"></i>{% trans %}dashboard.user.index.activer{% endtrans %}</a>
+                                {% endif %} 
+                                {%  if user.hasRole('ROLE_ADMIN') %}
+                                    <a href="{{ path("dashboard_user_toggle_admin", {'id': user.id}) }}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-medal"></i> Admin
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path("dashboard_user_toggle_admin", {'id': user.id}) }}" class="btn btn-outline-warning btn-sm">
+                                        <i class="fas fa-medal"></i> Admin
+                                    </a>
+                                {% endif %}                                
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN_SISR') %}
+                                {%  if user.hasRole('ROLE_ADMIN_SISR') %}
+                                    <a href="{{ path("dashboard_user_toggle_admin_sisr", {'id': user.id}) }}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-crown"></i> SISR
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path("dashboard_user_toggle_admin_sisr", {'id': user.id}) }}" class="btn btn-outline-warning btn-sm">
+                                        <i class="fas fa-crown"></i> SISR
+                                    </a>
+                                {% endif %}                                 
+                            {% endif %}
+                        </td>                                   
+                        </td>
+                    </tr>
+
+                    {% if is_granted('ROLE_ADMIN_SISR') %}
+                        <!-- modal detail -->
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_user_detail_{{user.id}}">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        {{ user.firstname }} {{ user.lastname }}
+                                    </h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="card mt-3">
+                                        <div class="card-body">
+                                            <u><strong>Hash</strong></u> : <pre>{{ user.hash }}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>       
+                    <!-- modal detail -->
+                {% endif %}
+
+                <!-- modal upgrade -->
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal_user_upgrade">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">
+                                    {% trans %}dashboard.user.index.modal_maj_profile_titre{% endtrans %}
+                                </h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <ul class="list-group inline-list">
+                                    {% for user in listUsers|filter(u => u.upgradeRequest is not empty) -%}
+                                        <li class="list-group-item">
+                                            <span class="text-small float-left">
+                                                <strong>{{ user.firstname }} {{ user.lastname }}</strong><br />
+                                                {{ user.getProfil() }} 
+                                                <i class="fas fa-long-arrow-alt-right"></i> 
+                                                {{ user.getProfilFromRole(user.getUpgradeRequest()) ?? "Pas de profil Lola" }} 
+                                            </span>
+                                            <span class="btn float-right">
+                                                {% if user.getProfilFromRole(user.getUpgradeRequest()) %}
+                                                    <a class="btn btn-success" href="{{ path("dashboard_user_upgrade_validation", {'user': user.id}) }}">
+                                                        {% trans %}dashboard.user.index.modal_maj_profile_accepter{% endtrans %}
+                                                         <i class="fas fa-check"></i>
+                                                    </a>
+                                                    <a class="btn btn-danger" href="{{ path("dashboard_user_upgrade_deny", {'user': user.id}) }}">
+                                                        {% trans %}dashboard.user.index.modal_maj_profile_refuser{% endtrans %} <i class="fas fa-times"></i>
+                                                    </a>
+                                                {% else %}
+                                                    <a class="btn btn-secondary disabled" href="#">
+                                                        Erreur <i class="fas fa-exclamation-circle"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </span>
+                                        </li>  
+                                    {% else %}
+                                        <em>{% trans %}dashboard.user.index.modal_maj_profile_pas_maj{% endtrans %}</em>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans %}dashboard.user.index.modal_maj_profile_fermer{% endtrans %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>       
+                <!-- modal upgrade -->
+
+                <!-- modal group -->
+                {% for group in user.groups %}
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_group_parametre_{{group.id}}">
+                        <div class="modal-dialog modal-dialog-scrollable" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        <strong><em>Infos</em></strong>
+                                    </h4>                                    
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" style="font-size:18px;">
+                                    <div class="col-12">
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.groupe.index.th_nom{% endtrans %}</em></strong> : {{ group.name }}  <br><br>
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.groupe.index.th_description{% endtrans %}</em></strong> : {{ group.description }} <br><br>
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.groupe.index.th_date_creation{% endtrans %}</em></strong> : {{ group.createdAt | date('d-m-Y') }} <br><br>
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.groupe.index.th_utilisateur{% endtrans %}</em></strong> : {{ group.users|map(user => user)|join(', ') }}
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.index.modal_btn_fermer{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <!-- modal group -->
+
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

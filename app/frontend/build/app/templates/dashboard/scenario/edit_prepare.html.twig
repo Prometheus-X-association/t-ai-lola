@@ -1,0 +1,183 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} {% trans %}dashboard.scenario.creation_etape1.titre{% endtrans %} {% endblock %}
+
+{% block content %}
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-database fa-2x sidebar-brand-icon"></i>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.scenario.creation_etape1.titre{% endtrans %}</span>
+        </div>
+        <span class="float-right">
+            <a class="btn btn-sm btn-primary" href="{{ path("dashboard_scenario_index") }}">
+                <i class="fas fa-cogs"></i>
+                {% trans %}dashboard.scenario.creation_etape1.btn_retour_scenario{% endtrans %} 
+            </a>
+        </span>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 mb-5">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        <div class="text-md font-weight-bold text-primary text-uppercase mb-1">
+                            {% trans %}dashboard.scenario.creation_etape1.tag_selection{% endtrans %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100" id="radioTag">
+                            {% for tag in tags %}
+                                {% if tag.status == constant('\\App\\Entity\\Tag::STATUS_AVAILABLE') %}
+                                    <div class="inputGroupTag">
+                                        <input id="{{ tag.id }}" name="tag" data-hash="{{ tag.hash }}" type="radio"/>
+                                        <label for="{{ tag.id }}">{{ tag.name }}</label>
+                                    </div>
+                                {% else %}
+                                    <div class="inputGroupTag">
+                                        <input id="{{ tag.id }}" type="radio" disabled/>
+                                        <label for="{{ tag.id }}" class="text-muted"> <i class="fas fa-exclamation-triangle text-danger"></i> {{ tag.name }}</label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-9 mb-5">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        <div class="text-md font-weight-bold text-info text-uppercase mb-1">
+                            {% trans %}dashboard.scenario.creation_etape1.dataset_selection{% endtrans %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100 overflow">
+                            <div class="container">
+                                <div class="row">
+                                    {% for dataset in datasets %}
+                                        {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                                            <div class="col-auto mb-3">
+                                                <div class="card" style="width: 21rem;">
+                                                    <h5 class="card-header">
+                                                        {{ dataset.name }}
+                                                        <span class="badge badge-primary float-right">{{ dataset.isShared ? 'dashboard.scenario.creation_etape1.public'|trans : 'dashboard.scenario.creation_etape1.prive'|trans }}</span>
+                                                    </h5>
+                                                    <div class="card-body">
+                                                        <ul class="list-group list-group-flush ">
+                                                            <li class="list-group-item p-1"><strong>Date</strong> : <em>{{ dataset.createdAt | date('d/m/Y') }}</em></li>
+                                                            <li class="list-group-item p-1"><strong>{% trans %}dashboard.scenario.creation_etape1.cree_par{% endtrans %}</strong> : <em>{{ dataset.createdBy }}</em></li>
+                                                        </ul>
+                                                        <hr />
+                                                        <div class="row">
+                                                            <div class="col-3 pl-1 pr-1 pr-1">
+                                                                <a href="#"
+                                                                   id="button_modal_dataset_{{ dataset.hash }}"
+                                                                   data-toggle="modal"
+                                                                   data-target="#modal_dataset_detail_{{ dataset.hash }}"
+                                                                   data-hash="{{ dataset.hash }}"
+                                                                   class="btn btn-primary btn-block">
+                                                                    <i class="fas fa-search"></i>
+                                                                </a>
+                                                            </div>
+                                                            <div class="col-9 pl-1 pr-1">
+                                                                <a href="#"
+                                                                   class=" btn btn-outline-success btn-block btn-scenario-execute-dataset"
+                                                                   data-hash="{{ dataset.hash }}">
+                                                                    <i class="fas fa-check"></i> {% trans %}dashboard.scenario.creation_etape1.btn_selectionner{% endtrans %}
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- modal Detail dataset -->
+                                            <div class="modal fade" tabindex="-1" role="dialog" id="modal_dataset_detail_{{ dataset.hash }}">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title">
+                                                                <strong><em>{{ dataset.name }}</em></strong>
+                                                            </h4>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <ul class="list-group">
+                                                                        <a href="#" class="list-group-item list-group-item-action">
+                                                                            <strong>Date de création</strong> : {{ dataset.createdAt | date('d-m-Y') }}
+                                                                        </a>
+                                                                        <a href="#"
+                                                                           id="modal_dataset_detail_totalstatements_{{ dataset.hash }}"
+                                                                           class="list-group-item list-group-item-action">
+                                                                        </a>
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <ul class="list-group">
+                                                                        <a href="#"
+                                                                           id="modal_dataset_detail_uniqueactor_{{ dataset.hash }}"
+                                                                           class="list-group-item list-group-item-action">
+                                                                        </a>
+                                                                        <a href="#"
+                                                                           id="modal_dataset_detail_uniqueverb_{{ dataset.hash }}"
+                                                                           class="list-group-item list-group-item-action">
+                                                                        </a>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <hr />
+                                                            <div class="col-12">
+                                                                <pre id="modal_dataset_detail_statements_{{ dataset.hash }}"></pre>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.creation_etape1.btn_fermer{% endtrans %}</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- modal detail -->
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-auto p-2 bd-highlight">
+                        <form method="POST" action="{{ path("dashboard_scenario_edit_prepare_parameter") }}">
+                            <input type="hidden" name="hidden_tag_hash" id="hidden_tag_hash" value="{{ tagHash }}" />
+                            <input type="hidden" name="hidden_dataset_hash" id="hidden_dataset_hash" value="{{ datasetHash }}" />
+                            <input type="hidden" name="hidden_scenario_id" id="hidden_scenario_id" value="{{ scenario.id }}" />
+                            <button type="submit" id="btn_scenario_execute_step2" class=" btn btn-primary btn-lg btn-block mt-auto">
+                                <i class="fas fa-sliders-h"></i> {% trans %}dashboard.scenario.creation_etape1.btn_validation{% endtrans %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('input[data-hash="{{ tagHash }}"]').prop("checked", true);
+        let selectedDataset = $('a[data-hash="{{ datasetHash }}"').filter(".btn-scenario-execute-dataset");
+        selectedDataset.removeClass("btn-outline-success");
+        selectedDataset.addClass("btn-success");
+    </script>
+{% endblock %}

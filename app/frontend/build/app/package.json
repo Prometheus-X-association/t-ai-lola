@@ -1,0 +1,21 @@
+{
+  "name": "lola",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@gitlab.inria.fr:jalcuta/lola.git",
+  "author": "ALCUTA Jonathan <jonathan.alcuta@loria.fr>",
+  "license": "MIT",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.13.0",
+    "bootstrap": "^4.4.1",
+    "chart.js": "^4.2.1",
+    "chart.js-plugin-labels-dv": "^4.0.0",
+    "datatables": "^1.10.18",
+    "jquery": "^3.4.1",
+    "markdown-it": "^12.3.2",
+    "popper.js": "^1.16.1",
+    "pwstrength-bootstrap": "^3.0.9",
+    "select2": "^4.0.7",
+    "tinymce": "^5.6.2"
+  }
+}

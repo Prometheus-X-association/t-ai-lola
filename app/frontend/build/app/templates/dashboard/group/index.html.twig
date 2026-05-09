@@ -1,0 +1,111 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Groupes {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-users fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1"> 
+                {% trans %}dashboard.groupe.index.titre{% endtrans %}
+            </span>
+        </div>
+        <a href="{{ path('dashboard_group_new') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> 
+            {% trans %}dashboard.groupe.index.btn_ajout_groupe{% endtrans %}
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered dt-basic" id="table_users" width="98%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th scope="col">{% trans %}dashboard.groupe.index.th_nom{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.groupe.index.th_description{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.groupe.index.th_utilisateur{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.groupe.index.th_date_creation{% endtrans %}</th>
+                    <th scope="col">{% trans %}dashboard.groupe.index.th_date_modification{% endtrans %}</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for group in groups %}
+                    <tr>
+                        <td>{{ group.name }}</td>
+                        <td>{{ group.description }}</td>
+                        <td>{% for user in group.users %}
+                                <!-- lien pour infos de chaque user du groupe-->
+                                <a href="#" data-toggle="modal" data-target="#modal_user_parametre_{{ user.id }}">{{ user.firstname}}{{user.lastname}}</a>
+                                {% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        </td>
+                        {% if group.createdBy is not null and group.createdAt is not null%}
+                            <td data-sort="{{ group.createdAt|date('U') }}">{{ group.createdAt | date('d-m-Y H:i:s') }}</td>
+{#                            <br /><i>({{ group.createdBy }})</i>#}
+                        {% else %}
+                            <td><i>{% trans %}dashboard.groupe.index.non_defini{% endtrans %}</i></td>
+                        {% endif %}
+                        {% if group.updatedBy is not null and group.updatedAt is not null%}
+                            <td data-sort="{{ group.updatedAt|date('U') }}">{{ group.updatedAt | date('d-m-Y H:i:s') }}</td>
+{#                            <br /><i>({{ group.updatedBy }})</i>#}
+                        {% else %}
+                            <td><i>{% trans %}dashboard.groupe.index.non_defini{% endtrans %}</i></td>
+                        {% endif %}
+                        <td>
+                            <form method="post" class="form-inline" action="{{ path('dashboard_group_delete', {'id': group.id}) }}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ group.id) }}">
+
+                                <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_group_edit', {'id': group.id}) }}">
+                                    <i class="fa fa-edit"></i> {% trans %}dashboard.groupe.index.btn_modifier{% endtrans %} 
+                                </a> 
+                                <button type="submit" class="btn btn-outline-danger btn-sm ml-2">
+                                    <i class="fas fa-times"> </i> {% trans %}dashboard.groupe.index.btn_supprimer{% endtrans %} 
+                                </button>
+                                </a>
+                            </form>                                
+
+                        </td>
+                    </tr>
+
+
+                    <!-- modal user -->
+                    {% for user in group.users %}
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_user_parametre_{{user.id}}">
+                        <div class="modal-dialog modal-dialog-scrollable" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        <strong><em>{{ user.firstname }} {{ user.lastname }}</em></strong>
+                                    </h4>                                    
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" style="font-size:18px;">
+                                    <div class="col-12">
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.user.index.th_prenom{% endtrans %}</em></strong> : {{ user.firstname }}  <br><br>
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.user.index.th_nom{% endtrans %}</em></strong> : {{ user.lastname }} <br><br>
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.user.index.th_email{% endtrans %}</em></strong> : {{ user.email }} <br><br>
+                                        <strong style="color:#0066ff;"><em>Hash</em></strong> : {{ user.hash }}
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.index.modal_btn_fermer{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <!-- modal user -->
+
+                {% else %}
+                    <tr>
+                        <td colspan="4"><em>Aucun groupe</em></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

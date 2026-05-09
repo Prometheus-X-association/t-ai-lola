@@ -1,0 +1,46 @@
+- name: Install Slurm dependencies (Debian/Ubuntu)
+  apt:
+    name:
+      - munge
+      - libmunge-dev
+      - libmunge2
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Slurm client
+  apt:
+    name:
+      - slurm-client
+      - slurm-wlm
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Slurm server components
+  apt:
+    name:
+      - slurmctld
+      - slurmd
+    state: present
+  when: 
+    - ansible_os_family == "Debian"
+    - slurm_role in ['server', 'both']
+
+- name: Start and enable munge service
+  systemd:
+    name: munge
+    state: started
+    enabled: yes
+
+- name: Start and enable slurmctld (server)
+  systemd:
+    name: slurmctld
+    state: started
+    enabled: yes
+  when: slurm_role in ['server', 'both']
+
+- name: Start and enable slurmd (compute node)
+  systemd:
+    name: slurmd
+    state: started
+    enabled: yes
+  when: slurm_role in ['server', 'both']

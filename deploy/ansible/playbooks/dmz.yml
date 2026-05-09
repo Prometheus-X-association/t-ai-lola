@@ -1,0 +1,9 @@
+- name: Configure DMZ servers
+  hosts: dmz
+  become: yes
+  
+  roles:
+    - common
+    - docker
+    - harbor
+    - frontend

@@ -1,0 +1,17 @@
+- name: Gather facts from all hosts
+  hosts: all
+  gather_facts: yes
+  
+- name: Configure ARCH servers
+  hosts: arch
+  become: yes
+  
+  roles:
+    - common
+    - docker
+    - create_user
+    - cron_script
+    - harbor
+    - nfs_server
+    - slurm_client
+    - lolapy

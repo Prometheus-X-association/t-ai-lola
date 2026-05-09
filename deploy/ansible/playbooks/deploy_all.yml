@@ -1,0 +1,38 @@
+# - name: Global Setup (All Nodes)
+#   hosts: all
+#   become: yes
+#   roles:
+#     - common
+#     - docker
+#     - create_user
+
+# - name: Setup Slurm Controller (Calc)
+#   hosts: calc
+#   become: yes
+#   roles:
+#     - slurm_controller
+
+# - name: Setup DMZ Services (Harbor, Frontend)
+#   hosts: dmz
+#   become: yes
+#   roles:
+#     - harbor
+#     - frontend
+
+# - name: Setup Arch Node (Slurm Client, NFS, Harbor, Lolapy)
+#   hosts: arch
+#   become: yes
+#   roles:
+#     - slurm_client
+#     - nfs_server
+#     - harbor
+#     - cron_script
+#     - lolapy
+
+- name: Finish Calc Setup (NFS Client, Workers, SSH Keys)
+  hosts: calc
+  become: yes
+  roles:
+    - nfs_client
+    - slurm_worker
+    - ssh_key

@@ -1,0 +1,88 @@
+- name: Clone Git repository
+  git:
+    repo: "{{ git_repo_url }}"
+    dest: "{{ git_repo_dest }}"
+    version: test/devops
+    force: yes
+- name: Create certs directory
+  file:
+    path: "{{ git_repo_dest }}/certs"
+    state: directory
+
+- name: Create .env file
+  copy: 
+    src: "{{ git_repo_dest }}/.env.sample"
+    dest: "{{ git_repo_dest }}/.env"
+    remote_src: yes
+
+- name: Set environment variables
+  lineinfile:
+    path: "{{ git_repo_dest }}/.env"
+    regexp: '^{{ item.key }}='
+    line: "{{ item.key }}={{ item.value }}"
+  with_items:
+    - { key: 'FRONTEND_API_IP', value: '{{ dmz_ip }}' }
+    - { key: 'HARBOR_HOST', value: '{{ dmz_ip }}' }
+    - { key: 'HARBOR_USER', value: 'backend' }
+    - { key: 'HARBOR_PASSWORD', value: '{{ harbor_password }}' }
+    - { key: 'LOLAPY_HOST_IP', value: '{{ arch_ip }}' }
+- name: Generate private key
+  command: "openssl genpkey -algorithm RSA -out private.key -pkeyopt rsa_keygen_bits:2048"
+  args:
+    chdir: "{{ git_repo_dest }}/certs"
+    
+- name: Generate public key
+  command: "openssl req -new -x509 -key private.key -out certificate.crt -days 365 -subj \"/CN=example.com\""
+  args:
+    chdir: "{{ git_repo_dest }}/certs"
+
+- name: Get docker group ID
+  command: getent group docker
+  register: docker_group_entry
+
+- name: Set docker group variable
+  set_fact:
+    docker_group: "{{ docker_group_entry.stdout.split(':')[2] }}"
+
+- name: Start application with docker-compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ git_repo_dest }}"
+    state: present
+  environment:
+    DOCKER_GROUP: "{{ docker_group }}"
+  register: compose_output
+
+- name: change munge key permissions
+  command: 
+    cmd: docker exec -u root lolapy-hueyconsumer-1 chown munge:munge /etc/munge/munge.key
+
+- name: restart hueyconsumer
+  command: 
+    cmd: docker compose -f {{ git_repo_dest }}/docker-compose.yml restart hueyconsumer
+
+- name: prepare sftp container
+  command: "docker exec lolapy-sftp-1 chown {{ dmz_sftp_user }} /home/{{ dmz_sftp_user }}/upload"
+
+- name: change certs permissions
+  command: "docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /tmp/certs"
+
+- name: give user lola access to home
+  command: "docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /home/lolauser"
+
+# - name: give access to group docker of host to lolauser inside container
+#   command: "docker exec -u root lolapy-hueyconsumer-1 usermod -aG $DOCKER_GROUP lolauser"
+#   environment:
+#     DOCKER_GROUP: "{{ docker_group }}"
+    
+- name: create ssh key
+  command: "docker exec lolapy-hueyconsumer-1 ssh-keygen -q -t rsa -b 4096 -N \"\" -f /home/lolauser/.ssh/id_rsa"
+
+- name: retrieve ssh key
+  command: "docker cp lolapy-hueyconsumer-1:/home/lolauser/.ssh/id_rsa.pub ."
+
+- name: Fetch ssh key
+  fetch:
+    src: id_rsa.pub
+    dest: /tmp/id_rsa.pub
+    flat: yes
+  run_once: yes

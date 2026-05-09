@@ -1,0 +1,389 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Scenario configuration - switchable algorithms {% endblock %}
+
+{% block content %}
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-database fa-2x sidebar-brand-icon"></i>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">Scenario configuration - switchable algorithms</span>
+        </div>
+        <span class="float-right">
+            <a class="btn btn-sm btn-primary" href="{{ path("dashboard_metascenario_index") }}">
+                <i class="fas fa-cogs"></i>
+                {% trans %}dashboard.scenario.creation_etape2.btn_retour_templatescenario{% endtrans %}
+            </a>
+        </span>
+    </div>
+{#    {{ app.session.get("create_scenario") }}    #}
+    <div class="row">
+        <div class="col-xl-5 mb-5">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        <div class="text-md font-weight-bold text-primary text-uppercase mb-1">
+                            Algorithms
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100">
+                            <div id="scenario_algorithms">
+                                <div id="loader_algorithms" class="d-none">
+                                    <div class="col-md-12">
+                                        <h3>
+                                            <center>
+                                                <i class="fa fa-spinner fa-spin fa-lg"></i>
+                                                {% trans %}dashboard.scenario.creation_etape2.chargement{% endtrans %}
+                                            </center>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <span id="scenario_algorithms_selection" class="d-none">
+                                    aucun algo
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-7 mb-5">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-header">
+                    <div class="col mr-2">
+                        <div class="text-md font-weight-bold text-info text-uppercase mb-1">
+                            Algorithms parameters
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="row no-gutters align-items-center">
+                        <div class="mb-0 text-gray-800 w-100">
+                            <div id="scenario_algorithms">
+                                <div id="loader_algorithms_parameters" class="d-none">
+                                    <div class="col-md-12">
+                                        <h3>
+                                            <center>
+                                                <i class="fa fa-spinner fa-spin fa-lg"></i>
+                                                {% trans %}dashboard.scenario.creation_etape2.chargement{% endtrans %}
+                                            </center>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="accordion" id="accordionExample"class="d-none">
+                                    <span id="scenario_algorithms_parameters"  class="d-none">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script>
+
+    function sanitize(string) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#x27;',
+            "/": '&#x2F;',
+        };
+        const reg = /[&<>"'/]/ig;
+        return string.replace(reg, (match) => (map[match]));
+    }
+
+    let metaScenarioId = "{{ metascenario.id }}";
+    let tagHash = "{{ tag.hash }}";
+    let datasetHash = "{{ dataset.hash }}";
+
+    $.ajax({
+        url: window.location.origin + "/dashboard/metascenario/ajax/parameters/{{ tag.hash }}",
+        method: "GET",
+        dataType: "json",
+        beforeSend: function () {
+            $("#loader_algorithms").removeClass("d-none");
+            $("#loader_algorithms").addClass("d-block");
+        },
+        complete: function () {
+            $("#loader_algorithms").removeClass("d-block");
+            $("#loader_algorithms").addClass("d-none");
+            $("#scenario_algorithms_selection").removeClass("d-none");
+            $("#scenario_algorithms_parameters").removeClass("d-none");
+        },
+        success: function (listParams) {
+
+            let switchableAlgorithms = listParams.switchable_algorithms;
+            let leftBlock = "";
+            let rightBlock = "";
+
+            rightBlock += `<form method="post" action="{{ path("dashboard_scenario_scenario_manage") }}">`;
+
+            {# display the available algorithm slots #}
+            for (algorithm in switchableAlgorithms) {
+                leftBlock += `
+                    <div class="card">
+                        <div class="card-header">
+                            ${switchableAlgorithms[algorithm].name}
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${switchableAlgorithms[algorithm].description}</p>
+                            <p class="card-text">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col">
+                                            <select class="form-control" id="selection_algorithm_${switchableAlgorithms[algorithm].nf_variable}">
+                                            `;
+                                            {% for algorithmVersion in algorithmVersions %}
+                                            leftBlock += `
+                                                <option value="{{ algorithmVersion.hash }}">{{ algorithmVersion.algorithm.name }} - {{ algorithmVersion.name }}</option>
+                                            `;
+                                            {% endfor %}
+                                            leftBlock += `
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <button type="button" class="btn btn-primary btn-block btn_selection_algorithm" data-nfvariable="${switchableAlgorithms[algorithm].nf_variable}" id="btn_selection_algorithm_${switchableAlgorithms[algorithm].nf_variable}">
+                                                Select algorithm
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                    <br />
+                `;
+                rightBlock += `
+                    <div class="card">
+                        <div class="card-header" id="heading_${switchableAlgorithms[algorithm].nf_variable}">                                
+                            <button class="btn btn-link text-muted float-left"
+                                type="button"
+                                data-toggle="collapse"
+                                data-target="#collapse_${switchableAlgorithms[algorithm].nf_variable}"
+                                aria-expanded="true"
+                                aria-controls="collapse_${switchableAlgorithms[algorithm].nf_variable}">
+                                <span id="selected_algorithm_${switchableAlgorithms[algorithm].nf_variable}">
+                                    <span class="pr-3"><i class="fas fa-angle-double-down"> </i></span>
+                                    <i class="far fa-circle fa-lg"> </i>
+                                    No algorithm selected
+                                </span>
+                            </button>
+                            <a href="#" id="btn_readme_modal_${switchableAlgorithms[algorithm].nf_variable}"
+                                data-toggle="modal"
+                                data-target="#modal_algorithm_readme_${switchableAlgorithms[algorithm].nf_variable}"
+                                class="btn btn-outline-info float-right disabled">
+                                Readme
+                            </a>
+                        </div>
+                        <div id="collapse_${switchableAlgorithms[algorithm].nf_variable}" class="collapse" aria-labelledby="heading_${switchableAlgorithms[algorithm].nf_variable}" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <span id="algorithm_detail_${switchableAlgorithms[algorithm].nf_variable}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <!-- modal readme -->
+                    <div class="modal fade" tabindex="-1" role="dialog" id="modal_algorithm_readme_${switchableAlgorithms[algorithm].nf_variable}">
+                        <div class="modal-dialog modal-xl" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">
+                                        <strong><em>Readme</em></strong>
+                                        <blockquote class="subtitle"><h6> ${switchableAlgorithms[algorithm].name} </h6></blockquote>
+                                    </h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="col-12">
+                                        <pre class="format_json" id="algorithm_readme_${switchableAlgorithms[algorithm].nf_variable}"></pre>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.index.modal_btn_fermer{% endtrans %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- modal readme -->
+                `;
+            }
+
+            rightBlock += `<button type="submit" class="btn btn-primary btn-block" name="create_button_with_algo" value="create">{% trans %}dashboard.scenario.creation_etape2.creer_scenario{% endtrans %}</button>`;
+            rightBlock += `</form>`;
+
+            $("#scenario_algorithms_selection").html(leftBlock);
+            $("#scenario_algorithms_parameters").html(rightBlock);
+
+            // Event handler for algorithm selection buttons
+            $(document).on('click', '.btn_selection_algorithm', function (e) {
+                e.preventDefault(); // Prevent any default action
+                
+                let nf_variable = $(this).attr('data-nfvariable');
+                let algorithmVersionHash = $("#selection_algorithm_" + nf_variable).val();
+                
+                console.log("Selecting algorithm:", {
+                    nf_variable: nf_variable,
+                    algorithmVersionHash: algorithmVersionHash
+                });
+
+                $.ajax({
+                    url: window.location.origin + "/dashboard/algorithm/ajax/parameters/" + algorithmVersionHash,
+                    method: "GET",
+                    dataType: "json",
+                    beforeSend: function () {
+                        $("#loader_algorithms_parameters").removeClass("d-none");
+                        $("#loader_algorithms_parameters").addClass("d-block");
+                    },
+                    complete: function () {
+                        $("#loader_algorithms_parameters").removeClass("d-block");
+                        $("#loader_algorithms_parameters").addClass("d-none");
+                    },
+                    success: function (listParams) {
+                        let selectedAlgorithm = $("#selection_algorithm_" + nf_variable).children("option:selected").text();
+                        $("#selected_algorithm_" + nf_variable).html("<span class='pr-3'><i class='fas fa-angle-double-down'> </i></span><i class='fas fa-check-circle fa-lg text-success'> </i> " + selectedAlgorithm);
+                        console.log("Algorithm parameters received:", listParams);
+                        
+                        // activate the button for the readme modal and set the readme to md format
+                        let readme = listParams.readme || "";
+                        let md = window.markdownit();
+                        $("#algorithm_readme_" + nf_variable).html(md.render(readme));
+                        $("#btn_readme_modal_" + nf_variable).removeClass("disabled");
+
+                        let txt = "";
+                        
+                        // CRITICAL: Always include the selected algorithm as a hidden field
+                        txt += `<input type="hidden" name="${algorithmVersionHash}:${nf_variable}:selected_algorithm" value="${algorithmVersionHash}" />`;
+                        
+                        for (param in listParams.parameters) {
+                            let defaultValue = listParams.parameters[param].default || "";
+                            let type = listParams.parameters[param].type;
+                            let name = sanitize(listParams.parameters[param].name);
+                            let help = sanitize(listParams.parameters[param].description);
+                            let choices = listParams.parameters[param].choices;
+
+                            txt += `
+                                <div class="form-group">
+                                    <label for="${name}_${metaScenarioId}"><strong> ${name} </strong></label>
+                                    <footer class="blockquote-footer">${help}</footer>
+                                </div>
+                            `;
+
+                            switch (type) {
+                                case 'int':
+                                    txt += `
+                                          <input type="number"
+                                            class="form-control"
+                                            name="${algorithmVersionHash}:${nf_variable}:${name}"
+                                            aria-describedby="${param}_${metaScenarioId}Help"
+                                            placeholder="${name}"
+                                            value="${defaultValue}">
+                                    `;
+                                    break;
+                                case 'float':
+                                    txt += `
+                                          <input type="number"
+                                            step = "any"
+                                            class="form-control"
+                                            name="${algorithmVersionHash}:${nf_variable}:${name}"
+                                            aria-describedby="${param}_${metaScenarioId}Help"
+                                            placeholder="${name}"
+                                            value="${defaultValue}">
+                                    `;
+                                    break;
+                                case 'string':
+                                    txt += `
+                                          <input type="text"
+                                            class="form-control"
+                                            name="${algorithmVersionHash}:${nf_variable}:${name}"
+                                            aria-describedby="${param}_${metaScenarioId}Help"
+                                            placeholder="${name}"
+                                            value="${defaultValue}">
+                                    `;
+                                    break;
+                                case 'bool':
+                                    let checked = defaultValue ? "checked" : "";
+                                    txt += `
+                                          <input type="hidden" value="false" name="${algorithmVersionHash}:${nf_variable}:${name}">
+                                          <input type="checkbox"
+                                            class="form-control"
+                                            name="${algorithmVersionHash}:${nf_variable}:${name}"
+                                            value="true"
+                                            aria-describedby="${param}_${metaScenarioId}Help"
+                                            placeholder="${name}"
+                                            ${checked}
+                                            >
+                                    `;
+                                    break;
+                                case 'choices':
+                                    txt += `<select name="${algorithmVersionHash}:${nf_variable}:${name}" class="form-control">`;
+                                    for (choice in choices) {
+                                        let selected = (choices[choice] === defaultValue) ? 'selected' : '';
+                                        txt += `<option value="${choices[choice]}" ${selected}>${choices[choice]}</option>`;
+                                    }
+                                    txt += `</select>`;
+                                    break;
+                                default:
+                            }
+                            txt += `<hr />`;
+                        }
+
+                        $("#algorithm_detail_" + nf_variable).html(txt);
+                        
+                        // Automatically expand the accordion to show the parameters
+                        $("#collapse_" + nf_variable).collapse('show');
+                        
+                        console.log("Algorithm parameters form created for:", nf_variable);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error loading algorithm parameters:", {
+                            status: status,
+                            error: error,
+                            statusCode: xhr.status,
+                            responseText: xhr.responseText
+                        });
+                        
+                        // Show the actual response in the UI for debugging
+                        $("#algorithm_detail_" + nf_variable).html(
+                            `<div class="alert alert-danger">
+                                <strong>Error loading parameters!</strong><br>
+                                Status: ${xhr.status}<br>
+                                <details>
+                                    <summary>Click to see response</summary>
+                                    <pre>${xhr.responseText}</pre>
+                                </details>
+                            </div>`
+                        );
+                        
+                        $("#collapse_" + nf_variable).collapse('show');
+                    }
+                });
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error("Error loading switchable algorithms:", {
+                status: status,
+                error: error,
+                response: xhr.responseText
+            });
+            alert("Failed to load switchable algorithms. Please check the console for details.");
+        }
+    });
+
+</script>
+
+{% endblock %}
+

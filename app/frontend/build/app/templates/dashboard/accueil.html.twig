@@ -1,0 +1,722 @@
+{% extends "dashboard/base/layout.html.twig" %}
+
+{% block content %}
+
+	<!-- Added chart.js library-->
+	<script src="{{ asset('node_modules/chart.js/dist/chart.umd.js') }}"></script>
+	<!-- Added chart.js-plugin-labels-dv plugin -->
+	<script src="{{ asset('node_modules/chart.js-plugin-labels-dv/dist/chartjs-plugin-labels.min.js') }}"></script>
+
+	<div class="container-fluid">
+		<!-- Page Heading -->
+		<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			<h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+		</div>
+
+		<div class="row">
+
+		<!-- Card for the latest scenario runs  -->
+			<div class="col-xl-12 col-md-12 mb-4">
+				<div class="card border-left-primary shadow h-100 py-2">
+					<div class="card-body">
+						<div class="row no-gutters align-items-center">
+							<div class="col mr-2">
+								<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
+									{% if is_granted('ROLE_ADMIN_SISR') %}
+										Last executions of the scenarios
+									{% else %}
+										my last executions of the scenarios
+									{% endif %}
+								</div><br>
+								<div class="h6 mb-0 font-weight-bold text-gray-800">
+									<ul class="list-group list-group-flush">
+										<table class="table">
+											<thead>
+												<tr class="font-weight-bold text-gray-800">
+													<th scope="col">Template-scenario</th>
+													<th scope="col">Dataset</th>
+													<th scope="col">Status</th>
+													<th scope="col">Results</th>
+													<th scope="col"></th>
+												</tr>
+											</thead>
+											<tbody>
+												<!-- Display the last 3 scenario runs in the dashboard -->
+												{% for run in runs|sort((a, b) => b.createdAt <=> a.createdAt)|slice(0, 3) %}
+												<tr>
+													<td>{{ run.scenario.metascenario.name }}</td>
+													<td>{{ run.scenario.dataset.name }}</td>
+													<td>
+														{% if run.status == "COMPLETED" %}
+															<span class="badge badge-primary">
+														{% elseif run.status == "ERROR" %}
+															<span class="badge badge-danger">
+														{% elseif run.status == "WAITING" %}
+															<span class="badge badge-warning">
+														{% else %}
+															<span class="badge badge-secondary">
+														{% endif %}
+															{{ run.status }}
+															</span>
+													</td>
+													<td>
+														{% if run.hasOutput %}
+															<a class="btn btn-outline-primary btn-sm" href="{{ path("dashboard_run_results", {'hash': run.hash}) }}">
+																<i class="fas fa-download"></i> {% trans %}dashboard.runs.index.btn_resultats{% endtrans %}
+															</a>
+														{% else %}
+															<a class="btn btn-outline-primary btn-sm disabled" href="#">
+																<i class="fas fa-download"></i> {% trans %}dashboard.runs.index.btn_resultats{% endtrans %}
+															</a>                                    
+														{% endif %}
+													</td>
+													<td>
+														{% if run.createdBy.isAdmin %}
+															<span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
+														{% endif %}
+													</td>
+												</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>			
+		</div>
+
+		<div class="row">
+
+			<!-- Card for scenario runs bar chart -->
+
+			<!-- Counting scenario runs by status -->
+			{% set runStatus = {"WAITING": 0, "SCHEDULING_TRAX_DB": 0, "WAITING_NEXTFLOW": 0, "RUNNING_SCENARIO":0, "COMPLETED":0, "ERROR":0} %}
+			{% for run in runs %}
+				{% set runStatus = runStatus|merge({(run.status): runStatus[run.status] + 1}) %}
+			{% endfor %}
+			<!-- Storing values -->
+			<div id="runWaiting" data-waiting="{{ runStatus['WAITING'] }}"></div>
+			<div id="runSheduling" data-sheduling="{{ runStatus['SCHEDULING_TRAX_DB'] }}"></div>
+			<div id="runNextflow" data-nextflow="{{ runStatus['WAITING_NEXTFLOW'] }}"></div>
+			<div id="runRunning" data-running="{{ runStatus['RUNNING_SCENARIO'] }}"></div>
+			<div id="runCompleted" data-completed="{{ runStatus['COMPLETED'] }}"></div>
+			<div id="runError" data-error="{{ runStatus['ERROR'] }}"></div>
+
+			<div class="col-xl-3 col-lg-5">
+				<div class="card border-left-primary shadow mb-4">
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
+							{% if is_granted('ROLE_ADMIN_SISR') %}
+								execution histogram
+							{% else %}
+								histogram of my executions
+							{% endif %}
+						</div>
+					</div>
+					<!-- Card Body -->
+					<div class="card-body">
+						<div class="chart-pie pt-4 pb-2">
+							<canvas id="runBarChart"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Card for server memory doughnut -->
+			<div class="col-xl-3 col-lg-5">
+				<div class="card border-left-primary shadow mb-4">
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">Server Memory</div>
+					</div>
+					<!-- Card Body -->
+					<div class="card-body">
+						<div class="chart-pie pt-4 pb-2">
+							<canvas id="memoryDoughnut"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Storing values ​​of MemoryUsed and MemoryTotal -->
+			<div id="memoryUsed" data-used="{{ statistics.memory_usage|default(0) }}"></div>
+			<div id="memoryTotal" data-total="{{ statistics.memory_total|default(0) }}"></div>
+
+			<!-- Card for slurm job bar chart -->
+			<div class="col-xl-3 col-lg-5">
+				<div class="card border-left-primary shadow mb-4">
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">Slurm Job</div>
+					</div>
+					<!-- Card Body -->
+					<div class="card-body">
+						<div class="chart-pie pt-4 pb-2">
+							<canvas id="slurmJobChart"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Storing values ​​of slurm pending job and slurm running job -->
+			<div id="slurmRunning" data-running="{{ statistics.slurm_running_job|default(0) }}"></div>
+			<div id="slurmPending" data-pending="{{ statistics.slurm_pending_job|default(0) }}"></div>
+
+			<!-- Card for CPU doughnut -->
+			<div class="col-xl-3 col-lg-5">
+				<div class="card border-left-primary shadow mb-4">
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">CPU</div>
+					</div>
+					<!-- Card Body -->
+					<div class="card-body">
+						<div class="chart-pie pt-4 pb-2">
+							<canvas id="cpuDoughnut"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Storing values ​​of CPU Used and CPU Total -->
+			<div id="cpuUsed" data-used="{{ statistics.cpu_usage|default(0) }}"></div>
+			<div id="cpuTotal" data-total="{{ statistics.cpu_total|default(0) }}"></div>
+		</div>
+
+		<div class="row">
+
+			<!-- Card for dataset pie chart -->
+
+			<!-- Counting datasets by status. -->
+			{% set datasetStatus = {"WAITING": 0, "PROCESSING": 0, "AVAILABLE": 0, "ERROR": 0, "DELETING": 0} %}
+			{% for dataset in datasets %}
+				{% set datasetStatus = datasetStatus|merge({(dataset.status): datasetStatus[dataset.status] + 1}) %}
+			{% endfor %}
+			<!-- Storing values -->
+			<div id="waiting" data-waiting="{{ datasetStatus['WAITING'] }}"></div>
+			<div id="processing" data-processing="{{ datasetStatus['PROCESSING'] }}"></div>
+			<div id="available" data-available="{{ datasetStatus['AVAILABLE'] }}"></div>
+			<div id="error" data-error="{{ datasetStatus['ERROR'] }}"></div>
+			<div id="deletng" data-deleting="{{ datasetStatus['DELETING'] }}"></div>
+			<div id="totalDatasets" data-total="{{ datasets|length }}"></div>
+
+			<div class="col-xl-4 col-lg-5">
+				<div class="card border-left-primary shadow mb-4">
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
+							{% if is_granted('ROLE_ADMIN_SISR') %}
+								datasets
+							{% else %}
+								my datasets
+							{% endif %}
+						</div>
+					</div>
+					<!-- Card Body -->
+					<div class="card-body">
+						<div class = "row">
+							<div class="col-6">
+								<div class="mt-7 text-center medium font-weight-bold text-primary">
+									Total datasets
+									<span class="badge badge-info" style="font-size: 15px;">{{ datasets|length }}</span>
+								</div>
+								<div class="chart-pie pt-4 pb-2">
+									<canvas id="dataPieChart"></canvas>
+								</div>
+								<div class="mt-6 text-center small">
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #ff8000;"></i>
+										Waiting
+									</span>
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #ffc107;"></i>
+										Processing 
+									</span>
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #007bff;"></i>
+										Available
+									</span>
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #dc3545;"></i>
+										Error
+									</span>
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #6c757d;"></i>
+										Deleting
+									</span>
+								</div>
+							</div>
+							<!-- Card for the latest datasets in possession -->
+							<div class="col-6">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="h6 mb-0 font-weight-bold text-primary">
+											Last datasets
+											<!-- Display the last 3 datasets in the dashboard -->
+											{% for dataset in datasets|sort((a, b) => b.createdAt <=> a.createdAt)|slice(0, 4) %}
+												<ul class="list-group list-group-flush mt-3">
+													<li class="list-group-item">
+														<span class="mr-2 text-gray-800">
+															{% if dataset.status == "WAITING" %}
+																<i class="fas fa-circle" style="color: #ff8000;"></i>
+																{{ dataset.name }}
+															{% elseif dataset.status == "PROCESSING" %}
+																<i class="fas fa-circle" style="color: #ffc107;"></i>
+																{{ dataset.name }}
+															{% elseif dataset.status == "AVAILABLE" %}
+																<i class="fas fa-circle" style="color: #007bff;"></i>
+																{{ dataset.name }}
+																<br><span class="badge badge-primary" style="font-size: 12px;">
+																	{{ dataset.size }}</span>
+															{% elseif dataset.status == "ERROR" %}
+																<i class="fas fa-circle" style="color: #dc3545;"></i>
+																{{ dataset.name }}
+															{% elseif dataset.status == "DELETING" %}
+																<i class="fas fa-circle" style="color: #6c757d;"></i>
+																{{ dataset.name }}
+															{% endif %}
+															{% if dataset.createdBy.isAdmin %}
+																<span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
+															{% endif %}
+														</span>
+													</li>
+												{% endfor %}
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Card for algorithm pie chart -->
+
+			<!-- Counting algorithm versions by status -->
+			{% set algorithmVersions = {"PROCESSING": 0, "AVAILABLE": 0, "ERROR": 0} %}
+			{% for algorithm in algorithms %}
+				{% for algorithmVersion in algorithm.algorithmVersions %}
+					{% set algorithmVersions = algorithmVersions|merge({(algorithmVersion.status): algorithmVersions[algorithmVersion.status] + 1}) %}
+				{% endfor %}
+			{% endfor %}
+			{% set totalAlgoVersions = algorithmVersions['PROCESSING'] + algorithmVersions['AVAILABLE'] + algorithmVersions['ERROR'] %}
+			<!-- Storing values -->
+			<div id="algoProcessing" data-processing="{{ algorithmVersions['PROCESSING'] }}"></div>
+			<div id="algoAvailable" data-available="{{ algorithmVersions['AVAILABLE'] }}"></div>
+			<div id="algoError" data-error="{{ algorithmVersions['ERROR'] }}"></div>
+			<div id="totalAlgoVersions" data-total="{{ totalAlgoVersions }}"></div>
+
+			<div class="col-xl-4 col-lg-5">
+				<div class="card border-left-primary shadow mb-4">
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
+							{% if is_granted('ROLE_ADMIN_SISR') %}
+								algorithms
+							{% else %}
+								my algorithms
+							{% endif %}
+						</div>
+					</div>
+					<!-- Card Body -->
+					<div class="card-body">
+						<div class = "row">
+							<div class="col-6">
+								<div class="mt-7 text-center medium font-weight-bold text-primary">
+									Total algorithms
+									<span class="badge badge-info" style="font-size: 15px;">{{ totalAlgoVersions }}</span>
+								</div>
+								<div class="chart-pie pt-4 pb-2">
+									<canvas id="algoPieChart"></canvas>
+								</div>
+								<div class="mt-6 text-center small">
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #007bff;"></i>
+										Available
+									</span>
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #ffc107;"></i>
+										Processing
+									</span>
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #dc3545;"></i>
+										Error
+									</span>
+								</div>
+							</div>
+							<!-- Card for the latest algorithms in possession -->
+							<div class="col-6">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="h6 mb-0 font-weight-bold text-primary">
+											Last algorithms
+											<ul class="list-group list-group-flush mt-3">
+												<!-- Display the last 3 algorithms in the dashboard -->
+												{% for algorithm in algorithms|sort((a, b) => b.createdAt <=> a.createdAt)|slice(0, 3) %}
+													<li class="list-group-item text-gray-800">{{ algorithm.name }}
+														{% if algorithm.createdBy.isAdmin %}
+															<br><span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
+														{% endif %}
+													</li>
+													{% for algorithmVersion in algorithm.algorithmVersions|slice(0, 3) %}
+														<span class="mr-2 text-gray-800">
+															{% if algorithmVersion.status == "AVAILABLE" %}
+																<i class="fas fa-circle" style="color: #007bff;"></i>
+																{{ algorithmVersion.name }}
+															{% elseif algorithmVersion.status == "PROCESSING" %}
+																<i class="fas fa-circle" style="color: #ffc107;"></i>
+																{{ algorithmVersion.name }}
+															{% else %}
+																<i class="fas fa-circle" style="color: #dc3545;"></i>
+																{{ algorithmVersion.name }}
+															{% endif %}
+														</span>
+													{% endfor %}
+												{% endfor %}
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Card for metascenario pie chart -->
+
+			<!-- Counting metascenario tags by status -->
+			{% set metasenarioTags = {"PROCESSING": 0, "AVAILABLE": 0, "ERROR": 0} %}
+			{% for metascenario in metascenarios %}
+				{% for tag in metascenario.tags %}
+					{% set metasenarioTags = metasenarioTags|merge({(tag.status): metasenarioTags[tag.status] + 1}) %}
+				{% endfor %}
+			{% endfor %}
+			{% set totalTags = metasenarioTags['PROCESSING'] + metasenarioTags['AVAILABLE'] + metasenarioTags['ERROR'] %}
+			
+			<!-- Storing values -->
+			<div id="tagProcessing" data-processing="{{ metasenarioTags['PROCESSING'] }}"></div>
+			<div id="tagAvailable" data-available="{{ metasenarioTags['AVAILABLE'] }}"></div>
+			<div id="tagError" data-error="{{ metasenarioTags['ERROR'] }}"></div>
+			<div id="totalTags" data-total="{{ totalTags }}"></div>
+
+			<div class="col-xl-4 col-lg-5">
+				<div class="card border-left-primary shadow mb-4">
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
+							{% if is_granted('ROLE_ADMIN_SISR') %}
+								templates
+							{% else %}
+								my templates
+							{% endif %}
+						</div>
+					</div>
+					<!-- Card Body -->
+					<div class="card-body">
+						<div class="row">
+							<div class="col-6">
+								<div class="mt-7 text-center medium font-weight-bold text-primary">
+									Total templates
+									<span class="badge badge-info" style="font-size: 15px;">{{ totalTags }}</span>
+								</div>
+								<div class="chart-pie pt-4 pb-2">
+									<canvas id="metascenarioPieChart"></canvas>
+								</div>
+								<div class="mt-6 text-center small">
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #007bff;"></i>
+										Available
+									</span>
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #ffc107;"></i>
+										Processing
+									</span>
+									<span class="mr-2">
+										<i class="fas fa-circle" style="color: #dc3545;"></i>
+										Error
+									</span>
+								</div>
+							</div>
+							<!-- Card for the latest metascenarios in possession -->
+							<div class="col-6">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="h6 mb-0 font-weight-bold text-primary">
+											Last templates
+											<ul class="list-group list-group-flush mt-3">
+												<!-- Display the last 3 metascenarios in the dashboard -->
+												{% for metascenario in metascenarios|sort((a, b) => b.createdAt <=> a.createdAt)|slice(0, 3) %}
+													<li class="list-group-item text-gray-800">{{ metascenario.name }}
+														{% if metascenario.createdBy.isAdmin %}
+															<br><span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
+														{% endif %}
+													</li>
+													{% for tag in metascenario.tags|slice(0, 3) %}
+														<span class="mr-2 text-gray-800">
+															{% if tag.status == "AVAILABLE" %}
+																<i class="fas fa-circle" style="color: #007bff;"></i>
+																{{ tag.name }}
+															{% elseif tag.status == "PROCESSING" %}
+																<i class="fas fa-circle" style="color: #ffc107;"></i>
+																{{ tag.name }}
+															{% else %}
+																<i class="fas fa-circle" style="color: #dc3545;"></i>
+																{{ tag.name }}
+															{% endif %}
+														</span>
+													{% endfor %}
+												{% endfor %}
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+{% endblock %}
+
+{% block javascript %}
+
+	<script>
+		
+		$(document).ready(function () {
+			// Dataset pie chart
+			let dataCounts = {
+				Waiting: $("#waiting").attr("data-waiting"),
+				Processing: $("#processing").attr("data-processing"),
+				Available: $("#available").attr("data-available"),
+				Error: $("#error").attr("data-error"),
+				Deleting: $("#deleting").attr("data-deleting"),
+				Total: $("#totalDatasets").attr("data-total")
+			};
+			let dataPieChart = $('#dataPieChart')[0].getContext('2d');
+			// Creation of the dataset pie chart
+			let myDataPieChart = new Chart(dataPieChart, {
+				type: 'pie',
+				data: {
+					datasets: [{
+						data: [dataCounts.Waiting, dataCounts.Processing, dataCounts.Available, dataCounts.Error, dataCounts.Deleting],
+						backgroundColor: ['#ff8000','#ffc107', '#007bff', '#dc3545', '#6c757d']
+					}],
+				},
+				options: {
+					plugins: {
+						labels: {
+							render: function (args) {
+                				return ((args.value * 100) / dataCounts.Total).toFixed(0) + '%';
+            				},
+							fontColor: '#000',
+							fontSize: 17
+						},
+						tooltip : {
+							enabled : false
+						}
+					}
+				}
+			});
+
+			// Algorithm pie chart
+			let algoCounts = {
+				Processing: $("#algoProcessing").attr("data-processing"),
+				Available: $("#algoAvailable").attr("data-available"),
+				Error: $("#algoError").attr("data-error"),
+				Total: $("#totalAlgoVersions").attr("data-total"),
+
+			};
+			let algoPieChart = $('#algoPieChart')[0].getContext('2d');
+			// Creation of the algorithm pie chart
+			let myAlgoPieChart = new Chart(algoPieChart, {
+				type: 'pie',
+				data: {
+					datasets: [{
+						data: [algoCounts.Processing, algoCounts.Available, algoCounts.Error],
+						backgroundColor: ['#ffc107', '#007bff', '#dc3545']
+					}]
+				},
+				options: {
+					plugins: {
+						labels: {
+							render: function (args) {
+                				return ((args.value * 100) / algoCounts.Total).toFixed(0) + '%';
+            				},
+							fontColor: '#000',
+							fontSize: 15
+						},
+						tooltip : {
+							enabled : false
+						}
+					}
+				}
+			});
+
+			// Metascenario pie chart
+			let metaCounts = {
+				Processing: $("#tagProcessing").attr("data-processing"),
+				Available: $("#tagAvailable").attr("data-available"),
+				Error: $("#tagError").attr("data-error"),
+				Total: $("#totalTags").attr("data-total"),
+
+			};
+			let metaPieChart = $('#metascenarioPieChart')[0].getContext('2d');
+			// Creation of the metascenario pie chart
+			let myMetaPieChart = new Chart(metaPieChart, {
+				type: 'pie',
+				data: {
+					datasets: [{
+						data: [metaCounts.Processing, metaCounts.Available, metaCounts.Error],
+						backgroundColor: ['#ffc107', '#007bff', '#dc3545']
+					}]
+				},
+				options: {
+					plugins: {
+						labels: {
+							render: function (args) {
+                				return ((args.value * 100) / metaCounts.Total).toFixed(0) + '%';
+            				},
+							fontColor: '#000',
+							fontSize: 15
+						},
+						tooltip : {
+							enabled : false
+						}
+					}
+				}
+			});
+
+			// Scenario run bar chart
+			let runCounts = {
+				Waiting: $("#runWaiting").attr("data-waiting"),
+				Scheduling_Trax_db: $("#runSheduling").attr("data-sheduling"),
+				Waiting_nextflow: $("#runNextflow").attr("data-nextflow"),
+				Running_scenario: $("#runRunning").attr("data-running"),
+				Completed: $("#runCompleted").attr("data-completed"),
+				Error: $("#runError").attr("data-error")
+			};
+			let runBarChart = $('#runBarChart')[0].getContext('2d');
+			// Exclude items with a value of 0
+			let filteredData = [runCounts.Waiting, runCounts.Scheduling_Trax_db, runCounts.Waiting_nextflow, runCounts.Running_scenario, runCounts.Completed, runCounts.Error]
+								.filter(function(value) {
+									return value != 0;
+								});
+			// Array of labels corresponding to the filtered values
+			let filteredLabels = ['Waiting', 'Scheduling_Trax_db', 'Waiting_nextflow', 'Running_scenario', 'Completed', 'Error']
+								.filter(function(value, index) {
+									return [runCounts.Waiting, runCounts.Scheduling_Trax_db, runCounts.Waiting_nextflow, runCounts.Running_scenario, runCounts.Completed, runCounts.Error][index] != 0;
+								});
+			// Creation of the scenario run bar chart
+			let myRunBarChart = new Chart(runBarChart, {
+				type: 'bar',
+				data: {
+					labels: filteredLabels,
+					datasets: [{
+						label: 'Number of executions by status',
+						data: filteredData,
+						backgroundColor: ['#007bff']
+					}]
+				},
+				options: {
+					// Fit chart to browser window
+					responsive: true,
+					// Take all available width
+					maintainAspectRatio: false
+					
+    			}
+			});
+
+			// Server memory doughnut
+			let memoryCounts = {
+				Memory_usage: $("#memoryUsed").attr("data-used"),
+				Memory_total: $("#memoryTotal").attr("data-total")
+			};
+			let memoryAvailable = memoryCounts.Memory_total - memoryCounts.Memory_usage;
+			let memoryDoughnut = $('#memoryDoughnut')[0].getContext('2d');
+			// Creation of the server memory doughnut
+			let myMemoryDounghunt = new Chart(memoryDoughnut, {
+				type: 'doughnut',
+				data: {
+					labels: ['Memory used in GB', 'Memory available in GB'],
+					datasets: [{
+						data: [memoryCounts.Memory_usage, memoryAvailable],
+						backgroundColor: ['#007bff','#ffc107']
+					}]
+				},
+				options: {
+					plugins: {
+						labels: {
+							render: function (args) {
+								return args.value.toString() + ' GB';
+							},
+							fontColor: '#000',
+							fontSize: 12						
+						},
+						tooltip : {
+							enabled : false
+						}
+					},
+					responsive: true,
+					maintainAspectRatio: false	
+				}
+			});
+
+			// Slurm job bar chart
+			let slurmJobCounts = {
+				Running: $("#slurmRunning").attr("data-running"),
+				Pending: $("#slurmPending").attr("data-pending")
+			};
+			let slurmJobChart = $('#slurmJobChart')[0].getContext('2d');
+			// Creation of the slurm job bar chart
+			let mySlurmJobChart = new Chart(slurmJobChart, {
+				type: 'bar',
+				data: {
+					labels: ['Running', 'Pending'],
+					datasets: [{
+						label: 'Number of slurm job by status',
+						data: [slurmJobCounts.Running, slurmJobCounts.Pending],
+						backgroundColor: ['#007bff']
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false	
+				}	
+			});
+
+			// CPU doughnut
+			let cpuCounts = {
+				CPU_usage: $("#cpuUsed").attr("data-used"),
+				CPU_total: $("#cpuTotal").attr("data-total")
+			};
+			let cpuAvailable = cpuCounts.CPU_total - cpuCounts.CPU_usage;
+			let cpuDoughnut = $('#cpuDoughnut')[0].getContext('2d');
+			// Creation of the CPU doughnut
+			let myCPUDounghunt = new Chart(cpuDoughnut, {
+				type: 'doughnut',
+				data: {
+					labels: ['Number of CPU used', 'Number of CPU available'],
+					datasets: [{
+						data: [cpuCounts.CPU_usage, cpuAvailable],
+						backgroundColor: ['#007bff','#ffc107']
+					}]
+				},
+				options: {
+					plugins: {
+						labels: {
+							render: 'value',
+							fontColor: '#000',
+							fontSize: 14						
+						},
+						tooltip : {
+							enabled : false
+						}
+					},
+					responsive: true,
+					maintainAspectRatio: false	
+				}
+			});
+			
+		});
+
+	</script>
+
+{% endblock %}

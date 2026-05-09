@@ -1,0 +1,76 @@
+- name: Create Harbor directory
+  file:
+    path: /opt/harbor
+    state: directory
+    mode: '0755'
+
+- name: Download Harbor installer
+  get_url:
+    url: "https://github.com/goharbor/harbor/releases/download/v{{ harbor_version }}/harbor-offline-installer-v{{ harbor_version }}.tgz"
+    dest: "/tmp/harbor-installer-v{{ harbor_version }}.tgz"
+    timeout: 300
+
+- name: Extract Harbor installer
+  unarchive:
+    src: "/tmp/harbor-installer-v{{ harbor_version }}.tgz"
+    dest: /opt/
+    remote_src: yes
+
+- name: Copy Harbor configuration template
+  copy:
+    src: /opt/harbor/harbor.yml.tmpl
+    dest: /opt/harbor/harbor.yml
+    remote_src: yes
+
+- name: Configure Harbor hostname
+  lineinfile:
+    path: /opt/harbor/harbor.yml
+    regexp: '^hostname:'
+    line: "hostname: {{ harbor_hostname }}"
+
+- name: Change Harbor admin password
+  lineinfile:
+    path: /opt/harbor/harbor.yml
+    regexp: '^harbor_admin_password:'
+    line: "harbor_admin_password: {{ harbor_password }}"
+
+- name: Comment out HTTPS port line
+  lineinfile:
+    path: /opt/harbor/harbor.yml
+    regexp: '^https:'
+    line: '# https:'
+
+- name: Comment out HTTPS certificate path
+  replace:
+    path: /opt/harbor/harbor.yml
+    regexp: '^(\s+certificate:.*)'
+    replace: '#\1'
+
+- name: Comment out HTTPS private key path
+  replace:
+    path: /opt/harbor/harbor.yml
+    regexp: '^(\s+private_key:.*)'
+    replace: '#\1'
+
+- name: Comment out HTTPS port number
+  replace:
+    path: /opt/harbor/harbor.yml
+    regexp: '^(\s+port: 443.*)'
+    replace: '#\1'
+
+- name: Check if Harbor is already installed
+  stat:
+    path: /opt/harbor/common/config/core/app.conf
+  register: harbor_installed
+
+- name: Install Harbor
+  command: /opt/harbor/install.sh
+  args:
+    chdir: /opt/harbor
+  when: not harbor_installed.stat.exists
+
+- name: Start Harbor if already installed
+  command: docker-compose up -d
+  args:
+    chdir: /opt/harbor
+  when: harbor_installed.stat.exists

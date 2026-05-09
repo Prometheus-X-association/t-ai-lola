@@ -1,0 +1,35 @@
+{% extends "dashboard/base/layout.html.twig" %}
+{% block title %} Meta-scénario - {% trans %}dashboard.scenario.edit.title{% endtrans %} {% endblock %}
+
+{% block content %}
+
+    <div class="breadcrumb d-flex justify-content-between align-items-center">
+        <div class="d-flex">
+            <i class="fas fa-scroll fa-2x sidebar-brand-icon"></i> 
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.scenario.edit.scenario_modification{% endtrans %} <strong>{{ metaScenario.name }}</strong></span>
+        </div>
+        <a href="{{ path('dashboard_metascenario_index') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-arrow-left"></i>
+            {% trans %}dashboard.scenario.edit.btn_retour{% endtrans %}
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-8">
+            {{ include('dashboard/metascenario/_form.html.twig', {'button_label': 'dashboard.scenario.edit.btn_modifier'|trans}) }}
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> {% trans %}dashboard.scenario.edit.aide_titre{% endtrans %}
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        {% trans %}dashboard.scenario.edit.aide{% endtrans %}
+                    </p>
+                </div>
+            </div>            
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,130 @@
+#!/bin/bash
+
+# Configuration
+REMOTE_SFTP_HOST="{{ dmz_ip }}"
+REMOTE_SFTP_USER="{{ dmz_sftp_user }}"
+REMOTE_SFTP_PASSWORD="{{ dmz_sftp_password }}"
+REMOTE_SFTP_PORT="{{ dmz_sftp_port }}"
+REMOTE_SFTP_PATH="/upload"
+
+LOCAL_SFTP_HOST="localhost"
+LOCAL_SFTP_USER="{{ arch_sftp_user }}"
+LOCAL_SFTP_PASSWORD="{{ arch_sftp_password }}"
+LOCAL_SFTP_PORT="{{ arch_sftp_port }}"
+LOCAL_SFTP_PATH="/upload"
+LOCAL_PATH="/home/lolauser/nf-workdir/datasets"
+API_ENDPOINT="http://localhost:5000/dataset/import"
+
+# Check if sshpass is installed
+if ! command -v sshpass &> /dev/null; then
+    echo "ERROR: sshpass is not installed. Install it with:"
+    echo "  Ubuntu/Debian: sudo apt-get install sshpass"
+    echo "  CentOS/RHEL: sudo yum install sshpass"
+    exit 1
+fi
+
+# Temporary directory for file listing
+TEMP_DIR="/tmp/sftp_sync"
+mkdir -p "$TEMP_DIR"
+
+# Log file
+LOG_FILE="$TEMP_DIR/sftp_sync.log"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+cleanup() {
+    rm -rf "$TEMP_DIR"
+}
+
+trap cleanup EXIT
+
+log "Starting SFTP file synchronization"
+
+# Get list of files from remote SFTP server
+log "Retrieving file list from remote SFTP server..."
+sshpass -p "$REMOTE_SFTP_PASSWORD" sftp -o StrictHostKeyChecking=no -P "$REMOTE_SFTP_PORT" "$REMOTE_SFTP_USER@$REMOTE_SFTP_HOST" <<EOF > "$TEMP_DIR/remote_files.txt"
+cd $REMOTE_SFTP_PATH
+ls -1
+bye
+EOF
+
+if [ $? -ne 0 ]; then
+    log "ERROR: Failed to connect to remote SFTP server"
+    exit 1
+fi
+
+# Process each file
+grep -v "^sftp>" "$TEMP_DIR/remote_files.txt" | grep -v "^cd" | grep -v "^ls" | grep -v "^bye" | while read -r filename; do
+    # Skip empty lines
+    [ -z "$filename" ] && continue
+    
+    log "Processing file: $filename"
+    
+    # Download file from remote SFTP
+    TEMP_FILE="$TEMP_DIR/$filename"
+    log "Downloading from remote SFTP..."
+    sshpass -p "$REMOTE_SFTP_PASSWORD" sftp -o StrictHostKeyChecking=no -P "$REMOTE_SFTP_PORT" "$REMOTE_SFTP_USER@$REMOTE_SFTP_HOST" <<EOF
+cd $REMOTE_SFTP_PATH
+get "$filename" "$TEMP_FILE"
+bye
+EOF
+    
+    if [ $? -ne 0 ]; then
+        log "ERROR: Failed to download $filename"
+        continue
+    fi
+    
+    # Upload file to local SFTP
+    log "Uploading to local SFTP..."
+    sshpass -p "$LOCAL_SFTP_PASSWORD" sftp -o StrictHostKeyChecking=no -P "$LOCAL_SFTP_PORT" "$LOCAL_SFTP_USER@$LOCAL_SFTP_HOST" <<EOF
+cd $LOCAL_SFTP_PATH
+put "$TEMP_FILE" "$filename"
+bye
+EOF
+    
+    if [ $? -ne 0 ]; then
+        log "ERROR: Failed to upload $filename to local SFTP"
+        continue
+    fi
+    
+    # Construct full path for API call
+    FULL_PATH="$LOCAL_PATH/$filename"
+    
+    # Send curl request
+    log "Sending import request for: $FULL_PATH"
+    RESPONSE=$(curl -s -X POST "$API_ENDPOINT" \
+        -H "Content-Type: application/json" \
+        -d "{\"dataset\": \"$FULL_PATH\"}")
+    
+    if [ $? -eq 0 ]; then
+        log "SUCCESS: Import request sent for $filename"
+        log "Response: $RESPONSE"
+        
+        # Delete file from remote SFTP after successful processing
+        log "Deleting $filename from remote SFTP..."
+        sshpass -p "$REMOTE_SFTP_PASSWORD" sftp -o StrictHostKeyChecking=no -P "$REMOTE_SFTP_PORT" "$REMOTE_SFTP_USER@$REMOTE_SFTP_HOST" <<EOF
+cd $REMOTE_SFTP_PATH
+rm "$filename"
+bye
+EOF
+        
+        if [ $? -eq 0 ]; then
+            log "SUCCESS: Deleted $filename from remote SFTP"
+        else
+            log "ERROR: Failed to delete $filename from remote SFTP"
+        fi
+    else
+        log "ERROR: Failed to send import request for $filename"
+        log "WARNING: File NOT deleted from remote SFTP due to import failure"
+    fi
+    
+    # Clean up temp file
+    rm -f "$TEMP_FILE"
+    
+    log "---"
+done
+
+log "SFTP file synchronization completed"
+log "Log file: $LOG_FILE"

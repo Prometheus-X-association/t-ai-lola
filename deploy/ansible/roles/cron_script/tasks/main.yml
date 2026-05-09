@@ -1,0 +1,40 @@
+- name: Create scripts directory
+  file:
+    path: /home/lolauser/scripts
+    state: directory
+    owner: lolauser
+    group: lolauser
+    mode: '0755'
+
+- name: Copy script from local to server
+  template:
+    src: "sftp.sh.j2"
+    dest: "/home/lolauser/scripts/{{ cron_script_name }}"
+    owner: lolauser
+    group: lolauser
+    mode: '0755'
+
+- name: Add cron job for the script
+  cron:
+    name: "{{ cron_job_name }}"
+    minute: "{{ cron_minute | default('*') }}"
+    hour: "{{ cron_hour | default('*') }}"
+    day: "{{ cron_day | default('*') }}"
+    month: "{{ cron_month | default('*') }}"
+    weekday: "{{ cron_weekday | default('*') }}"
+    job: "/home/lolauser/scripts/{{ cron_script_name }}"
+    user: lolauser
+    state: present
+
+# - name: Log cron job output (optional)
+#   cron:
+#     name: "{{ cron_job_name }}"
+#     minute: "{{ cron_minute | default('0') }}"
+#     hour: "{{ cron_hour | default('*') }}"
+#     day: "{{ cron_day | default('*') }}"
+#     month: "{{ cron_month | default('*') }}"
+#     weekday: "{{ cron_weekday | default('*') }}"
+#     job: "/home/lolauser/scripts/{{ cron_script_name }} >> /home/lolauser/scripts/{{ cron_script_name }}.log 2>&1"
+#     user: lolauser
+#     state: present
+#   when: cron_enable_logging | default(false)

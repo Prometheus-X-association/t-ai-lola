@@ -1,0 +1,33 @@
+ClusterName={{ slurm_cluster_name | default('cluster') }}
+SlurmctldHost={{ hostvars[groups['calc'][0]].ansible_hostname }}
+SlurmUser=slurm
+SlurmctldPort=6817
+SlurmdPort=6818
+
+StateSaveLocation=/var/spool/slurm/state
+SlurmdSpoolDir=/var/spool/slurmd
+
+SlurmctldLogFile=/var/log/slurm/slurmctld.log
+SlurmdLogFile=/var/log/slurm/slurmd.log
+
+AuthType=auth/munge
+# MungeSocket=/var/run/munge/munge.socket.2
+MailProg=/bin/true
+SchedulerType=sched/backfill
+SelectType=select/cons_tres
+SelectTypeParameters=CR_CPU
+
+# Node Definitions - Controller
+{% for host in groups['calc'] %}
+NodeName={{ hostvars[host].ansible_hostname | default(host) }} RealMemory={{ hostvars[host].ansible_memtotal_mb - 500 }} CPUs={{ hostvars[host].ansible_processor_vcpus - 1 | default(2) }} State=UNKNOWN
+{% endfor %}
+
+# Node Definitions - Workers (if you have a workers group)
+{% if groups['workers'] is defined %}
+{% for host in groups['workers'] %}
+NodeName={{ host }} NodeAddr={{ hostvars[host]['ansible_host'] }} CPUs={{ hostvars[host]['ansible_processor_vcpus'] | default(2) }} State=UNKNOWN
+{% endfor %}
+{% endif %}
+
+# Partition Definitions
+PartitionName=all Nodes={% for host in groups['calc'] %}{{ hostvars[host].ansible_hostname }}{% if not loop.last %},{% endif %}{% endfor %}{% if groups['workers'] is defined and groups['workers'] | length > 0 %},{% for host in groups['workers'] %}{{ host }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} Default=YES MaxTime=INFINITE State=UP

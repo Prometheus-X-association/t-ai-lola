@@ -1,0 +1,162 @@
+{% extends "public/base/layout.html.twig" %}
+
+{% block content %}
+    <div class="login-wrap" id="login-wrap">
+        <div class="login-html">
+            <h2>Lola</h2>
+            <blockquote class="smallcaps">Laboratoire Ouvert en Learning Analytics</blockquote>
+
+            <div class="hr-sm"></div>
+            {% if not app.user %}
+                <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab" id="tab-login">{% trans %}dashboard.accueil.connexion{% endtrans %}</label>
+                <input id="tab-2" type="radio" name="tab" class="for-pwd float-right"><label for="tab-2" class="tab" id="tab-register">{% trans %}dashboard.accueil.inscription{% endtrans %}</label>
+            {% endif %}
+
+            <div class="login-form">
+                {% if app.user %}
+                    <center><i class="fas fa-user-circle"></i> <em>{{ app.user }}</em></center>
+                    <div class="hr-sm"></div>
+                    <div class="group">
+                        {% if app.user.termsOfUse or app.user.isAdmin %}
+                            <a href="{{ path("dashboard_accueil") }}" class="button button-green btn" target="_blank"><i class="fas fa-cogs"> </i> {% trans %}dashboard.accueil.btn_dashboard{% endtrans %}</a>
+                        {% else %}
+                            <div class="alert alert-warning" role="alert">
+                                Pour acceder au dashboard Lola, veuillez accepter la nouvelle charte du service. <hr />
+                                <a href="#" id="link_terms" data-toggle="modal" data-target="#terms_update" class="btn btn-primary btn-sm btn-block">
+                                    {% trans %}dashboard.accueil.voir_conditions{% endtrans %}
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="group">
+                    <a href="{{ path("account") }}" class="button button-blue btn"><i class="fas fa-user-circle"> </i> {% trans %}dashboard.accueil.btn_compte{% endtrans %}</a>
+                    </div>
+                    <div class="hr-sm"></div>
+                    <div class="group">
+                        <a href="{{ path("app_logout") }}" class="button button-red btn"><i class="fas fa-sign-out-alt"> </i> {% trans %}dashboard.accueil.btn_deconnexion{% endtrans %}</a>
+                    </div>
+                {% else %}
+                    <div class="sign-in-htm">
+                        <form method="post" action="{{ path("app_login") }}">
+                            <div class="group">
+                                <label for="user" class="label">{% trans %}dashboard.accueil.email{% endtrans %}</label>
+                                <input id="user" class="input" name="email" type="email" placeholder={% trans %}dashboard.accueil.email{% endtrans %} value="{{ last_username ?? "" }}" required>
+                            </div>
+                            <div class="group">
+                                <label for="pass" class="label">{% trans %}dashboard.accueil.password{% endtrans %}</label>
+                                <input id="pass" class="input" data-type="password" name="password" type="password" placeholder={% trans %}dashboard.accueil.password{% endtrans %} required>
+                            </div>
+                            <div class="group">
+                                <input type="submit" class="button button-blue" value={% trans %}dashboard.accueil.btn_connexion{% endtrans %} href="{{ path("homepage") }}" >
+                            </div>
+                            <div class="hr-sm"></div>
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        </form>
+                        <center><a href="https://lola.loria.fr" target="_blank" class="text-white">{% trans %}dashboard.accueil.btn_lola_site_publique{% endtrans %}<i class="fas fa-external-link-alt"></i></a></center>
+                    </div>
+                    <div class="for-pwd-htm">
+                        {% for flashError in app.flashes('verify_email_error') %}
+                            <div class="alert alert-danger" role="alert">{{ flashError }}</div>
+                        {% endfor %}
+                        {{ form_start(form) }}
+
+                        <div class="group">
+                            <label for="email" class="label">{% trans %}dashboard.accueil.email{% endtrans %}</label>
+                            {{ form_widget(form.email, { 'attr': {'class': 'input'} }) }}
+                            <div class="form-error">
+                                {{ form_errors(form.email) }}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <label for="firstname" class="label">{% trans %}dashboard.accueil.prenom{% endtrans %}</label>
+                            {{ form_widget(form.firstname, { 'attr': {'class': 'input'} }) }}
+                            <div class="form-error">
+                                {{ form_errors(form.firstname) }}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <label for="lastname" class="label">{% trans %}dashboard.accueil.nom{% endtrans %}</label>
+                            {{ form_widget(form.lastname, { 'attr': {'class': 'input'} }) }}
+                            <div class="form-error">
+                                {{ form_errors(form.lastname) }}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <label for="password" class="label">{% trans %}dashboard.accueil.password{% endtrans %}</label>
+                            {{ form_widget(form.plainPassword, { 'attr': {'class': 'input'} }) }}
+                            <div class="form-error">
+                                {{ form_errors(form.plainPassword) }}
+                            </div>
+                        </div>
+
+                        <div class="row pb-2 pt-2 ml-1 mr-1 group">
+                            <div class="col-md-8">
+                                <a href="#" id="link_terms" class="label" data-toggle="modal" data-target="#terms">{% trans %}dashboard.accueil.voir_conditions{% endtrans %}</a>
+                                <hr>
+                                {{ form_widget(form.agreeTerms, {label: 'dashboard.accueil.accepter_conditions'|trans}) }}
+                                <div class="form-error">
+                                    {{ form_errors(form.agreeTerms) }}
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-right">
+                                <label for="captcha" class="label">Captcha</label>
+                                {{ form_widget(form.captcha, { 'attr': {'class': 'input'} }) }}
+                                <div class="form-error">
+                                    {{ form_errors(form.captcha) }}
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="formHasError" value="{{ formHasError ?? '0' }}">
+
+                        <button type="submit" class="btn btn-outline-success btn-lg btn-block mt-4">{% trans %}dashboard.accueil.inscription{% endtrans %}</button>
+                        {{ form_end(form) }}
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="terms">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content text-dark font-weight-light">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        Conditions générales d'utilisation du service
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ termsOfUse.description | raw }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+                    
+    <div class="modal fade" tabindex="-1" role="dialog" id="terms_update">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content text-dark font-weight-light">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        Conditions générales d'utilisation du service
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">   
+                    {{ termsOfUse.description | raw }}
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ path("app_terms_update") }}" type="button" class="btn btn-success">Accepter</a>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>                                    
+{% endblock %}
