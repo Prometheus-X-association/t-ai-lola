@@ -28,7 +28,7 @@ import json
 
 from jinja2 import Template, StrictUndefined
 import jinja2
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from lolapy.algorithm.algorithm import AlgorithmRecipe, InputValue, OutputValue
 from lolapy.algorithm.errors import (
@@ -111,8 +111,7 @@ class CreateNFscript(BaseModel):
     algorithm_parameters: dict = None or {}
     output_template: Path
 
-    class Config:
-        arbitrary_types_allowed = True  # required to validate ScenarioTemplate
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # required to validate ScenarioTemplate
 
     def gen_template(self):
         """Generate and write the new nf file based of the template."""

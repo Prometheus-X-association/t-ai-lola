@@ -203,7 +203,7 @@ class AlgorithmParameter(BaseModel):
         """
         try:
             return AlgorithmParameter(**json_data)
-        except pydantic.error_wrappers.ValidationError as e:
+        except pydantic.ValidationError as e:
             raise errors.AlgorithmParameterMissingField(json_data, e)
 
 
@@ -227,7 +227,7 @@ class AlgorithmRecipe(BaseModel):
         """
         try:
             return cls(**json_data)
-        except pydantic.error_wrappers.ValidationError as e:
+        except pydantic.ValidationError as e:
             raise errors.AlgorithmRecipeMissingField(json_data, e)
 
     @classmethod
@@ -245,7 +245,7 @@ class AlgorithmRecipe(BaseModel):
             json_data = json.load(open(algo_recipe))  # Don't catch this !
             # The file is ensure during installation
             return cls(**json_data)
-        except pydantic.error_wrappers.ValidationError as e:
+        except pydantic.ValidationError as e:
             raise errors.AlgorithmRecipeMissingField(json_data, e)
 
 

@@ -109,7 +109,7 @@ class InstallScenario:
         # Sanitize URL of docker images
         for image in docker_images_list:
             image.sanitize()
-        docker.PullDockerImages(docker_images=docker_images_list).pull()
+        #docker.PullDockerImages(docker_images=docker_images_list).pull()
         # everything is Done. Log complete to the frontend
         frontend_api.FrontendRequest.get(url=f"/api/tag/{self.hash}/complete")
 

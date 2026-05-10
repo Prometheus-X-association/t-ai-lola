@@ -153,7 +153,9 @@ class RunScenario:
                parameters=self.parameters,
             )
             my_nextflow.run()
-        except:
+
+        except Exception as e:
+            logging.error(e)
             logging.error("Something went wrong")
         else:
             logging.error("Nothing went wrong")

@@ -30,7 +30,7 @@ def test_command_not_server_not_localhost():
 def test_command_on_server_from_env():
     with settings.EditSettings():
         settings.get().cluster_host = "localhost"
-        settings.get().cluster_is_backend = False
+        settings.get().cluster_type = "slurm"
         cmd_result = shell_command.ShellCommand.from_env(command="ls -la").run()
         assert ".bashrc" in cmd_result.stdout
         assert cmd_result.exit_code == None
@@ -38,7 +38,7 @@ def test_command_on_server_from_env():
 def test_command_localhost_from_env():
     with settings.EditSettings():
         settings.get().cluster_host = "localhost"
-        settings.get().cluster_is_backend = True
+        settings.get().cluster_type = "local"
         cmd_result = shell_command.ShellCommand.from_env(command="ls -la").run()
         assert "tests" in cmd_result.stdout
         assert cmd_result.exit_code == 0
@@ -46,14 +46,21 @@ def test_command_localhost_from_env():
 def test_command_error_ssh():
     with settings.EditSettings():
         settings.get().cluster_host = "999.0.9.0"  # Unknow ip adress
-        settings.get().cluster_is_backend = False
+        settings.get().cluster_type = "slurm"
         with pytest.raises(errors.SSHConnectionError):
             cmd_result = shell_command.ShellCommand.from_env(command="ls -la").run()
+
+# def test_command_k8s_from_env():
+#     with settings.EditSettings():
+#         settings.get().cluster_type = "k8s"
+#         cmd_result = shell_command.ShellCommand.from_env(command="ls -la").run()
+#         assert "tests" in cmd_result.stdout
+#         assert cmd_result.exit_code == 0
 
 def test_command_ssh_cwd():
     with settings.EditSettings():
         settings.get().cluster_host = "localhost"
-        settings.get().cluster_is_backend = True
+        settings.get().cluster_type = "slurm"
         cmd_result = shell_command.ShellCommand.new(
             command="ls -la",
             on_localhost=False,

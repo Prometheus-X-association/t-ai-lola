@@ -93,3 +93,36 @@ def extract_missing_fields(
         if matches:
             return [matches[1]]
     return ["Unable to find the missing field. Check the format of your file"]
+
+def handle_api_errors(error: Exception) -> "flask.Response":
+    """Convert Lolapy catched errors to the correct respond code"""
+    import flask
+    from flask.wrappers import Response
+    import lolapy.dataset.errors as dataset_error
+    import lolapy.algorithm.errors as algorithm_error
+    import lolapy.scenario.errors as scenario_errors
+    import logging
+    import traceback
+
+    match error:
+        case LolapyGlobalError():
+            internal_message = error.message
+            public_message = error.public_message
+            response_code = 500
+            match error:
+                case dataset_error.DatasetDoesNotExist():
+                    response_code = 404
+                case dataset_error.DatasetPermissionDenied():
+                    response_code = 403
+                case scenario_errors.ScenarioNotExist():
+                    response_code = 404
+                case algorithm_error.AlgorithmNotExist():
+                    response_code = 404
+        case _:
+            logging.error(traceback.format_exc())
+            internal_message = str(error)
+            public_message = LolapyGlobalError.standard_public_message
+            response_code = 500
+
+    logging.error(internal_message)
+    return Response(status=response_code, response=public_message)

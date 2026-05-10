@@ -271,6 +271,7 @@ class NextflowLog:
           }
         }
         """
+        logging.warning(self.json_data)
         # machine traces are only available when job complete
         log_statistics: NextflowLogProcessStatistics | None = None
         if self.log_event == NextflowLogEvent.DONE:

@@ -53,7 +53,7 @@ class SettingsMissingParameters(ToolsErrors):
     """If there is a problem when the expansion of the command template"""
 
     def __init__(
-        self, validation_error: pydantic.error_wrappers.ValidationError, env_file: str
+        self, validation_error: pydantic.ValidationError, env_file: str
     ):
         missing_fields = extract_missing_fields(validation_error)
         self.message = f"Missing variable(s) when reading '{env_file}': Missing variable(s): {', '.join(missing_fields)}"

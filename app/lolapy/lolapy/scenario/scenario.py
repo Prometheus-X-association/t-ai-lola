@@ -15,9 +15,7 @@ from lolapy.tools import settings
 from lolapy.algorithm.algorithm import ParameterAvailableTypes
 from lolapy.tools.docker import DockerImage
 
-import pydantic.json
 
-pydantic.json.ENCODERS_BY_TYPE[Path] = str
 
 class CONST_SCENARIO:
     """Store constant information for scenario"""
@@ -129,7 +127,7 @@ class ScenarioParameter(BaseModel):
         """
         try:
             return ScenarioParameter(**json_data)
-        except pydantic.error_wrappers.ValidationError as e:
+        except pydantic.ValidationError as e:
             raise errors.ScenarioParameterMissingField(json_data, e)
         except errors.ScenarioParameterFieldWrongFormat as e:
             raise e
@@ -160,13 +158,13 @@ class ScenarioRecipe(BaseModel):
         Args:
             scenario_recipe: Path: FullPath of the params.json file containing the recipe.
         Raises:
-            pydantic.error_wrappers.ValidationError: if the file is not well formatted
+            pydantic.ValidationError: if the file is not well formatted
         """
         json_data = json.load(open(scenario_recipe)) # Don't catch this !
                                                      # The file is ensure during installation
         try:
             return cls(**json_data)
-        except pydantic.error_wrappers.ValidationError as e:
+        except pydantic.ValidationError as e:
             raise errors.ScenarioRecipeMissingField(scenario_data=json_data, error=e)
 
 

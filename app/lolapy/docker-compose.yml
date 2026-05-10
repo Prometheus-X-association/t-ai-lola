@@ -24,6 +24,7 @@ services:
       context: .
     environment:
       - ENV_FILE=/app/.env
+      - KUBECONFIG=/app/kubeconfig.yml
     network_mode: host
     privileged: true
     group_add: 
@@ -31,9 +32,10 @@ services:
     user: lolauser
     volumes:
       - .env:/app/.env
+      - ./kubeconfig.yml:/app/kubeconfig.yml
       - lolasqlite:/tmp
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/docker/daemon.json:/etc/docker/daemon.json
+      - /etc/docker:/etc/docker
       - ./certs/:/tmp/certs
       - /etc/munge/munge.key:/etc/munge/munge.key
       - /etc/slurm/slurm.conf:/etc/slurm/slurm.conf

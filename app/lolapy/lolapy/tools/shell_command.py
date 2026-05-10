@@ -155,7 +155,8 @@ class ShellCommand:
         # settings and required a env_file to be load
         from lolapy.tools import settings
 
-        if settings.get().cluster_is_backend:
+        cluster_type = settings.get().cluster_type
+        if cluster_type == "local":
             return ShellCommand.new(
                 command=command,
                 on_localhost=True,

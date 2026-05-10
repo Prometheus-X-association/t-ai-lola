@@ -88,7 +88,7 @@ class ScenarioRecipeMissingField(ScenarioErrors):
         The error generate a correct error message depending of missing fields in the params.json
     """
 
-    def __init__(self, scenario_data: dict, error: pydantic.error_wrappers.ValidationError):
+    def __init__(self, scenario_data: dict, error: pydantic.ValidationError):
         # In case the only missing field is name, we cannot search for the algorithm_name
         if "name" in scenario_data:
             scenario_name = scenario_data["name"]
@@ -102,7 +102,7 @@ class ScenarioRecipeMissingField(ScenarioErrors):
 class ScenarioParameterMissingField(ScenarioErrors):
     """If there is a missing field in the scenario parameter"""
 
-    def __init__(self, scenario_data: dict, error: pydantic.error_wrappers.ValidationError):
+    def __init__(self, scenario_data: dict, error: pydantic.ValidationError):
         # In case the only missing field is name, we cannot search for the scenario_name
         if "name" in scenario_data:
             scenario_name = scenario_data["name"]

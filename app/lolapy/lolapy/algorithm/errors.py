@@ -48,7 +48,7 @@ class AlgorithmRecipeMissingField(AlgorithmErrors):
     """If there is a missing field in the algorithm parameter
     TODO:"""
 
-    def __init__(self, algorithm_data: dict, error: pydantic.error_wrappers.ValidationError):
+    def __init__(self, algorithm_data: dict, error: pydantic.ValidationError):
         if "name" in algorithm_data:
             algorithm_name = algorithm_data["name"]
         else:
@@ -61,7 +61,7 @@ class AlgorithmParameterMissingField(AlgorithmErrors):
     """If there is a missing field in the algorithm parameter
     TODO:"""
 
-    def __init__(self, algorithm_data: dict, error: pydantic.error_wrappers.ValidationError):
+    def __init__(self, algorithm_data: dict, error: pydantic.ValidationError):
         # In case the only missing field is name, we cannot search for the algorithm_name
         if "name" in algorithm_data:
             algorithm_name = algorithm_data["name"]

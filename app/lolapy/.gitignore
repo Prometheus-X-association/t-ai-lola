@@ -10,6 +10,5 @@ lolapi/__pycache__
 /docs/references/
 /site/
 /build/
-.venv/
+.venv
 /tmp/sftp_path/
-/certs/

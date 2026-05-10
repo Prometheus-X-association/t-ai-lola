@@ -17,7 +17,12 @@ class BadRequestFormat(LolapyGlobalError):
 
     @classmethod
     def from_ValidationError(cls, request: flask.Request, error: pydantic.ValidationError) -> BadRequestFormat:
-        missing_fields = [str(field["loc"][0]) for field in error.errors()]
-        message = f"Error with request '{request}': Missing field(s): '{', '.join(missing_fields)}'"
-        public_message = f"Error in request: Missing field(s): '{', '.join(missing_fields)}'"
+        errors = []
+        for err in error.errors():
+            loc = " -> ".join(str(l) for l in err["loc"])
+            msg = err["msg"]
+            errors.append(f"'{loc}': {msg}")
+
+        message = f"Error with request '{request}': {', '.join(errors)}"
+        public_message = f"Error in request: {', '.join(errors)}"
         return cls(public_message=public_message, message=message)
