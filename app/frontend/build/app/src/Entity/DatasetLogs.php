@@ -6,42 +6,31 @@ use App\Repository\DatasetLogsRepository;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Dataset;
 
-/**
- * @ORM\Entity(repositoryClass=DatasetLogsRepository::class)
- */
+#[ORM\Entity(repositoryClass: DatasetLogsRepository::class)]
 class DatasetLogs {
 
     const ACTION_START = "START";
     const ACTION_COMPLETE = "COMPLETE";
     const ACTION_ERROR = "ERROR";
-    
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $token;    
-    
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    private $token;
+
+    #[ORM\Column(type: 'string', length: 255)]
     private $action;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $datetime;
 
     /**
      * @var Dataset
-     *
-     * @ORM\ManyToOne(targetEntity=Dataset::class, inversedBy="datasetLogs")
-     */
+     **/
+    #[ORM\ManyToOne(targetEntity: Dataset::class, inversedBy: 'datasetLogs')]
     public $dataset;
 
     public function __construct(Dataset $dataset, string $action, string $token)

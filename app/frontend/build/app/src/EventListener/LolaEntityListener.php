@@ -4,7 +4,7 @@ namespace App\EventListener;
 
 use App\Entity\AbstractLolaEntity;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class LolaEntityListener {
 

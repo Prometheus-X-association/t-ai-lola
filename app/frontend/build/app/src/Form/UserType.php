@@ -17,25 +17,25 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class UserType extends AbstractType {
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
                 ->add('email', EmailType::class, [
                     'label' => 'Email',
                     'constraints' => [
-                        new NotBlank(['message' => 'L\'email est requis.']),
+                        new NotBlank(message: 'L\'email est requis.'),
                     ],
                 ])
                 ->add('firstname', TextType::class, [
                     'label' => 'Prénom',
                     'constraints' => [
-                        new NotBlank(['message' => 'Le prénom est requis.']),
+                        new NotBlank(message: 'Le prénom est requis.'),
                     ],
                 ])
                 ->add('lastname', TextType::class, [
                     'label' => 'Nom',
                     'constraints' => [
-                        new NotBlank(['message' => 'Le nom est requis.']),
+                        new NotBlank(message: 'Le nom est requis.'),
                     ],
                 ])
                 ->add('roles', ChoiceType::class, [
@@ -45,7 +45,7 @@ class UserType extends AbstractType {
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,

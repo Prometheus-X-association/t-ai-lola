@@ -5,22 +5,17 @@ namespace App\Controller\Dashboard;
 use App\Entity\Output;
 use App\Form\OutputType;
 use App\Repository\OutputRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Controller\LolaController;
 
-/**
- * @Route("/dashboard/output", name="dashboard_output_")
- * @IsGranted("ROLE_PROFIL_4")
- */
+#[Route('/dashboard/output', name: 'dashboard_output_')]
+#[IsGranted('ROLE_PROFIL_4')]
 class OutputController extends LolaController {
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(OutputRepository $outputRepository): Response
     {
         return $this->render('dashboard/output/index.html.twig', [
@@ -28,9 +23,7 @@ class OutputController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $output = new Output();
@@ -38,9 +31,8 @@ class OutputController extends LolaController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($output);
-            $entityManager->flush();
+            $this->getEm()->persist($output);
+            $this->getEm()->flush();
 
             $this->addFlash("success", "L'indicateur a bien été ajouté");
             return $this->redirectToRoute('dashboard_output_index');
@@ -52,16 +44,14 @@ class OutputController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
-     */
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Output $output): Response
     {
         $form = $this->createForm(OutputType::class, $output);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->getEm()->flush();
 
             $this->addFlash("success", "L'indicateur a bien été modifié");
             return $this->redirectToRoute('dashboard_output_index');
@@ -73,29 +63,21 @@ class OutputController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"DELETE"})
-     */
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
     public function delete(Request $request, Output $output): Response
     {
         if ($this->isCsrfTokenValid('delete' . $output->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($output);
-            $entityManager->flush();
+            $this->getEm()->remove($output);
+            $this->getEm()->flush();
 
             $this->addFlash("success", "L'indicateur a bien été supprimée");
         }
 
         return $this->redirectToRoute('dashboard_output_index');
     }
-    
-    /**
-     * @Route("/toggle_visible/{id}", name="toggle_visible", 
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function toggleVisible(Output $output)
+
+    #[Route('/toggle_visible/{id}', name: 'toggle_visible', requirements: ['id' => '\d+'])]
+    public function toggleVisible(Output $output): Response
     {
         $output->toggleActive();
         $this->getEm()->flush();

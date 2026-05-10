@@ -8,37 +8,25 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\AbstractLolaEntity;
 
-/**
- * @ORM\Entity(repositoryClass=GroupRepository::class)
- * @ORM\Table(name="`group`")
- */
+#[ORM\Entity(repositoryClass: GroupRepository::class)]
+#[ORM\Table(name: '`group`')]
 class Group extends AbstractLolaEntity
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="groups")
-     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'groups')]
     private $users;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Dataset::class, inversedBy="groups")
-     */
+    #[ORM\ManyToMany(targetEntity: Dataset::class, inversedBy: 'groups')]
     private $datasets;
 
     public function __construct()

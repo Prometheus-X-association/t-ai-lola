@@ -16,7 +16,7 @@ class LolapyServiceApi {
     /**
      * Security service for User logged data
      * 
-     * @var \Symfony\Component\Security\Core\Security
+     * @var \Symfony\Bundle\SecurityBundle\Security
      */
     private $security;
 
@@ -128,7 +128,7 @@ class LolapyServiceApi {
     // Update the constructor to include LoggerInterface
     public function __construct(
         LoggerInterface $logger,  // Add this parameter
-        \Symfony\Component\Security\Core\Security $security
+        \Symfony\Bundle\SecurityBundle\Security $security
     )
     {
         $this->logger = $logger;  // Add this line

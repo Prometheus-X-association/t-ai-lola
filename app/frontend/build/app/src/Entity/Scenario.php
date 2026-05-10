@@ -7,63 +7,47 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\AbstractLolaEntity;
-/**
- * @ORM\Entity(repositoryClass=ScenarioRepository::class)
- */
+
+#[ORM\Entity(repositoryClass: ScenarioRepository::class)]
 class Scenario extends AbstractLolaEntity {
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $hash;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     private $parametres = [];
 
     /**
      * @var Tag
-     *
-     * @ORM\ManyToOne(targetEntity=Tag::class)
-     */
+     **/
+    #[ORM\ManyToOne(targetEntity: Tag::class)]
     public $tag;
-    
-    /**
-     * @ORM\Column(type="boolean")
-     */
+
+    #[ORM\Column(type: 'boolean')]
     private $isActive;    
 
     /**
      * @var Dataset
-     *
-     * @ORM\ManyToOne(targetEntity=Dataset::class)
-     */
+     **/
+    #[ORM\ManyToOne(targetEntity: Dataset::class)]
     public $dataset;
 
     /**
      * @var MetaScenario
-     *
-     * @ORM\ManyToOne(targetEntity=MetaScenario::class, inversedBy="scenarios")
-     */
+     **/
+    #[ORM\ManyToOne(targetEntity: MetaScenario::class, inversedBy: 'scenarios')]
     public $metascenario;
-    
-    /**
-     * @ORM\OneToMany(targetEntity=ScenarioAlgorithm::class, mappedBy="scenario")
-     */
+
+    #[ORM\OneToMany(targetEntity: ScenarioAlgorithm::class, mappedBy: 'scenario')]
     private $scenarioAlgorithms;    
 
-    /**
-     * @ORM\OneToMany(targetEntity=Run::class, mappedBy="scenario")
-     */
+    #[ORM\OneToMany(targetEntity: Run::class, mappedBy: 'scenario')]
     public $runs;
 
     public function __construct()
@@ -147,7 +131,7 @@ class Scenario extends AbstractLolaEntity {
     {
         if (!$this->runs->contains($run)) {
             $this->runs[] = $run;
-            $run->setRun($this);
+            $run->setScenario($this);
         }
 
         return $this;
@@ -157,8 +141,8 @@ class Scenario extends AbstractLolaEntity {
     {
         if ($this->runs->removeElement($run)) {
             // set the owning side to null (unless already changed)
-            if ($run->getRun() === $this) {
-                $run->setRun(null);
+            if ($run->getScenario() === $this) {
+                $run->setScenario(null);
             }
         }
 

@@ -2,24 +2,21 @@
 
 namespace App\Controller\Dashboard;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\User;
 use App\Controller\LolaController;
 use App\Email\EmailService;
+use App\Lolapy\LolapyServiceApi;
 
-/**
- * @Route("/dashboard", name="dashboard_")
- */
+#[Route('/dashboard', name: 'dashboard_')]
 class DashboardController extends LolaController
 {
 
-    /**
-     * @Route("/", name="accueil")
-     */
-    public function index(\App\Lolapy\LolapyServiceApi $lolapyService): Response
+    #[Route('/', name: 'accueil')]
+    public function index(LolapyServiceApi $lolapyService): Response
     {
         // if user has only profil_1, redirect after authentification to the upgrade page
         if ($this->getUser()->hasRole(User::ROLE_PROFIL_1)) {
@@ -46,17 +43,13 @@ class DashboardController extends LolaController
         }
     }
 
-    /**
-     * @Route("/upgrade", name="upgrade")
-     */
+    #[Route('/upgrade', name: 'upgrade')]
     public function upgrade(): Response
     {
         return $this->render('dashboard/upgrade.html.twig');
     }
 
-    /**
-     * @Route("/user/upgrade/{profil}", name="user_upgrade")
-     */
+    #[Route('/user/upgrade/{profil}', name: 'user_upgrade')]
     public function userUpgrade(Request $request, EmailService $mailer): Response
     {
         $userProfil = strtoupper($request->get("profil"));
@@ -67,7 +60,7 @@ class DashboardController extends LolaController
 
             try {
                 $mailer->upgradeRequest($this->getUser());
-            } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+            } catch (TransportException) {
                 $this->addFlash('warning', "L'envoi de la notification par email à échoué.");
             }
         } else {

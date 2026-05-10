@@ -6,26 +6,18 @@ use App\Repository\TermsOfUseRepository;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\AbstractLolaEntity;
 
-/**
- * @ORM\Entity(repositoryClass=TermsOfUseRepository::class)
- */
+#[ORM\Entity(repositoryClass: TermsOfUseRepository::class)]
 class TermsOfUse extends AbstractLolaEntity {
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
-    
-    /**
-     * @ORM\Column(type="boolean")
-     */
+
+    #[ORM\Column(type: 'boolean')]
     private $active;
 
     public function __construct()

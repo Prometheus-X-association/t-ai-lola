@@ -4,33 +4,29 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use App\Entity\User;
-use App\Repository\UserRepository;
 use App\Entity\Group;
-use App\Entity\Algorithm;
 use App\Entity\Output;
 use App\Entity\MetaScenario;
-use App\Entity\Scenario;
 use App\Entity\TermsOfUse;
-use App\Entity\Dataset;
 
 class DevFixtures extends Fixture implements FixtureGroupInterface {
 
-    private $passwordEncoder;
+    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
     }
 
     public static function getGroups(): array
     {
         return ['dev'];
     }
-    
-    public function load(ObjectManager $manager)
+
+    public function load(ObjectManager $manager): void
     {
         $userSisr = new User();
         $userSisr->setEmail("sisr@lola.fr");
@@ -39,7 +35,7 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $userSisr->setLastname("RoleSisr");
         $userSisr->setCreatedAt(new \DateTime());
         $userSisr->setActive(true);
-        $userSisr->setPassword($this->passwordEncoder->encodePassword(
+        $userSisr->setPassword($this->passwordHasher->hashPassword(
                         $userSisr,
                         'azerty'
         ));
@@ -52,7 +48,7 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $user->setLastname("RoleAdmin");
         $user->setCreatedAt(new \DateTime());
         $user->setActive(true);
-        $user->setPassword($this->passwordEncoder->encodePassword(
+        $user->setPassword($this->passwordHasher->hashPassword(
                         $user,
                         'azerty'
         ));
@@ -65,7 +61,7 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $user1->setLastname("RoleP1");
         $user1->setCreatedAt(new \DateTime());
         $user1->setActive(true);
-        $user1->setPassword($this->passwordEncoder->encodePassword(
+        $user1->setPassword($this->passwordHasher->hashPassword(
                         $user1,
                         'azerty'
         ));
@@ -78,7 +74,7 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $user2->setLastname("RoleP2");
         $user2->setCreatedAt(new \DateTime());
         $user2->setActive(true);
-        $user2->setPassword($this->passwordEncoder->encodePassword(
+        $user2->setPassword($this->passwordHasher->hashPassword(
                         $user2,
                         'azerty'
         ));
@@ -91,7 +87,7 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $user3->setLastname("RoleP3");
         $user3->setCreatedAt(new \DateTime());
         $user3->setActive(true);
-        $user3->setPassword($this->passwordEncoder->encodePassword(
+        $user3->setPassword($this->passwordHasher->hashPassword(
                         $user3,
                         'azerty'
         ));
@@ -104,7 +100,7 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $user4->setLastname("RoleP4");
         $user4->setCreatedAt(new \DateTime());
         $user4->setActive(true);
-        $user4->setPassword($this->passwordEncoder->encodePassword(
+        $user4->setPassword($this->passwordHasher->hashPassword(
                         $user4,
                         'azerty'
         ));
@@ -117,7 +113,7 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $user5->setLastname("RoleP5");
         $user5->setCreatedAt(new \DateTime());
         $user5->setActive(true);
-        $user5->setPassword($this->passwordEncoder->encodePassword(
+        $user5->setPassword($this->passwordHasher->hashPassword(
                         $user5,
                         'azerty'
         ));
@@ -147,19 +143,19 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $metascenario->setUrlRepository("https://gitlab.inria.fr");
         $metascenario->setCreatedAt(new \DateTime());
         $metascenario->setCreatedBy($userSisr);
-                        
+
         $manager->persist($metascenario);
         $manager->flush();
-        
+
         $terms = new TermsOfUse();
         $terms->setCreatedAt(new \DateTime());
         $terms->setCreatedBy($userSisr);
         $terms->setActive();
         $terms->setDescription("Terms of use");
-                                
+
         $manager->persist($terms);
         $manager->flush();
-        
+
         // ---
 
         $output = new Output();

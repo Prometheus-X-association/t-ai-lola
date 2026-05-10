@@ -3,36 +3,32 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Psr\Log\LoggerInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class LolaController extends AbstractController {
 
-    /**
-     * @var Symfony\Contracts\Translation\TranslatorInterface 
-     */
-    private $translator;
-    protected $logger;
-
-    /**
-     * @var SessionInterface $session
-     */
-    private $session;
+    private TranslatorInterface $translator;
+    protected LoggerInterface $logger;
+    private RequestStack $requestStack;
+    private EntityManagerInterface $entityManager;
     
-    public function __construct(TranslatorInterface $translator, SessionInterface $session, LoggerInterface $logger) {
+    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, RequestStack $requestStack, EntityManagerInterface $entityManager) {
         $this->translator = $translator;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->logger = $logger;
+        $this->entityManager = $entityManager;
     }
 
     /**
-     * @return \Doctrine\ORM\EntityManager
+     * @return EntityManagerInterface
      */
-    protected function getEm(): \Doctrine\ORM\EntityManager
+    protected function getEm(): EntityManagerInterface
     {
-        return $this->getDoctrine()->getManager();
+        return $this->entityManager;
     }
 
     /**
@@ -40,9 +36,9 @@ class LolaController extends AbstractController {
      */
     protected function getSession(): SessionInterface
     {
-        return $this->session;
+        return $this->requestStack->getSession();
     }
-    
+
     /**
      * @return TranslatorInterface
      */
@@ -52,9 +48,9 @@ class LolaController extends AbstractController {
     }
 
     /**
-     * @return \App\Repository\UserRepository
+     * @return \Doctrine\ORM\EntityRepository
      */
-    protected function getUserRepository(): \App\Repository\UserRepository
+    protected function getUserRepository(): \Doctrine\ORM\EntityRepository
     {
         return $this->getEm()->getRepository(\App\Entity\User::class);
     }

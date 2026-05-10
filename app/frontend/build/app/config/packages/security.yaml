@@ -2,7 +2,7 @@ security:
     access_decision_manager:
         strategy: unanimous
 
-    encoders:
+    password_hashers:
         App\Entity\User:
             algorithm: auto
 
@@ -26,12 +26,11 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: lazy
+            lazy: true
             provider: app_user_provider
             user_checker: App\Security\UserChecker
-            guard:
-                authenticators:
-                    - App\Security\LoginFormAuthenticator
+            custom_authenticators:
+                - App\Security\LoginFormAuthenticator
             logout:
                 path: app_logout
 
@@ -48,7 +47,8 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         # Access to all authenticated users
         - { path: ^/dashboard, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api, roles: PUBLIC_ACCESS, methods: [POST, GET] }
         # API access is only for the Lolapy server
-        - { path: ^/api, roles: IS_AUTHENTICATED_ANONYMOUSLY, ips: ['%env(LOLAPY_API_ADRESS)%'], methods: [POST, GET] }
-        - { path: ^/api, allow_if: "'%env(ENABLE_API_ACCESS_CONTROL)%' == 'false'" }
-        - { path: ^/api, roles: ROLE_NO_ACCESS }
+        #- { path: ^/api, roles: PUBLIC_ACCESS, ips: ['%env(LOLAPY_API_ADRESS)%'], methods: [POST, GET] }
+        #- { path: ^/api, allow_if: "'%env(ENABLE_API_ACCESS_CONTROL)%' == 'false'" }
+        #- { path: ^/api, roles: ROLE_NO_ACCESS }

@@ -4,7 +4,7 @@ namespace App\Api;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use OpenApi\Annotations as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use App\Entity\ApiLog;
@@ -15,11 +15,11 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
+#[Route('/lolapi')]
 class LolapiController extends AbstractFOSRestController {
 
     /**
      * Insert into database a log record from Lolapy
-     * @Post("/log")
      * @OA\Response(response=201, description="Serialized ApiLog object"),
      * @OA\Response(response=400, description="Data sent"),
      * @RequestParam(
@@ -39,14 +39,15 @@ class LolapiController extends AbstractFOSRestController {
      * )
      * @OA\Tag(name="Lolapy Logs")
      */
+    #[Route('/log', methods: ['POST'])]
     public function log(Request $request, EntityManagerInterface $em): Response
     {
         $serializer = $this->container->get('serializer');
         $data = json_decode($request->getContent());
         
-        if (isset($data->type) && !empty($data->type) && $data->message && !empty($data->message)) {
+        if (isset($data->type) && !empty($data->type) && isset($data->message) && !empty($data->message)) {
             $apiLog = new ApiLog();
-            $apiLog->setDatetime(new \Datetime());
+            $apiLog->setDatetime(new \DateTime());
             $apiLog->setType($data->type);
             $apiLog->setMessage($data->message);
             (!isset($data->details)) ?: $apiLog->setDetails($data->details);

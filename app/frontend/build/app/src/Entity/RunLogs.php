@@ -2,13 +2,11 @@
 
 namespace App\Entity;
 
-use Symfony\Component\Serializer\Annotation\MaxDepth;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use App\Repository\RunLogsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=RunLogsRepository::class)
- */
+#[ORM\Entity(repositoryClass: RunLogsRepository::class)]
 class RunLogs
 {
     const TYPE_PROCESS = "PROCESS";
@@ -30,52 +28,34 @@ class RunLogs
         "error" => self::EVENT_ERROR
     ];
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $type;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $event;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $time;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $workdir;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $error;
 
-    /**
-     * @ORM\Column(type="json", nullable=true)
-     */
+    #[ORM\Column(type: 'json', nullable: true)]
     private $statistic = [];
 
-    /**
-     * @MaxDepth(1)
-     * @ORM\ManyToOne(targetEntity=Run::class, inversedBy="runLogs")
-     */
+    #[ORM\ManyToOne(targetEntity: Run::class, inversedBy: 'runLogs')]
+    #[MaxDepth(1)]
     public $run;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $nomProcess;
 
     public function getId(): ?int

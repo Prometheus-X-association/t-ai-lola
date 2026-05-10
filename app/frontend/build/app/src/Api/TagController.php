@@ -5,25 +5,20 @@ namespace App\Api;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Annotations as OA;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\RequestParam;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use App\Entity\ApiLog;
-use App\Entity\Scenario;
 use App\Entity\Tag;
 
-/**
- * @route("/tag")
- */
+#[Route('/tag')]
 class TagController extends AbstractController {
 
     /**
      * Notify when a tag is successfully added
      *
-     * @Route("/{hash}/complete", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="",
@@ -36,6 +31,7 @@ class TagController extends AbstractController {
      * )
      * @OA\Tag(name="Tag")
      */
+    #[Route('/{hash}/complete', methods: ['GET'])]
     public function complete(Tag $tag, EntityManagerInterface $em): Response
     {
         $tag->setStatus(Tag::STATUS_AVAILABLE);
@@ -46,7 +42,6 @@ class TagController extends AbstractController {
     /**
      * Notify when adding the tag fails
      *
-     * @Post("/error")
      * @OA\Response(response=200, description=""),
      * @OA\Response(response=400, description="The hash of the tag is invalid"),
      * @RequestParam(
@@ -59,9 +54,9 @@ class TagController extends AbstractController {
      * )
      * @OA\Tag(name="Tag")
      */
+    #[Route('/error', methods: ['POST'])]
     public function error(Request $request, EntityManagerInterface $em): Response
     {
-        $serializer = $this->container->get('serializer');
         $data = json_decode($request->getContent());
 
         if (isset($data->tag) && !empty($data->tag) && $data->error && !empty($data->error)) {

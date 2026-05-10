@@ -5,24 +5,20 @@ namespace App\Api;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Annotations as OA;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\RequestParam;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use App\Entity\ApiLog;
 use App\Entity\AlgorithmVersion;
 
-/**
- * @route("/algorithm")
- */
+#[Route('/algorithm')]
 class AlgorithmVersionController extends AbstractController {
 
     /**
      * Notify when a version algorithm is successfully added
      *
-     * @Route("/{hash}/complete", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="",
@@ -35,6 +31,7 @@ class AlgorithmVersionController extends AbstractController {
      * )
      * @OA\Tag(name="Algorithm")
      */
+    #[Route('/{hash}/complete', methods: ['GET'])]
     public function complete(AlgorithmVersion $algorithmVersion, EntityManagerInterface $em): Response
     {
         $algorithmVersion->setStatus(AlgorithmVersion::STATUS_AVAILABLE);
@@ -45,7 +42,6 @@ class AlgorithmVersionController extends AbstractController {
     /**
      * Notify when adding the version algorithm fails
      *
-     * @Post("/error")
      * @OA\Response(response=200, description=""),
      * @OA\Response(response=400, description="The hash of the algorithm version is invalid"),
      * @RequestParam(
@@ -58,12 +54,12 @@ class AlgorithmVersionController extends AbstractController {
      * )
      * @OA\Tag(name="Algorithm")
      */
+    #[Route('/error', methods: ['POST'])]
     public function error(Request $request, EntityManagerInterface $em): Response
     {
-        $serializer = $this->container->get('serializer');
         $data = json_decode($request->getContent());
 
-        if (isset($data->algorithm_hash) && !empty($data->algorithm_hash) && $data->error && !empty($data->error)) {
+        if (isset($data->algorithm_hash) && !empty($data->algorithm_hash) && isset($data->error) && !empty($data->error)) {
 
             $algorithmVersion = $em->getRepository(AlgorithmVersion::class)->findOneBy(["hash" => $data->algorithm_hash]);
 

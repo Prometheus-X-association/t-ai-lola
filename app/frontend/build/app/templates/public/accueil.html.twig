@@ -129,7 +129,9 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                {% if termsOfUse %}
                     {{ termsOfUse.description | raw }}
+                {% endif %}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>

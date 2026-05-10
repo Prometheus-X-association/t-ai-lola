@@ -4,18 +4,18 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use App\Entity\User;
 use App\Entity\TermsOfUse;
 
 class ProdFixtures extends Fixture implements FixtureGroupInterface {
 
-    private $passwordEncoder;
+    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
     }
 
     public static function getGroups(): array
@@ -23,7 +23,7 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface {
         return ['prod'];
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = new User();
         $user->setEmail("sisr@lola.fr");
@@ -32,7 +32,7 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface {
         $user->setLastname("RoleSisr");
         $user->setCreatedAt(new \DateTime());
         $user->setActive(true);
-        $user->setPassword($this->passwordEncoder->encodePassword(
+        $user->setPassword($this->passwordHasher->hashPassword(
                         $user,
                         'azerty'
         ));
@@ -42,7 +42,7 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface {
                 
         $terms = new TermsOfUse();
         $terms->setCreatedAt(new \DateTime());
-        $terms->setCreatedBy($userSisr);
+        $terms->setCreatedBy($user);
         $terms->setActive();
         $terms->setDescription("Terms of use");
                                 

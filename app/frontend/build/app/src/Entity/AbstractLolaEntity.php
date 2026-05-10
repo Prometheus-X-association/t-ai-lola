@@ -3,42 +3,33 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \Symfony\Component\Security\Core\User\UserInterface;
-use \Symfony\Component\Security\Core\User\EquatableInterface;
-use App\Entity\LoggableInterface;
 
-/**
- * @ORM\MappedSuperclass
- * @ORM\HasLifecycleCallbacks()
- */
+#[ORM\MappedSuperclass]
+#[ORM\HasLifecycleCallbacks]
 class AbstractLolaEntity implements LoggableInterface {
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
      */
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
     public $createdAt;
 
     /**
      * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
     public $updatedAt;
     
     /**
      * @var User
-     *
-     * @ORM\ManyToOne(targetEntity=User::class)
      */
+    #[ORM\ManyToOne(targetEntity: User::class)]
     public $createdBy;
     
     /**
      * @var User
-     *
-     * @ORM\ManyToOne(targetEntity=User::class)
      */
+    #[ORM\ManyToOne(targetEntity: User::class)]
     public $updatedBy;
 
     /**

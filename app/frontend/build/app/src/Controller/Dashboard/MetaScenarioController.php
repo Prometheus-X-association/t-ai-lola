@@ -2,28 +2,24 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\AlgorithmVersion;
 use App\Entity\MetaScenario;
 use App\Entity\Tag;
-use App\Entity\Run;
-use App\Entity\Scenario;
 use App\Form\MetaScenarioType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\MetaScenarioRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Controller\LolaController;
+use App\Lolapy\LolapyServiceApi;
 
-/**
- * @Route("/dashboard/metascenario", name="dashboard_metascenario_")
- * @IsGranted("ROLE_PROFIL_2")
- */
+#[Route('/dashboard/metascenario', name: 'dashboard_metascenario_')]
+#[IsGranted('ROLE_PROFIL_2')]
 class MetaScenarioController extends LolaController {
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
-    public function index(\App\Repository\MetaScenarioRepository $metaScenarioRepository): Response
+    #[Route('/', name: 'index', methods: ['GET'])]
+    public function index(MetaScenarioRepository $metaScenarioRepository): Response
     {
         $userMetaScenario = $metaScenarioRepository->findBy($this->getUserFilter());
         $sharedMetaScenario = $metaScenarioRepository->findBy(["isPublic" => true]);
@@ -40,10 +36,8 @@ class MetaScenarioController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     * @IsGranted("ROLE_PROFIL_4")
-     */
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_PROFIL_4')]
     public function new(Request $request): Response
     {
         $metaScenario = new MetaScenario();
@@ -51,9 +45,8 @@ class MetaScenarioController extends LolaController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($metaScenario);
-            $entityManager->flush();
+            $this->getEm()->persist($metaScenario);
+            $this->getEm()->flush();
 
             $this->addFlash("success", "Le méta-scénario a bien été ajouté");
             return $this->redirectToRoute('dashboard_metascenario_index');
@@ -65,15 +58,13 @@ class MetaScenarioController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/tag/new", name="tag_new", methods={"GET","POST"})
-     * @IsGranted("ROLE_PROFIL_4")
-     */
+    #[Route('/tag/new', name: 'tag_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_PROFIL_4')]
     public function tagNew(Request $request): Response
     {
         $data = $request->request->all();
 
-        if ($data["tag_name"] && !empty($data["tag_name"])) {
+        if (!empty($data["tag_name"])) {
             $tag = new Tag();
 
             // TODO : controle que l'utilisateur à des droits sur le metascenario
@@ -94,17 +85,15 @@ class MetaScenarioController extends LolaController {
         return $this->redirectToRoute('dashboard_metascenario_index');
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
-     * @IsGranted("ROLE_PROFIL_4")
-     */
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_PROFIL_4')]
     public function edit(Request $request, MetaScenario $metaScenario): Response
     {
         $form = $this->createForm(MetaScenarioType::class, $metaScenario);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->getEm()->flush();
 
             $this->addFlash("success", "Le méta-scénario a bien été modifié");
             return $this->redirectToRoute('dashboard_metascenario_index');
@@ -116,14 +105,9 @@ class MetaScenarioController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/toggle_public/{id}", name="toggle_public",
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     * @IsGranted("ROLE_PROFIL_4")
-     */
-    public function togglePublic(MetaScenario $metaScenario)
+    #[Route('/toggle_public/{id}', name: 'toggle_public', requirements: ['id' => '\d+'])]
+    #[IsGranted('ROLE_PROFIL_4')]
+    public function togglePublic(MetaScenario $metaScenario): Response
     {
         $metaScenario->togglePublic();
         $this->getEm()->flush();
@@ -131,14 +115,9 @@ class MetaScenarioController extends LolaController {
         return $this->redirectToRoute("dashboard_metascenario_index");
     }
 
-    /**
-     * @Route("/toggle_active/{id}", name="toggle_active",
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     * @IsGranted("ROLE_PROFIL_4")
-     */
-    public function toggleActive(MetaScenario $metaScenario)
+    #[Route('/toggle_active/{id}', name: 'toggle_active', requirements: ['id' => '\d+'])]
+    #[IsGranted('ROLE_PROFIL_4')]
+    public function toggleActive(MetaScenario $metaScenario): Response
     {
         $metaScenario->toggleActive();
         $this->getEm()->flush();
@@ -148,25 +127,25 @@ class MetaScenarioController extends LolaController {
 
     /**
      * Make a request on Lolapy API to get the metascenario parameters
-     * @Route("/ajax/parameters/{hash}", name="ajax_parameters", methods={"GET"})
      */
-    public function ajaxParameters(Request $request, Tag $tag, \App\Lolapy\LolapyServiceApi $lolapyService): Response
+    #[Route('/ajax/parameters/{hash}', name: 'ajax_parameters', methods: ['GET'])]
+    public function ajaxParameters(Request $request, Tag $tag, LolapyServiceApi $lolapyService): Response
     {
         if (!$lolapyService->isLolapyReady()) {
-            return new \Symfony\Component\HttpFoundation\Response(json_encode(null));
+            return new Response(json_encode(null));
         }
 
-        return new \Symfony\Component\HttpFoundation\Response($lolapyService->getScenarioParameters($tag->getHash()));
+        return new Response($lolapyService->getScenarioParameters($tag->getHash()));
     }
 
     /**
      * Delete a tag with status ERROR or PROCESSING
-     * @Route("/tag/delete/{hash}", name="tag_delete", methods={"GET"})
      */
-    public function tagDelete(Tag $tag, \App\Lolapy\LolapyServiceApi $lolapyService): Response
+    #[Route('/tag/delete/{hash}', name: 'tag_delete', methods: ['GET'])]
+    public function tagDelete(Tag $tag, LolapyServiceApi $lolapyService): Response
     {
         if (!$lolapyService->isLolapyReady()) {
-            return new \Symfony\Component\HttpFoundation\Response(json_encode(null));
+            return new Response(json_encode(null));
         }
 
         // delete tag on the backend
@@ -182,11 +161,11 @@ class MetaScenarioController extends LolaController {
 
     /**
      * Prepare the execution of the scenario
-     * @Route("/prepare/{id}", name="prepare", methods={"GET"})
      */
-    public function prepare(MetaScenario $metaScenario)
+    #[Route('/prepare/{id}', name: 'prepare', methods: ['GET'])]
+    public function prepare(MetaScenario $metaScenario): Response
     {
-        $this->getSession()->set("create_scenario", ["metascenario" => $metaScenario]);
+        $this->getSession()?->set("create_scenario", ["metascenario" => $metaScenario]);
         return $this->render('dashboard/metascenario/prepare.html.twig', [
                     'metaScenario' => $metaScenario,
                     'tags' => $metaScenario->getTags(),
@@ -196,9 +175,9 @@ class MetaScenarioController extends LolaController {
 
     /**
      * Prepare the execution of the scenario - scenario parameters
-     * @Route("/prepare/parameter", name="prepare_parameter", methods={"POST"})
      */
-    public function prepareParameter(Request $request)
+    #[Route('/prepare/parameter', name: 'prepare_parameter', methods: ['POST'])]
+    public function prepareParameter(Request $request): Response
     {
         $data = $request->request->all();
         $tag = $this->getTagRepository()->findOneBy(["hash" => $data["hidden_tag_hash"]]);
@@ -209,12 +188,12 @@ class MetaScenarioController extends LolaController {
             $this->addFlash("danger", "Une erreur est survenue lors de la préparation du scénario");
             $this->redirectToRoute("dashboard_metascenario_index");
         }
-        
-        $dataSession = $this->getSession()->get("create_scenario");
+
+        $dataSession = $this->getSession()?->get('create_scenario', []);
         $dataSession["tag"] = $tag;
         $dataSession["dataset"] = $dataset;
-        $this->getSession()->set("create_scenario", $dataSession);
-        
+        $this->getSession()?->set('create_scenario', $dataSession);
+
         return $this->render('dashboard/metascenario/prepare_parameter.html.twig', [
                     'tag' => $dataSession["tag"],
                     'dataset' => $dataSession["dataset"],
@@ -224,20 +203,20 @@ class MetaScenarioController extends LolaController {
 
     /**
      * Prepare the execution of the scenario - switchable algorithm
-     * @Route("/prepare/algorithm", name="prepare_algorithm", methods={"POST"})
      */
-    public function prepareAlgorithm(Request $request)
+    #[Route('/prepare/algorithm', name: 'prepare_algorithm', methods: ['POST'])]
+    public function prepareAlgorithm(Request $request): Response
     {
         $parameters = $request->request->all();
-        $dataSession = $this->getSession()->get("create_scenario");
+        $dataSession = $this->getSession()?->get('create_scenario', []);
         $dataSession["parameters"] = serialize($parameters);
-        $this->getSession()->set("create_scenario", $dataSession);
+        $this->getSession()?->set('create_scenario', $dataSession);
         
         return $this->render('dashboard/metascenario/prepare_algorithm.html.twig', [
                     'tag' => $dataSession["tag"],
                     'dataset' => $dataSession["dataset"],
                     'metascenario' => $dataSession["metascenario"],
-                    'algorithmVersions' => $this->getAlgorithmVersionRepository()->findBy(["status" => \App\Entity\AlgorithmVersion::STATUS_AVAILABLE])
+                    'algorithmVersions' => $this->getAlgorithmVersionRepository()->findBy(["status" => AlgorithmVersion::STATUS_AVAILABLE])
         ]);        
     }
 

@@ -4,23 +4,19 @@ namespace App\Controller\Dashboard;
 
 use App\Controller\LolaController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
-use App\Form\UserFormType;
 use App\Form\UserType;
 use App\Entity\User;
 use App\Email\EmailService;
 
-/**
- * @Route("/dashboard/user", name="dashboard_user_")
- * @IsGranted("ROLE_ADMIN")
- */
+#[Route('/dashboard/user', name: 'dashboard_user_')]
+#[IsGranted('ROLE_ADMIN')]
 class UserController extends LolaController {
 
-    /**
-     * @Route("/", name="index")
-     */
+    #[Route('/', name: 'index')]
     public function index(): Response
     {
         return $this->render('dashboard/user/index.html.twig', [
@@ -28,16 +24,14 @@ class UserController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
-     */
+    #[Route('/edit/{id}', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user): Response
     {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->getEm()->flush();
 
             $this->addFlash("success", "L'utilisateur a bien été modifié");
             return $this->redirectToRoute('dashboard_user_index');
@@ -49,9 +43,7 @@ class UserController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/upgrade/validation/{user}", name="upgrade_validation")
-     */
+    #[Route('/upgrade/validation/{user}', name: 'upgrade_validation')]
     public function upgradeValidation(User $user, EmailService $mailer): Response
     {
         if (User::isUserProfil($user->getUpgradeRequest())) {
@@ -63,7 +55,7 @@ class UserController extends LolaController {
 
             try {
                 $mailer->upgradeAccepted($user);
-            } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+            } catch (TransportException) {
                 $this->addFlash('warning', "L'envoi de la notification par email a échoué.");
             }
         } else {
@@ -72,9 +64,7 @@ class UserController extends LolaController {
         return $this->redirectToRoute('dashboard_user_index');
     }
 
-    /**
-     * @Route("/upgrade/deny/{user}", name="upgrade_deny")
-     */
+    #[Route('/upgrade/deny/{user}', name: 'upgrade_deny')]
     public function upgradeDeny(User $user, EmailService $mailer): Response
     {
         if (User::isUserProfil($user->getUpgradeRequest())) {
@@ -84,7 +74,7 @@ class UserController extends LolaController {
 
             try {
                 $mailer->upgradeDenied($user);
-            } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+            } catch (TransportException) {
                 $this->addFlash('warning', "L'envoi de la notification par email a échoué.");
             }
 
@@ -94,13 +84,8 @@ class UserController extends LolaController {
         return $this->redirectToRoute('dashboard_user_index');
     }
 
-    /**
-     * @Route("/enable/{id}", name="enable",
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function enable(User $user)
+    #[Route('/enable/{id}', name: 'enable', requirements: ['id' => '\d+'])]
+    public function enable(User $user): Response
     {
         $user->setActive(true);
         $this->getEm()->flush();
@@ -108,13 +93,8 @@ class UserController extends LolaController {
         return $this->redirectToRoute("dashboard_user_index");
     }
 
-    /**
-     * @Route("/disable/{id}", name="disable",
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function disable(User $user)
+    #[Route('/disable/{id}', name: 'disable', requirements: ['id' => '\d+'])]
+    public function disable(User $user): Response
     {
         $user->setActive(false);
         $this->getEm()->flush();
@@ -122,13 +102,8 @@ class UserController extends LolaController {
         return $this->redirectToRoute("dashboard_user_index");
     }
 
-    /**
-     * @Route("/toggle_admin/{id}", name="toggle_admin",
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function toggleAdmin(User $user)
+    #[Route('/toggle_admin/{id}', name: 'toggle_admin', requirements: ['id' => '\d+'])]
+    public function toggleAdmin(User $user): Response
     {
         $user->toggleAdmin();
         $this->getEm()->flush();
@@ -136,13 +111,8 @@ class UserController extends LolaController {
         return $this->redirectToRoute("dashboard_user_index");
     }
 
-    /**
-     * @Route("/toggle_admin_sisr/{id}", name="toggle_admin_sisr",
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function toggleAdminSisr(User $user)
+    #[Route('/toggle_admin_sisr/{id}', name: 'toggle_admin_sisr', requirements: ['id' => '\d+'])]
+    public function toggleAdminSisr(User $user): Response
     {
         $user->toggleAdminSisr();
         $this->getEm()->flush();

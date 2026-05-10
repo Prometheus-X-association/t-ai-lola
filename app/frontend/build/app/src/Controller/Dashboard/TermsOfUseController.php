@@ -5,22 +5,17 @@ namespace App\Controller\Dashboard;
 use App\Entity\TermsOfUse;
 use App\Form\TermsOfUseType;
 use App\Repository\TermsOfUseRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Controller\LolaController;
 
-/**
- * @Route("/dashboard/termsofuse", name="dashboard_termsofuse_")
- * @IsGranted("ROLE_ADMIN")
- */
+#[Route('/dashboard/termsofuse', name: 'dashboard_termsofuse_')]
+#[IsGranted('ROLE_ADMIN')]
 class TermsOfUseController extends LolaController {
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(TermsOfUseRepository $termsOfUseRepository): Response
     {
         return $this->render('dashboard/termsofuse/index.html.twig', [
@@ -28,9 +23,7 @@ class TermsOfUseController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $termsOfUse = new TermsOfUse();
@@ -38,9 +31,8 @@ class TermsOfUseController extends LolaController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($termsOfUse);
-            $entityManager->flush();
+            $this->getEm()->persist($termsOfUse);
+            $this->getEm()->flush();
 
             $this->addFlash("success", "La nouvelle charte a bien été ajoutée");
             return $this->redirectToRoute('dashboard_termsofuse_index');
@@ -52,16 +44,14 @@ class TermsOfUseController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
-     */
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, TermsOfUse $termsOfUse): Response
     {
         $form = $this->createForm(TermsOfUseType::class, $termsOfUse);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->getEm()->flush();
 
             $this->addFlash("success", "La charte a bien été modifiée");
             return $this->redirectToRoute('dashboard_termsofuse_index');
@@ -73,15 +63,12 @@ class TermsOfUseController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"DELETE"})
-     */
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
     public function delete(Request $request, TermsOfUse $termsOfUse): Response
     {
         if ($this->isCsrfTokenValid('delete' . $termsOfUse->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($termsOfUse);
-            $entityManager->flush();
+            $this->getEm()->remove($termsOfUse);
+            $this->getEm()->flush();
 
             $this->addFlash("success", "La charte a bien été supprimée");
         }
@@ -89,13 +76,8 @@ class TermsOfUseController extends LolaController {
         return $this->redirectToRoute('dashboard_termsofuse_index');
     }
 
-    /**
-     * @Route("/active/{id}", name="active",
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function active(TermsOfUse $termsOfUse)
+    #[Route('/active/{id}', name: 'active', requirements: ['id' => '\d+'])]
+    public function active(TermsOfUse $termsOfUse): Response
     {
         // set inactive all termsOfUse
         $this->getTermsOfUseRepository()->updateAllInactive();
