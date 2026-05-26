@@ -7,9 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=RunRepository::class)
- */
+#[ORM\Entity(repositoryClass: RunRepository::class)]
 class Run extends AbstractLolaEntity {
 
     const STATUS_WAITING = "WAITING";
@@ -19,38 +17,27 @@ class Run extends AbstractLolaEntity {
     const STATUS_COMPLETED = "COMPLETED";
     const STATUS_ERROR = "ERROR";
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $hash;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $status;
-    
-    /**
-     * @ORM\Column(type="boolean")
-     */
+
+    #[ORM\Column(type: 'boolean')]
     private $hasOutput;  
 
     /**
      * @var Scenario
-     *
-     * @ORM\ManyToOne(targetEntity=Scenario::class, inversedBy="runs")
-     */
+     **/
+    #[ORM\ManyToOne(targetEntity: Scenario::class, inversedBy: 'runs')]
     public $scenario;
 
-    /**
-     * @ORM\OneToMany(targetEntity=RunLogs::class, mappedBy="run")
-     */
+    #[ORM\OneToMany(targetEntity: RunLogs::class, mappedBy: 'run')]
     public $runLogs;
 
     public function __construct()

@@ -20,6 +20,7 @@ class AlgorithmVersionCreationListener {
     }
 
     public function prePersist(AlgorithmVersion $algorithmVersion, LifecycleEventArgs $event): void {
+        error_log('### AlgorithmVersionCreationListener CALLED ###');
         // set the status to processing while Lolapy clone the repository and pull the docker image
         $algorithmVersion->setStatus(AlgorithmVersion::STATUS_PROCESSING);
 
@@ -28,6 +29,10 @@ class AlgorithmVersionCreationListener {
                 $algorithmVersion->getAlgorithm()->getUrlRepository(),
                 $algorithmVersion->getName(),
                 $algorithmVersion->getHash());
+        
+        
+        error_log('### addAlgorithmVersion return: ' . print_r($returnAddAlgorithmVersion, true));
+
     }
 
 }

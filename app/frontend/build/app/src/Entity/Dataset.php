@@ -13,9 +13,7 @@ use App\Entity\AbstractLolaEntity;
 // The old logic is remained. To use old logic, just set type = "xapi" in ..... 
 // TODO
 
-/**
- * @ORM\Entity(repositoryClass=DatasetRepository::class)
- */
+#[ORM\Entity(repositoryClass: DatasetRepository::class)]
 class Dataset extends AbstractLolaEntity {
 
     const STATUS_WAITING = "WAITING";
@@ -29,67 +27,45 @@ class Dataset extends AbstractLolaEntity {
      */
     const DELAY_DELETE_PROCESSING_DAYS = "10";
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
      * This hash is transfered to Lolapy to identify the dataset
-     * @ORM\Column(type="string", length=255, unique=true)
      */
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
     private $hash;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $recipe;
 
-    /**
-     * @ORM\Column(name="recipe_link", type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(name: 'recipe_link', type: 'string', length: 255, nullable: true)]
     private $recipeLink;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private $isShared;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $status;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Group::class, mappedBy="datasets")
-     */
+    #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'datasets')]
     private $groups;
 
-    /**
-     * @ORM\OneToMany(targetEntity=DatasetLogs::class, mappedBy="dataset")
-     */
+    #[ORM\OneToMany(targetEntity: DatasetLogs::class, mappedBy: 'dataset')]
     private $datasetLogs;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
+    #[ORM\Column(type: 'float', nullable: true)]
     private $pourcentageProgress;
 
-    /**
-     * @ORM\Column(type="bigint", nullable=true)
-     */
+    #[ORM\Column(type: 'bigint', nullable: true)]
     private $size;
 
     /**
@@ -97,15 +73,14 @@ class Dataset extends AbstractLolaEntity {
      * Path or name of dataset in common storage directory
      * "a23f1c_mydata.csv"
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $storagePath;
 
     /**
      * type dataset "file" 
-     *
-     * @ORM\Column(type="string", length=50)
      */
+    #[ORM\Column(type: 'string', length: 50)]
     private $type = 'file';
 
     public function __construct()

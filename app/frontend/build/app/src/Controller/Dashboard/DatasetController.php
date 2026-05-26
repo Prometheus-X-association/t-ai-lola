@@ -5,28 +5,24 @@ namespace App\Controller\Dashboard;
 use App\Entity\Dataset;
 use App\Entity\Group;
 use App\Form\DatasetType;
-use App\Repository\DatasetRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Controller\LolaController;
+use App\Lolapy\LolapyServiceApi;
 
 
-/**
- * @Route("/dashboard/dataset", name="dashboard_dataset_")
- * @IsGranted("ROLE_PROFIL_2")
- */
+#[Route('/dashboard/dataset', name: 'dashboard_dataset_')]
+#[IsGranted('ROLE_PROFIL_2')]
 class DatasetController extends LolaController {
 
     /**
      * Display users's datasets + shared datasets (by group or for everyone)
      * Admin can see every datasets
-     * 
-     * @Route("/", name="index", methods={"GET"})
      */
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('dashboard/dataset/index.html.twig', [
@@ -34,9 +30,7 @@ class DatasetController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $dataset = new Dataset();
@@ -44,10 +38,8 @@ class DatasetController extends LolaController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($dataset);
-            $entityManager->flush();
+            $this->getEm()->persist($dataset);
+            $this->getEm()->flush();
 
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_dataset_ajoute'));
             return $this->redirectToRoute('dashboard_dataset_index');
@@ -59,17 +51,14 @@ class DatasetController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
-     */
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Dataset $dataset): Response
     {
         $form = $this->createForm(DatasetType::class, $dataset);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
+            $this->getEm()->flush();
                         
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_dataset_modifie'));
             return $this->redirectToRoute('dashboard_dataset_index');
@@ -81,10 +70,8 @@ class DatasetController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"DELETE"})
-     */
-    public function delete(Request $request, Dataset $dataset, \App\Lolapy\LolapyServiceApi $lolapyService): Response
+    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
+    public function delete(Request $request, Dataset $dataset, LolapyServiceApi $lolapyService): Response
     {
         if (!$lolapyService->isLolapyReady()) {
             $this->addFlash("error", $this->getTranslator()->trans('dashboard.dataset.controller.flash_suppression_erreur'));
@@ -98,7 +85,7 @@ class DatasetController extends LolaController {
 
             // update status to DELETING until Lolapy return the deleting confirmation on the frontend API
             $dataset->setStatus(Dataset::STATUS_DELETING);
-            $this->getDoctrine()->getManager()->flush();
+            $this->getEm()->flush();
 
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_suppression_confirmation') . $lolapyReturn);
         }
@@ -106,13 +93,8 @@ class DatasetController extends LolaController {
         return $this->redirectToRoute('dashboard_dataset_index');
     }
 
-    /**
-     * @Route("/toggle_share/{hash}", name="toggle_share", 
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function toggleShare(Dataset $dataset)
+    #[Route('/toggle_share/{hash}', name: 'toggle_share', requirements: ['id' => '\d+'])]
+    public function toggleShare(Dataset $dataset): Response
     {
         $dataset->toggleShare();
         $this->getEm()->flush();
@@ -120,16 +102,11 @@ class DatasetController extends LolaController {
         return $this->redirectToRoute("dashboard_dataset_index");
     }
 
-    /**
-     * @Route("/group_share/add/{hash}/{group}", name="group_share_add", 
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function groupShareAdd(Dataset $dataset, Group $group)
+    #[Route('/group_share/add/{hash}/{group}', name: 'group_share_add', requirements: ['id' => '\d+'])]
+    public function groupShareAdd(Dataset $dataset, Group $group): Response
     {
         // check if current user is the owner of the dataset and is member of the group
-        if( $this->getUser()->isAdmin() || ($dataset->createdBy->getId() === $this->getUser()->getId() && $group->hasUser($this->getUser()))) {
+        if( $this->getUser()->isAdmin() ||($dataset->getCreatedBy()->getId() === $this->getUser()->getId() && $group->hasUser($this->getUser()))) {
             $group->addDataset($dataset);
             $this->getEm()->flush();
 
@@ -145,16 +122,11 @@ class DatasetController extends LolaController {
         return $this->redirectToRoute("dashboard_dataset_index");
     }
 
-    /**
-     * @Route("/group_share/delete/{hash}/{group}", name="group_share_delete", 
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     */
-    public function groupShareDelete(Dataset $dataset, Group $group)
+    #[Route('/group_share/delete/{hash}/{group}', name: 'group_share_delete', requirements: ['id' => '\d+'])]
+    public function groupShareDelete(Dataset $dataset, Group $group): Response
     {
         // check if current user is the owner of the dataset and is member of the group
-        if( $this->getUser()->isAdmin() || ($dataset->createdBy->getId() === $this->getUser()->getId() && $group->hasUser($this->getUser()))) {
+        if( $this->getUser()->isAdmin() ||($dataset->getCreatedBy()->getId() === $this->getUser()->getId() && $group->hasUser($this->getUser()))) {
             $group->removeDataset($dataset);
             $this->getEm()->flush();
 
@@ -173,10 +145,9 @@ class DatasetController extends LolaController {
     /**
      * Return the file to be sent with the dataset. 
      * It contains the sftp_hash string to identify the user and the dataset id.
-     * 
-     * @Route("/download/{hash}", name="download")
      */
-    public function download(Dataset $dataset)
+    #[Route('/download/{hash}', name: 'download')]
+    public function download(Dataset $dataset): Response
     {
         $filename = "dataset_" . preg_replace('/[^a-z0-9]+/', '-', strtolower($dataset->getName()));
         $response = new Response(json_encode(["dataset" => $dataset->getHash(), "user" => $this->getUser()->getHash()]));
@@ -190,15 +161,15 @@ class DatasetController extends LolaController {
 
     /**
      * Make a request on Lolapy API to get dataset stats
-     * @Route("/ajax/show/{hash}", name="ajax_show", methods={"GET"})
      */
-    public function ajaxShow(Request $request, Dataset $dataset, \App\Lolapy\LolapyServiceApi $lolapyService): Response
+    #[Route('/ajax/show/{hash}', name: 'ajax_show', methods: ['GET'])]
+    public function ajaxShow(Request $request, Dataset $dataset, LolapyServiceApi $lolapyService): Response
     {
         if (!$lolapyService->isLolapyReady()) {
-            return new \Symfony\Component\HttpFoundation\Response(json_encode(null));
+            return new Response(json_encode(null));
         }
 
-        return new \Symfony\Component\HttpFoundation\Response($lolapyService->getDatasetData($dataset->getHash(), $dataset->getCreatedBy()->getHash()));
+        return new Response($lolapyService->getDatasetData($dataset->getHash(), $dataset->getCreatedBy()->getHash()));
     }
 
 }

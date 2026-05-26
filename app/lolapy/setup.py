@@ -14,7 +14,7 @@ to avoid raising errors before the checking of the python version.
 
 lolapy_version = "1.8.0"
 
-MINIMAL_PYTHON_VERSION = (3, 10, 0)
+MINIMAL_PYTHON_VERSION = (3, 12, 0)
 LITTERAL_PYTHON_VERSION = ".".join([str(ii) for ii in MINIMAL_PYTHON_VERSION])
 
 def check_python_version():

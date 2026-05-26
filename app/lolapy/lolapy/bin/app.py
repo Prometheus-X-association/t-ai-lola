@@ -12,7 +12,7 @@ from flask.wrappers import Response
 from flasgger import Swagger
 
 from lolapy.bin import async_tasks
-from lolapy.errors import LolapyGlobalError
+from lolapy.errors import LolapyGlobalError, handle_api_errors
 from lolapy.tools import settings
 from lolapy.tools import logs
 from lolapy.tools import health
@@ -39,9 +39,6 @@ flask_app.register_blueprint(scenario_blueprint)
 flask_app.register_blueprint(dataset_blueprint)
 flask_app.register_blueprint
 
-print(flask_app.blueprints)
-for rule in flask_app.url_map.iter_rules():
-    print(rule)
 # Config swagger routes
 flask_app.config["SWAGGER"] = {
     "title": "Lolapy API",
@@ -75,31 +72,7 @@ def after_request(response):
     return response
 
 
-def handle_api_errors(error: Exception) -> flask.Response:
-    """COnvert Lolapy catched errors to the correct respond code"""
 
-    match error:
-        case LolapyGlobalError():
-            internal_message = error.message
-            public_message = error.public_message
-            response_code = 500
-            match error:
-                case dataset_error.DatasetDoesNotExist():
-                    response_code = 404
-                case dataset_error.DatasetPermissionDenied():
-                    response_code = 403
-                case scenario_errors.ScenarioNotExist():
-                    response_code = 404
-                case algorithm_error.AlgorithmNotExist():
-                    response_code = 404
-        case _:
-            logging.error(traceback.format_exc())
-            internal_message = str(error)
-            public_message = LolapyGlobalError.standard_public_message
-            response_code = 500
-
-    logging.error(internal_message)
-    return Response(status=response_code, response=public_message)
 
 
 @flask_app.route("/version", methods=["GET"])
@@ -149,7 +122,6 @@ def parse_nextflow_logs():
     send them to the frontend
     """
     json_data = request.get_json()
-    logging.info(json_data)
     async_tasks.parse_nextflow_logs(json_data)
     return Response(status=200)
 

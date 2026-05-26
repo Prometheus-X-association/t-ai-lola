@@ -3,10 +3,15 @@ $(document).ready(function () {
     /*
      * activate datatable for the element with .dt-basic class'
      */
-    $(".dt-basic").DataTable({
-        "stateSave": true,
-        "pageLength": 25
-    });
+    try {
+        $(".dt-basic").DataTable({
+            "stateSave": true,
+            "pageLength": 25,
+            "autoWidth": false
+        });
+    } finally {
+        document.documentElement.classList.remove('dt-loading');
+    }
     /*
      * activate select2 component for all dropdown
      */

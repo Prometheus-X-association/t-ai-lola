@@ -5,40 +5,36 @@ namespace App\Entity;
 use App\Repository\ApiLogRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ApiLogRepository::class)
- */
+#[ORM\Entity(repositoryClass: ApiLogRepository::class)]
 class ApiLog
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
-     * @ORM\Column(type="datetime")
      * @var \DateTime
      */
+    #[ORM\Column(type: 'datetime')]
     private $datetime;
 
     /**
-     * @ORM\Column(type="string", length=255)
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 255)]
     private $type;
 
     /**
-     * @ORM\Column(type="string", length=255)
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 255)]
     private $message;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
      * @var string
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $details;
 
     public function getId(): ?int

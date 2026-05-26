@@ -271,13 +271,14 @@
                         for (param in listParams.parameters) {
                             let defaultValue = listParams.parameters[param].default || "";
                             let type = listParams.parameters[param].type;
-                            let name = sanitize(listParams.parameters[param].name);
+                            let label = sanitize(listParams.parameters[param].name);
+                            let variableName = sanitize(listParams.parameters[param].variable_name || listParams.parameters[param].name);
                             let help = sanitize(listParams.parameters[param].description);
                             let choices = listParams.parameters[param].choices;
 
                             txt += `
                                 <div class="form-group">
-                                    <label for="${name}_${metaScenarioId}"><strong> ${name} </strong></label>
+                                    <label for="${variableName}_${metaScenarioId}"><strong> ${label} </strong></label>
                                     <footer class="blockquote-footer">${help}</footer>
                                 </div>
                             `;
@@ -287,9 +288,9 @@
                                     txt += `
                                           <input type="number"
                                             class="form-control"
-                                            name="${algorithmVersionHash}:${nf_variable}:${name}"
+                                            name="${algorithmVersionHash}:${nf_variable}:${variableName}"
                                             aria-describedby="${param}_${metaScenarioId}Help"
-                                            placeholder="${name}"
+                                            placeholder="${label}"
                                             value="${defaultValue}">
                                     `;
                                     break;
@@ -298,9 +299,9 @@
                                           <input type="number"
                                             step = "any"
                                             class="form-control"
-                                            name="${algorithmVersionHash}:${nf_variable}:${name}"
+                                            name="${algorithmVersionHash}:${nf_variable}:${variableName}"
                                             aria-describedby="${param}_${metaScenarioId}Help"
-                                            placeholder="${name}"
+                                            placeholder="${label}"
                                             value="${defaultValue}">
                                     `;
                                     break;
@@ -308,28 +309,28 @@
                                     txt += `
                                           <input type="text"
                                             class="form-control"
-                                            name="${algorithmVersionHash}:${nf_variable}:${name}"
+                                            name="${algorithmVersionHash}:${nf_variable}:${variableName}"
                                             aria-describedby="${param}_${metaScenarioId}Help"
-                                            placeholder="${name}"
+                                            placeholder="${label}"
                                             value="${defaultValue}">
                                     `;
                                     break;
                                 case 'bool':
                                     let checked = defaultValue ? "checked" : "";
                                     txt += `
-                                          <input type="hidden" value="false" name="${algorithmVersionHash}:${nf_variable}:${name}">
+                                          <input type="hidden" value="false" name="${algorithmVersionHash}:${nf_variable}:${variableName}">
                                           <input type="checkbox"
                                             class="form-control"
-                                            name="${algorithmVersionHash}:${nf_variable}:${name}"
+                                            name="${algorithmVersionHash}:${nf_variable}:${variableName}"
                                             value="true"
                                             aria-describedby="${param}_${metaScenarioId}Help"
-                                            placeholder="${name}"
+                                            placeholder="${label}"
                                             ${checked}
                                             >
                                     `;
                                     break;
                                 case 'choices':
-                                    txt += `<select name="${algorithmVersionHash}:${nf_variable}:${name}" class="form-control">`;
+                                    txt += `<select name="${algorithmVersionHash}:${nf_variable}:${variableName}" class="form-control">`;
                                     for (choice in choices) {
                                         let selected = (choices[choice] === defaultValue) ? 'selected' : '';
                                         txt += `<option value="${choices[choice]}" ${selected}>${choices[choice]}</option>`;

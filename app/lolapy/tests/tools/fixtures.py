@@ -45,7 +45,7 @@ def fixture_GitRepo_clone_dest_no_permission(fixture_GitRepo_clone_empty_dir):
 def fixture_env_file_complete(tmp_path_factory):
     complete_env_file = """FRONTEND_API_IP=127.0.0.1
 FRONTEND_API_PORT=80
-FRONTEND_API_LOG_URL=/api/log
+FRONTEND_API_LOG_URL=/api/lolapi/log
 FRONTEND_API_FAKE=False
 FRONTEND_API_PREPARE_RESULT_COMPLETE_URL=/api/scenario/results/complete
 FRONTEND_API_PREPARE_RESULT_ERROR_URL=/api/scenario/results/error
@@ -71,7 +71,11 @@ HARBOR_USER=blabla
 HARBOR_PASSWORD=blabla
 HARBOR_PULL_IMAGES=true
 CLUSTER_HOST="bouh"
-CLUSTER_IS_BACKEND=false
+CLUSTER_TYPE=local
+K8S_PVC_NAME=lola-pvc
+K8S_MOUNT_PATH=/home/lolauser/nf-workdir
+K8S_NAMESPACE=default
+K8S_SERVICE_ACCOUNT=default
 HTTP_PROXY=this_is_a_fake_proxy
     """
     directory = tmp_path_factory.mktemp("tmp_dir")
@@ -84,7 +88,7 @@ HTTP_PROXY=this_is_a_fake_proxy
 def fixture_env_file_missing_variable(tmp_path_factory):
     complete_env_file = """FRONTEND_API_IP=127.0.0.1
 FRONTEND_API_PORT=80
-FRONTEND_API_LOG_URL=/api/log
+FRONTEND_API_LOG_URL=/api/lolapi/log
 FRONTEND_API_PREPARE_RESULT_COMPLETE_URL=/api/scenario/results/complete
 FRONTEND_API_PREPARE_RESULT_ERROR_URL=/api/scenario/results/error
 LOLAPY_HOST_PORT=5000

@@ -100,7 +100,7 @@ class _FrontendApi:
         Args:
             fct: Callable function. Actually supported: [requests.get] and [requests.post]
                 Request to execute.
-            url: URL to target. For example: `/api/user/{user-id}`(not http://localhost/api/log)
+            url: URL to target. For example: `/api/user/{user-id}`(not http://localhost/api/lolapi/log)
             data: Data to send. If Json data, it must be formatted before. Default to `None`
             file: Postfile to send. Default to `None`
         Returns:
@@ -186,7 +186,7 @@ class FrontendRequest:
 
     @staticmethod
     def log(log_type: str, message: str | None = None, details: str | None = None):
-        """Send post message to the frontend API to the adress /api/log.
+        """Send post message to the frontend API to the adress /api/lolapi/log.
 
         The sended request is in the form
         {
@@ -208,7 +208,7 @@ class FrontendRequest:
         frontend_apilog = _FrontendApi.init_from_env()
         status_code = frontend_apilog._request(
             request_fct=requests.post,
-            url="/api/log",
+            url="/api/lolapi/log",
             data={
                 "type": log_type,
                 "message": message,

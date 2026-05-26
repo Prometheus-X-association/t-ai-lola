@@ -5,10 +5,10 @@ import logging
 from flask import g, send_file
 from flask.wrappers import Response
 import json
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from lolapy.bin import async_tasks
-from lolapy.bin import app
+from lolapy.errors import handle_api_errors
 from lolapy.blueprints import scenario_blueprint
 from lolapy.blueprints.request_validation import validate_json
 from lolapy.scenario import installation
@@ -23,6 +23,13 @@ class AlgorithmExecuteJson(BaseModel):
     nf_variable: str
     algorithm_hash: str
     parameters: dict
+
+    @field_validator("parameters", mode="before")
+    @classmethod
+    def validate_parameters(cls, v):
+        if isinstance(v, list) and len(v) == 0:
+            return {}
+        return v
 
 class ScenarioExecuteJSON(BaseModel):
     """Json model for Scenario to run.
@@ -40,7 +47,6 @@ class ScenarioExecuteJSON(BaseModel):
 def start_scenario():
     """Start a nextflow scenario."""
     data: ScenarioExecuteJSON = g.request_data
-    logging.info(data)
     async_tasks.start_scenario(
         scenario_hash=data.tag_hash,
         run_hash=data.run_hash,
@@ -82,7 +88,7 @@ def scenario_parameters():
         json_response["readme"] = Readme.search(my_scenario.scenario_path).read()
 
     except Exception as error:
-        return app.handle_api_errors(error)
+        return handle_api_errors(error)
     return json.dumps(json_response)
 
 
@@ -111,7 +117,7 @@ def remove_scenario():
     try:
         installation.InstallScenario.remove(scenario_hash=data.tag_hash)
     except Exception as error:
-        return app.handle_api_errors(error)
+        return handle_api_errors(error)
 
     return Response(status=200)
 
@@ -145,7 +151,7 @@ def scenario_get_archive():
         return send_file(archive_path, download_name="result.zip", mimetype="application/zip")
     # TODO: app.handle missing archive file for missing run_hash
     except Exception as error:
-        return app.handle_api_errors(error)
+        return handle_api_errors(error)
 
 
 class PrepareResultsJSON(BaseModel):

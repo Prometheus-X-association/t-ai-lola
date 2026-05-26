@@ -21,7 +21,7 @@ import re
 from typing import ClassVar
 import logging
 
-from pydantic import BaseModel, validator, error_wrappers
+from pydantic import BaseModel, validator, ValidationError
 
 from lolapy.tools import errors as tools_errors
 
@@ -81,9 +81,14 @@ class AppSettings(BaseModel):
         harbor_password: str | None: Password to use for authentication to the harbor server. If empty,
             disable authentication to the harbor server.
         harbor_pull_images: bool: If set to True, pull image to the harbor. If no, use only local images.
-        cluster_host: str: IP or URL of the cluster server. Used for SSH connection, for example to install docker images
-            on the cluster.
-        cluster_is_backend: bool:
+        cluster_type: str: type of the cluster. Could be "local", "slurm" or "k8s".
+            "local": run on the local machine
+            "slurm": run on a slurm cluster
+            "k8s": run on a kubernetes cluster
+        k8s_pvc_name: str | None: Name of the PVC to use for storage in k8s mode.
+        k8s_mount_path: str: Path where to mount the PVC in k8s pods.
+        k8s_namespace: str: Namespace to use in k8s cluster.
+        k8s_service_account: str: Service account to use in k8s cluster.
         http_proxy: str | None: Default to None. If the backend should use a proxy to download ressources on internet (git repositories for example)
     """
 
@@ -119,7 +124,11 @@ class AppSettings(BaseModel):
     harbor_password: str | None = None
     harbor_pull_images: bool
     cluster_host: str
-    cluster_is_backend: bool
+    cluster_type: str = "local"
+    k8s_pvc_name: str | None = None
+    k8s_mount_path: str = "/home/lolauser/nf-workdir"
+    k8s_namespace: str = "default"
+    k8s_service_account: str = "default"
     http_proxy: str | None = None
 
     @validator("http_proxy")
@@ -151,7 +160,7 @@ class AppSettingsBuilder:
         expanded_variables = self.__expand_variables(variables)
         try:
             new_settings = AppSettings(**expanded_variables)
-        except error_wrappers.ValidationError as pydantic_error:
+        except ValidationError as pydantic_error:
             raise tools_errors.SettingsMissingParameters(
                 env_file=os.environ["ENV_FILE"], validation_error=pydantic_error
             )
@@ -305,7 +314,11 @@ class AppSettingsBuilder:
             harbor_password = None,
             harbor_pull_images = False,
             cluster_host = "",
-            cluster_is_backend = True,
+            cluster_type = "local",
+            k8s_pvc_name = None,
+            k8s_mount_path = "/home/lolauser/nf-workdir",
+            k8s_namespace = "default",
+            k8s_service_account = "default",
             http_proxy = None)
         AppSettings._instance_ = my_app_settings
 

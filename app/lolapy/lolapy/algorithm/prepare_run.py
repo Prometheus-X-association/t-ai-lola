@@ -33,7 +33,6 @@ from lolapy.algorithm.extend_template import CreateNFscript
 from lolapy.blueprints.scenario import AlgorithmExecuteJson
 from lolapy.scenario.scenario import Scenario
 from lolapy.scenario.template import ScenarioTemplate
-import logging
 
 
 class PrepareAlgorithms:
@@ -49,12 +48,11 @@ class PrepareAlgorithms:
                 generated during a scenario run.
         """
         all_parameters = {}  # Store all parameters used when running nextflow
-        logging.info(algorithms)
         # Generate template for all algorithm
         for algorithm in algorithms:
             template = ScenarioTemplate.from_nf_variable(nf_variable=algorithm.nf_variable, scenario=my_scenario)
             output_nf_script = run_workdir / f"{algorithm.algorithm_hash}"
-            logging.debug(f"output:{output_nf_script}")
+
             current_algorithm: AlgorithmRecipe = Algorithm.from_hash(
                 algorithm.algorithm_hash
             ).algo_recipe

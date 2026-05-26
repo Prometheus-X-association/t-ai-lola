@@ -1,38 +1,45 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Algorithme - Ajout {% endblock %}
+{% block title %} Algorithme - Add {% endblock %}
 
 {% block content %}
 
     <div class="breadcrumb d-flex justify-content-between align-items-center">
         <div class="d-flex">
             <i class="fas fa-code fa-2x sidebar-brand-icon"></i> 
-            <span class="text-monospace sidebar-brand-text ml-4 mt-1">Création d'un algorithme</span>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">Create a new algorithm</span>
         </div>
         <a href="{{ path('dashboard_algorithm_index') }}" class="btn btn-sm btn-primary">
             <i class="fas fa-arrow-left"></i>
-            Retour à la liste des algorithmes
+            Back to algorithm list
         </a>
     </div>
 
     <div class="row">
         <div class="col-8">
-            {{ include('dashboard/algorithm/_form.html.twig', {'button_label': 'Ajouter'}) }}
+            {{ include('dashboard/algorithm/_form.html.twig', {'button_label': 'Add'}) }}
         </div>
         <div class="col-4">
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-info-circle"></i> Algorithme
+                    <i class="fas fa-info-circle"></i> Algorithm
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Création d'un algorithme</h5>
+                    <h5 class="card-title">Creating an algorithm</h5>
                     <p class="card-text">
-                        Lorem Ipsum on lihtsalt proovitekst, mida kasutatakse printimis- ja ladumistööstuses. 
-                        See on olnud tööstuse põhiline proovitekst juba alates 1500. aastatest, mil tundmatu 
-                        printija võttis hulga suvalist teksti, et teha trükinäidist. Lorem Ipsum ei ole ainult
-                        viis sajandit säilinud, vaid on ka edasi kandunud elektroonilisse trükiladumisse, jäädes
-                        sealjuures peaaegu muutumatuks. See sai tuntuks 1960. aastatel Letraset'i lehtede 
-                        väljalaskmisega, ja hiljuti tekstiredaktoritega nagu Aldus PageMaker, mis sisaldavad 
-                        erinevaid Lorem Ipsumi versioone.
+                        This page allows you to add a new algorithm to the platform.
+                        You need to provide its title, repository URL, description and visibility.
+                    </p>
+
+                    <p class="card-text">
+                        The repository URL should point to the source code of the algorithm.
+                        The description should briefly explain what the algorithm does,
+                        what it is used for, and any useful information for users who may
+                        need to run it or include it in a scenario.
+                    </p>
+
+                    <p class="card-text">
+                        If the algorithm is visible to other users, they will be able to see
+                        it in the application and use it according to their access rights.
                     </p>
                 </div>
             </div>                

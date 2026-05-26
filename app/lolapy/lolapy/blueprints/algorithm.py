@@ -11,7 +11,7 @@ from lolapy.algorithm.algorithm import Algorithm
 from lolapy.blueprints import algorithm_blueprint
 from lolapy.blueprints.request_validation import validate_json
 from lolapy.bin import async_tasks
-from lolapy.bin import app
+from lolapy.errors import handle_api_errors
 from lolapy.algorithm import manage
 from lolapy.scenario.scenario import Readme
 
@@ -28,7 +28,7 @@ def algorithm_remove():
     try:
         manage.InstallAlgorithm.remove(data.algorithm_hash)
     except Exception as error:
-        return app.handle_api_errors(error)
+        return handle_api_errors(error)
 
 
 class AlgorithmAddJSON(BaseModel):
@@ -65,5 +65,5 @@ def algorithm_parameters():
         my_readme_txt = Readme.search(my_algo.algo_path).read()
         json_reponse = {"parameters": parameters, "readme": my_readme_txt}
     except Exception as error:
-        return app.handle_api_errors(error)
+        return handle_api_errors(error)
     return json.dumps(json_reponse)

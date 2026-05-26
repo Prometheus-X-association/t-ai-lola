@@ -5,40 +5,30 @@ namespace App\Entity;
 use App\Repository\ScenarioAlgorithmRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ScenarioAlgorithmRepository::class)
- */
+#[ORM\Entity(repositoryClass: ScenarioAlgorithmRepository::class)]
 class ScenarioAlgorithm
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
      * @var Dataset
-     *
-     * @ORM\ManyToOne(targetEntity=Scenario::class, inversedBy="scenarioAlgorithms")
-     */
+     **/
+    #[ORM\ManyToOne(targetEntity: Scenario::class, inversedBy: 'scenarioAlgorithms')]
     public $scenario;
 
     /**
      * @var Dataset
-     *
-     * @ORM\ManyToOne(targetEntity=AlgorithmVersion::class)
-     */
+     **/
+    #[ORM\ManyToOne(targetEntity: AlgorithmVersion::class)]
     public $algorithmVersion;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     private $parametres = [];
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $nfVariable;
 
     public function getId(): ?int

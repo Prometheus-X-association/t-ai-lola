@@ -1,18 +1,17 @@
-cryptncompress @ git+https://gitlab+deploy-token-336:ZE7Vo76ATyPMsU1FT-7R@gitlab.inria.fr/lola/back-end/cryptncompress.git@2.0.0
-cryptography==3.4.6
+cryptncompress @ git+https://gitlab+deploy-token-336:ZE7Vo76ATyPMsU1FT-7R@gitlab.inria.fr/lola/back-end/cryptncompress.git@fix/python3.12
+cryptography==48.0.0
 huey==2.4.0
-flasgger==0.9.5
-Flask==2.1.0
-Flask-HTTPAuth==4.2.0
-Flask-Caching==2.0.2
-gunicorn==20.0.4
+flasgger==0.9.7.1
+Flask==3.1.3
+Flask-HTTPAuth==4.8.1
+Flask-Caching==2.4.0
+gunicorn==26.0.0
 jsonschema==3.2.0
 mysql-connector==2.2.9
-paramiko==2.7.2
-pytest==6.2.4
-requests==2.25.1
-ijson==3.1.4
-pytest==6.2.4
+paramiko==5.0.0
+requests==2.33.1
+ijson==3.3.0
+pytest==9.0.3
 pytest-cov==3.0.0
-pydantic==1.10.2
-Werkzeug==2.2.2
+pydantic==2.13.4
+Werkzeug==3.1.8

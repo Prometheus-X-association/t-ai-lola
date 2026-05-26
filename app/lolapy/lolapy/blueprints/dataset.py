@@ -7,11 +7,15 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from lolapy.bin import app
+from lolapy.errors import handle_api_errors
 from lolapy.blueprints import dataset_blueprint
 from lolapy.blueprints.request_validation import validate_json
 from lolapy.dataset import dataset_information
 from lolapy.bin import async_tasks
+
+from flask import request
+import logging
+
 
 class ImportDatasetJSON(BaseModel):
     dataset: Path
@@ -61,7 +65,7 @@ def get_dataset_info():
         my_dataset = dataset_information.DatasetInformation(dataset_hash=data.dataset)
         info = my_dataset.get_dataset_info(user_hash=data.user)
     except Exception as error:
-        return app.handle_api_errors(error)
+        return handle_api_errors(error)
     return json.dumps(info)
 
 
@@ -79,5 +83,5 @@ def dataset_remove():
         my_dataset = dataset_information.DatasetRemove(dataset_hash=data.dataset)
         my_dataset.remove(user_hash=data.user)
     except Exception as error:
-        return app.handle_api_errors(error)
+        return handle_api_errors(error)
     return Response(status=200)

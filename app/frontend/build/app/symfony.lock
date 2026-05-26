@@ -29,6 +29,15 @@
     "doctrine/dbal": {
         "version": "2.12.1"
     },
+    "doctrine/deprecations": {
+        "version": "1.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "fdd756167454623e21f1d769c5b814b243782a67"
+        }
+    },
     "doctrine/doctrine-bundle": {
         "version": "2.0",
         "recipe": {
@@ -224,9 +233,6 @@
     "symfony/css-selector": {
         "version": "v4.4.17"
     },
-    "symfony/debug": {
-        "version": "v4.4.17"
-    },
     "symfony/debug-bundle": {
         "version": "4.1",
         "recipe": {
@@ -321,9 +327,6 @@
         "version": "v4.4.17"
     },
     "symfony/http-kernel": {
-        "version": "v4.4.17"
-    },
-    "symfony/inflector": {
         "version": "v4.4.17"
     },
     "symfony/intl": {

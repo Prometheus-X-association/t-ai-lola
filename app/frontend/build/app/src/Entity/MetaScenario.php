@@ -8,52 +8,34 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\AbstractLolaEntity;
 
-/**
- * @ORM\Entity(repositoryClass=MetaScenarioRepository::class)
- * @ORM\HasLifecycleCallbacks()
- */
+#[ORM\Entity(repositoryClass: MetaScenarioRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class MetaScenario extends AbstractLolaEntity {
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\Column(name="url_repository", type="string", length=255)
-     */
+    #[ORM\Column(name: 'url_repository', type: 'string', length: 255)]
     private $urlRepository;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private $isPublic;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private $isActive;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Tag::class, mappedBy="metascenario")
-     */
+    #[ORM\OneToMany(targetEntity: Tag::class, mappedBy: 'metascenario')]
     private $tags;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Scenario::class, mappedBy="metascenario")
-     */
+    #[ORM\OneToMany(targetEntity: Scenario::class, mappedBy: 'metascenario')]
     private $scenarios;
     
 
@@ -176,7 +158,7 @@ class MetaScenario extends AbstractLolaEntity {
     {
         if (!$this->scenarios->contains($scenario)) {
             $this->scenarios[] = $scenario;
-            $scenario->setScenario($this);
+            $scenario->setMetascenario($this);
         }
 
         return $this;
@@ -186,8 +168,8 @@ class MetaScenario extends AbstractLolaEntity {
     {
         if ($this->scenarios->removeElement($scenario)) {
             // set the owning side to null (unless already changed)
-            if ($scenario->getScenario() === $this) {
-                $scenario->setScenario(null);
+            if ($scenario->getMetascenario() === $this) {
+                $scenario->setMetascenario(null);
             }
         }
 
@@ -206,7 +188,7 @@ class MetaScenario extends AbstractLolaEntity {
     {
         if (!$this->tags->contains($tag)) {
             $this->tags[] = $tag;
-            $tag->setTag($this);
+            $tag->setMetascenario($this);
         }
 
         return $this;
@@ -216,8 +198,8 @@ class MetaScenario extends AbstractLolaEntity {
     {
         if ($this->tags->removeElement($tag)) {
             // set the owning side to null (unless already changed)
-            if ($tag->getTag() === $this) {
-                $tag->setTag(null);
+            if ($tag->getMetascenario() === $this) {
+                $tag->setMetascenario(null);
             }
         }
 

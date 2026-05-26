@@ -1,17 +1,17 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Algorithmes {% endblock %}
+{% block title %} Algorithms {% endblock %}
 
 {% block content %}
 
     <div class="breadcrumb d-flex justify-content-between align-items-center">
         <div class="d-flex">
             <i class="fas fa-code fa-2x sidebar-brand-icon"></i>
-            <span class="text-monospace sidebar-brand-text ml-4 mt-1"> Administration des algorithmes</span>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1"> Algorithm administration</span>
         </div>
         <span class="float-right">
             <a href="{{ path('dashboard_algorithm_new') }}" class="btn btn-sm btn-primary">
                 <i class="fas fa-plus"></i>
-                Ajouter un algorithme
+                Add an algorithm
             </a>
         </span>
     </div>
@@ -22,8 +22,8 @@
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Version</th>
-                    <th scope="col">Date de création</th>
-                    <th scope="col">Dernière modification</th>
+                    <th scope="col">Creation date</th>
+                    <th scope="col">Last update</th>
                     <th scope="col">&nbsp;</th>
                 </tr>
             </thead>
@@ -31,7 +31,7 @@
                 {% for algorithm in algorithms %}
                     <tr>                        
                         <td>
-                            {{ algorithm.name }} <span class="badge badge-primary badge-pill float-right">{{ algorithm.isPublic ? 'Public' : 'Privé'}}</span>
+                            {{ algorithm.name }} <span class="badge badge-primary badge-pill float-right">{{ algorithm.isPublic ? 'Public' : 'Private'}}</span>
                             {% if algorithm.urlRepository %}
                                 <hr />
                                 <a href="{{ algorithm.urlRepositoryNoToken }}" target="_blank">
@@ -42,17 +42,17 @@
                         <td>
                             {% for algorithmVersion in algorithm.algorithmVersions %}
                                 {% if algorithmVersion.status == constant('\\App\\Entity\\AlgorithmVersion::STATUS_PROCESSING') %}
-                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_version1{{ algorithmVersion.hash }}" title="La version est en cours de création, cliquer pour plus d'information." class="text-warning">
+                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_version1{{ algorithmVersion.hash }}" title="This version is currently being created. Click for more information." class="text-warning">
                                         <i class="fas fa-info-circle"> </i>
                                         {{ algorithmVersion.name }}
                                     </a>
                                 {% elseif algorithmVersion.status == constant('\\App\\Entity\\AlgorithmVersion::STATUS_ERROR') %}
-                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_version2{{ algorithmVersion.hash }}" title="La version est en erreur, cliquer pour plus d'information." class="text-danger">
+                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_version2{{ algorithmVersion.hash }}" title="This version has an error. Click for more information." class="text-danger">
                                         <i class="fas fa-times-circle"> </i>
                                         {{ algorithmVersion.name }}
                                     </a>
                                 {% elseif algorithmVersion.status == constant('\\App\\Entity\\AlgorithmVersion::STATUS_AVAILABLE') %}
-                                    <a class="text-success" role="button" data-toggle="tooltip" data-placement="right" title="La version est disponible.">
+                                    <a class="text-success" role="button" data-toggle="tooltip" data-placement="right" title="This version is available.">
                                         <i class="fas fa-info-circle"> </i>
                                         {{ algorithmVersion.name }}
                                     </a>
@@ -65,7 +65,7 @@
                                 {{ algorithm.createdAt | date('d-m-Y H:i:s') }}
                                 <br /><i>({{ algorithm.createdBy }})</i>
                             {% else %}
-                                <i>non défini</i>
+                                <i>not defined</i>
                             {% endif %}
                         </td>
                         <td>
@@ -73,28 +73,27 @@
                                 {{ algorithm.updatedAt | date('d-m-Y H:i:s') }}
                                 <br /><i>({{ algorithm.updatedBy }})</i>
                             {% else %}
-                                <i>non défini</i>
+                                <i>not defined</i>
                             {% endif %}
                         </td>
                         <td>
                             <form method="post" class="form" action="{{ path('dashboard_algorithm_delete', {'id': algorithm.id}) }}">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ algorithm.id) }}">
-                                <hr />
                                 <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_algorithm_edit', {'id': algorithm.id}) }}">
-                                    <i class="fa fa-edit"></i> Modifier
+                                    <i class="fa fa-edit"></i> Edit
                                 </a>
                                 <a class="btn btn-outline-dark btn-sm" href="#" data-toggle="modal" data-target="#modal_tag_{{algorithm.id}}">
-                                    <i class="fas fa-tags"></i> Version
+                                    <i class="fas fa-tags"></i> Add version
                                 </a>
                                 <hr />                                    
                                 {%  if algorithm.isPublic %}
                                     <a href="{{ path("dashboard_algorithm_toggle_public", {'id': algorithm.id}) }}" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-lock"></i> Rendre privé
+                                        <i class="fas fa-lock"></i> Make private
                                     </a>
                                 {% else %}
                                     <a href="{{ path("dashboard_algorithm_toggle_public", {'id': algorithm.id}) }}" class="btn btn-success btn-sm">
-                                        <i class="fas fa-lock-open"></i> Rendre public
+                                        <i class="fas fa-lock-open"></i> Make visible to users
                                     </a>
                                 {% endif %}
                                 </a>
@@ -109,7 +108,7 @@
                             <div class="modal-header">
                                 <h4 class="modal-title">
                                     <em>{{ algorithm.name }}</em>
-                                    <footer class="blockquote-footer">Ajout d'une version</footer>
+                                    <footer class="blockquote-footer">Add a version</footer>
                                 </h4>
 
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -119,13 +118,13 @@
                             <div class="modal-body">
                                 <form action="{{ path("dashboard_algorithm_version_new") }}" method="POST">
                                     <input type="hidden" name="algorithm_id" value="{{ algorithm.id }}" />
-                                    <label for="name" class="font-weight-bold">Version</label>
+                                    <label for="name" class="font-weight-bold">Version name</label>
                                     <input type="text" id="name" name="version_name" class="form-control" aria-describedby="versionHelpBlock">
                                     <small id="versionHelpBlock" class="form-text text-muted">
-                                        HELP TEXT
+                                        Enter the name of the version to create. This can be a Git branch, tag or release name, depending on how the algorithm repository is managed.
                                     </small>
                                     <hr />
-                                    <button type="submit" class="btn btn-success btn-block">Ajouter</button>
+                                    <button type="submit" class="btn btn-success btn-block">Add version</button>
                                 </form>
                             </div>
                         </div>
@@ -140,23 +139,23 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">
-                                        {% trans %}dashboard.algorithm.index.modal_title_version1{% endtrans %}
+                                        Delete version
                                         <strong style="color:#0099cc;"><em>{{ algorithmVersion.name }}</strong></em><br>
-                                        {% trans %}dashboard.algorithm.index.modal_title_version2{% endtrans %}
+                                        from algorithm
                                         <strong style="color:#0099cc;"><em>{{ algorithmVersion.algorithm.name  }}</strong></em> 
                                     </h5>                                    
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
-                                <div class="modal-body">
+                                 <div class="modal-body">
                                     <div class="col-12" style="font-size:18px;">
-                                        {% trans %}dashboard.algorithm.index.modal_body_processing{% endtrans %}
+                                        This version is currently being created. You can delete it if the process is blocked or no longer needed.
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button onclick="window.location.href = '{{ path("dashboard_algorithm_version_delete", {'hash': algorithmVersion.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_confirmer{% endtrans %}</button>
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_annuler{% endtrans %}</button>
+                                    <button onclick="window.location.href = '{{ path("dashboard_algorithm_version_delete", {'hash': algorithmVersion.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">Confirm</button>
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -171,9 +170,9 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">
-                                        {% trans %}dashboard.algorithm.index.modal_title_version1{% endtrans %} 
+                                        Delete version
                                         <strong style="color:#0099cc;"><em>{{ algorithmVersion.name }}</strong></em><br>
-                                        {% trans %}dashboard.algorithm.index.modal_title_version2{% endtrans %} 
+                                        from algorithm
                                         <strong style="color:#0099cc;"><em>{{ algorithmVersion.algorithm.name  }}</strong></em> 
                                     </h5>                                    
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -185,12 +184,12 @@
                                         {% if  algorithmVersion.log  %}
                                             <em>"{{ algorithmVersion.log }}"<em><br>
                                         {% endif %}
-                                        {% trans %}dashboard.algorithm.index.modal_body_error{% endtrans %}<br>  
+                                        This version could not be created correctly. You can delete it and try to add it again after fixing the problem.<br>  
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button onclick="window.location.href = '{{ path("dashboard_algorithm_version_delete", {'hash': algorithmVersion.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_confirmer{% endtrans %}</button>
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_annuler{% endtrans %}</button>
+                                    <button onclick="window.location.href = '{{ path("dashboard_algorithm_version_delete", {'hash': algorithmVersion.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">Confirm</button>
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -200,7 +199,7 @@
 
             {% else %}
                 <tr>
-                    <td colspan="4"><em>Aucun algorithme</em></td>
+                    <td colspan="5"><em>No algorithm found</em></td>
                 </tr>
             {% endfor %}
             </tbody>

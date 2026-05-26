@@ -1,15 +1,87 @@
-__pycache__
-lolapi/__pycache__
-.vscode
-.mypy_cache
-.env
-/.scannerwork/
-/.nextflow*
-/.coverage
-/cov_html/
-/docs/references/
-/site/
-/build/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
 .venv/
+venv/
+ENV/
+env/
+
+# Nextflow
+.nextflow/
+.nextflow.log*
+work/
+
+# Testing & Coverage
+.pytest_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+/cov_html/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Environment variables & secrets
+.env
+.env.local
+.envrc
+*.key
+*.pem
+certs/private.key
+
+# Kubernetes / k8s
+kubeconfig
+kubeconfig.yml
+kubeconfig.yaml
+kubeconfig.*
+.kube/
+
+# Slurm
+slurm-*.out
+slurm-*.err
+
+# Documentation site
+/site/
+/docs/references/
+
+# SFTP/Temp
 /tmp/sftp_path/
-/certs/
+/.scannerwork/
+
+# IDEs & System
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

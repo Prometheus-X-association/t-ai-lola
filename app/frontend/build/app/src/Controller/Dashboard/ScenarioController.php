@@ -2,29 +2,22 @@
 
 namespace App\Controller\Dashboard;
 
-use App\Repository\ScenarioRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Controller\LolaController;
 use App\Entity\Scenario;
 use App\Entity\ScenarioAlgorithm;
 use App\Entity\Run;
-use App\Entity\AlgorithmVersion;
-use Psr\Log\LoggerInterface;
+use App\Lolapy\LolapyServiceApi;
 
-/**
- * @Route("/dashboard/scenario", name="dashboard_scenario_")
- * @IsGranted("ROLE_PROFIL_2")
- */
+
+#[Route('/dashboard/scenario', name: 'dashboard_scenario_')]
+#[IsGranted('ROLE_PROFIL_2')]
 class ScenarioController extends LolaController {
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('dashboard/scenario/index.html.twig', [
@@ -32,14 +25,9 @@ class ScenarioController extends LolaController {
         ]);
     }
 
-    /**
-     * @Route("/toggle_active/{id}", name="toggle_active",
-     *      requirements = {
-     *          "id" = "\d+",
-     *      })
-     * @IsGranted("ROLE_PROFIL_4")
-     */
-    public function toggleActive(Scenario $scenario)
+    #[Route('/toggle_active/{id}', name: 'toggle_active', requirements: ['id' => '\d+'])]
+    #[IsGranted('ROLE_PROFIL_4')]
+    public function toggleActive(Scenario $scenario): Response
     {
         $scenario->toggleActive();
         $this->getEm()->flush();
@@ -47,13 +35,10 @@ class ScenarioController extends LolaController {
         return $this->redirectToRoute("dashboard_scenario_index");
     }
 
-    /**
-     * Execute the scenario
-     * @Route("/execute/{id}", name="execute", methods={"POST"})
-     */
-    public function execute(Request $request, Scenario $scenario, \App\Lolapy\LolapyServiceApi $lolapyService): Response
+    #[Route('/execute/{id}', name: 'execute', methods: ['POST'])]
+    public function execute(Request $request, Scenario $scenario, LolapyServiceApi $lolapyService): Response
     {
-	error_log('DEBUG: ScenarioController::execute called with scenario ID: ' . $scenario->getId());
+	    error_log('DEBUG: ScenarioController::execute called with scenario ID: ' . $scenario->getId());
         if ($this->isCsrfTokenValid('execute' . $scenario->getId(), $request->request->get('_token'))) {
             $run = new Run();
             $run->setScenario($scenario);
@@ -61,20 +46,17 @@ class ScenarioController extends LolaController {
             $this->getEm()->flush();
 
             // lance l'execution du scénar$io sur Lolapy
-            $resultExecute = $lolapyService->scenarioExecute($scenario, $run->getHash());
+            $lolapyService->scenarioExecute($scenario, $run->getHash());
 
             return $this->redirectToRoute("dashboard_run_details", ['hash' => $run->getHash()]);
         }
         return $this->redirectToRoute("dashboard_accueil");
     }
 
-    /**
-     * Edit the scenario - step 1 (tag and dataset)
-     * @Route("/prepare/{id}", name="edit_prepare", methods={"GET"})
-     */
-    public function prepare(Scenario $scenario)
+    #[Route('/prepare/{id}', name: 'edit_prepare', methods: ['GET'])]
+    public function prepare(Scenario $scenario): Response
     {
-        $this->getSession()->set("edit_scenario", ["metascenario" => $scenario->getMetascenario()]);
+        $this->getSession()?->set('edit_scenario', ['metascenario' => $scenario->getMetascenario()]);
         return $this->render('dashboard/scenario/edit_prepare.html.twig', [
                     'metaScenario' => $scenario->getMetascenario(),
                     'tags' => $scenario->getMetascenario()->getTags(),
@@ -85,11 +67,9 @@ class ScenarioController extends LolaController {
         ]);
     }
 
-    /**
-     * Edit the scenario - step 2 (parameters)
-     * @Route("/prepare/parameter", name="edit_prepare_parameter", methods={"POST"})
-     */
-    public function prepareParameter(Request $request)
+
+    #[Route('/prepare/parameter', name: 'edit_prepare_parameter', methods: ['POST'])]
+    public function prepareParameter(Request $request): Response
     {
         $data = $request->request->all();
         $tag = $this->getTagRepository()->findOneBy(["hash" => $data["hidden_tag_hash"]]);
@@ -102,7 +82,7 @@ class ScenarioController extends LolaController {
             $this->redirectToRoute("dashboard_metascenario_index");
         }
 
-        $dataSession = $this->getSession()->get("edit_scenario");
+        $dataSession = $this->getSession()?->get('edit_scenario', []);
         $dataSession["tag"] = $tag;
         $dataSession["dataset"] = $dataset;
         $dataSession["scenario"] = $scenario;
@@ -119,14 +99,14 @@ class ScenarioController extends LolaController {
 
     /**
      * Prepare the execution of the scenario - switchable algorithm
-     * @Route("/prepare/algorithm", name="edit_prepare_algorithm", methods={"POST"})
     */
-    public function prepareAlgorithm(Request $request)
+    #[Route('/prepare/algorithm', name: 'edit_prepare_algorithm', methods: ['POST'])]
+    public function prepareAlgorithm(Request $request): Response
     {
         $parameters = $request->request->all();
-        $dataSession = $this->getSession()->get("edit_scenario");
+        $dataSession = $this->getSession()?->get('edit_scenario', []);
         $dataSession["parameters"] = serialize($parameters);
-        $this->getSession()->set("edit_scenario", $dataSession);
+        $this->getSession()?->set('edit_scenario', $dataSession);
         $scenario = $this->getScenarioRepository()->find($dataSession["scenario"]->getId());
         $scenarioAlgorithms = $this->getScenarioAlgorithmRepository()->findBy(['scenario' => $scenario->getId()]);
         $algorithmVersions = $this->getAlgorithmVersionRepository()->findBy(["status" => \App\Entity\AlgorithmVersion::STATUS_AVAILABLE]); 
@@ -168,7 +148,7 @@ class ScenarioController extends LolaController {
      * @param type $data
      * @param Scenario $scenario
      */
-    private function update(string $datasetHash, string $tagHash, $data, Scenario $scenario)
+    private function update(string $datasetHash, string $tagHash, $data, Scenario $scenario): void
     {
         $scenario->setDataset($this->getDatasetRepository()->findOneBy(["hash" => $datasetHash]));
         $scenario->setTag($this->getTagRepository()->findOneBy(["hash" => $tagHash]));
@@ -203,11 +183,8 @@ class ScenarioController extends LolaController {
         return $scenario;
     }
 
-    /**
-     * dispatch to creation or updating method
-     * @Route("/scenario/manage", name="scenario_manage", methods={"POST"})
-     */
-    public function manage(Request $request,): Response
+    #[Route('/scenario/manage', name: 'scenario_manage', methods: ['POST'])]
+    public function manage(Request $request): Response
     {
          $this->logger->info('ScenarioController::manage called');
         
@@ -217,9 +194,9 @@ class ScenarioController extends LolaController {
         if (isset($data["create_button_no_algo"])) { 
              $this->logger->info('Creating scenario without algorithms');
             unset($data["create_button_no_algo"]);
-            $dataSession = $this->getSession()->get("create_scenario"); 
+            $dataSession = $this->getSession()?->get('create_scenario', []);
             $dataSession["parameters"] = serialize($data);
-            $this->getSession()->set("create_scenario", $dataSession);
+            $this->getSession()?->set('create_scenario', $dataSession);
             
              $this->logger->debug('Session data prepared', [
                 'dataset_hash' => $dataSession["dataset"]->getHash(),

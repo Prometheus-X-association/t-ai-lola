@@ -5,45 +5,31 @@ namespace App\Entity;
 use App\Repository\AlgorithmVersionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=AlgorithmVersionRepository::class)
- */
+#[ORM\Entity(repositoryClass: AlgorithmVersionRepository::class)]
 class AlgorithmVersion
 {
     const STATUS_PROCESSING = "PROCESSING";
     const STATUS_AVAILABLE = "AVAILABLE";
     const STATUS_ERROR = "ERROR";
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $hash;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $status;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $log;    
-    
-    /**
-     * @ORM\ManyToOne(targetEntity=Algorithm::class, inversedBy="algorithmVersions")
-     */
+
+    #[ORM\ManyToOne(targetEntity: Algorithm::class, inversedBy: 'algorithmVersions')]
     public $algorithm;    
     
     public function __construct()

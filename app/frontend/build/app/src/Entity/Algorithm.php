@@ -8,41 +8,27 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\AbstractLolaEntity;
 
-/**
- * @ORM\Entity(repositoryClass=AlgorithmRepository::class)
- */
+#[ORM\Entity(repositoryClass: AlgorithmRepository::class)]
 class Algorithm extends AbstractLolaEntity {
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\Column(name="url_repository", type="string", length=255)
-     */
+    #[ORM\Column(name: 'url_repository', type: 'string', length: 255)]
     private $urlRepository;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private $isPublic;
 
-    /**
-     * @ORM\OneToMany(targetEntity=AlgorithmVersion::class, mappedBy="algorithm")
-     */
+    #[ORM\OneToMany(targetEntity: AlgorithmVersion::class, mappedBy: 'algorithm')]
     private $algorithmVersions;
 
     public function __construct() {

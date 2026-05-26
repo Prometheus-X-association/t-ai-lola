@@ -6,6 +6,13 @@
         <meta name="description" content="">
 
         <title>Lola - {% block title %}{% trans %}dashboard.title.accueil{% endtrans %}{% endblock %}</title>
+        <script>
+            (function () {
+                var d = document.documentElement;
+                d.classList.add('dt-loading');
+                setTimeout(function () { d.classList.remove('dt-loading'); }, 3000);
+            })();
+        </script>
 
         <!-- Bootstrap -->
         <link href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -42,9 +49,6 @@
         <!-- Datatable -->
         <script src="{{ asset('node_modules/datatables/media/js/jquery.dataTables.min.js') }}"></script>
 
-        <!-- font-awesome -->
-        <script src="{{ asset('node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}" crossorigin="anonymous"></script>
-
         <!-- select2 -->
         <script src="{{ asset('node_modules/select2/dist/js/select2.min.js') }}"></script>
 
@@ -58,6 +62,5 @@
 
         <!-- JS Lola -->
         <script src="{{ asset('js/lola.js') }}"></script>
-        
     </body>
 </html>

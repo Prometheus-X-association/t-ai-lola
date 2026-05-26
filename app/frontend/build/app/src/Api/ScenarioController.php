@@ -5,25 +5,21 @@ namespace App\Api;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use FOS\RestBundle\Controller\Annotations\RequestParam;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Annotations as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use App\Lolapy\LolapyServiceApi;
-use App\Entity\ApiLog;
 use App\Entity\Run;
 use App\Entity\RunLogs;
 
-/**
- * @route("/scenario")
- */
+#[Route('/scenario')]
 class ScenarioController extends AbstractController {
 
     /**
      * Notify when Lolapy start the processing of the Trax db
      *
-     * @Route("/start/trax/{hash}", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="",
@@ -36,6 +32,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/start/trax/{hash}', methods: ['GET'])]
     public function startTrax(Run $run, EntityManagerInterface $em): Response
     {
         $run->setStatus(Run::STATUS_SCHEDULING_TRAX_DB);
@@ -46,7 +43,6 @@ class ScenarioController extends AbstractController {
     /**
      * Notify when Lolapy finish the processing of the Trax db and wait for Nextflow
      *
-     * @Route("/complete/trax/{hash}", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="",
@@ -59,6 +55,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/complete/trax/{hash}', methods: ['GET'])]
     public function completeTrax(Run $run, EntityManagerInterface $em): Response
     {
         $run->setStatus(Run::STATUS_WAITING_NEXTFLOW);
@@ -69,7 +66,6 @@ class ScenarioController extends AbstractController {
     /**
      * Notify when Lolapy start to run the scenario
      *
-     * @Route("/start/nextflow/{hash}", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="",
@@ -83,6 +79,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/start/nextflow/{hash}', methods: ['GET'])]
     public function startNextflow(Run $run, EntityManagerInterface $em): Response
     {
         $run->setStatus(Run::STATUS_RUNNING_SCENARIO);
@@ -93,7 +90,6 @@ class ScenarioController extends AbstractController {
     /**
      * Notify when Lolapy finish to run the scenario and send to Lolapy the last algorithme workdir
      *
-     * @Route("/complete/nextflow/{hash}", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="",
@@ -106,6 +102,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/complete/nextflow/{hash}', methods: ['GET'])]
     public function completeNextflow(Run $run, EntityManagerInterface $em, LolapyServiceApi $lolapy): Response
     {
         $run->setStatus(Run::STATUS_COMPLETED);
@@ -134,7 +131,6 @@ class ScenarioController extends AbstractController {
     /**
      * Notify when an error occured during the execution of the scenario
      *
-     * @Route("/error/{hash}", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="",
@@ -147,6 +143,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/error/{hash}', methods: ['GET'])]
     public function error(Run $run, EntityManagerInterface $em): Response
     {
         $run->setStatus(Run::STATUS_ERROR);
@@ -157,7 +154,6 @@ class ScenarioController extends AbstractController {
     /**
      * Collect Nextflow logs for processes only during scenario execution and put status in Submit.
      *
-     * @Route("/process/submit/{hash}", methods={"POST"})
      * @OA\Response(response=200, description=""),
      * @OA\Response(response=400, description="The hash of the run is invalid"),
      * @RequestParam(
@@ -178,6 +174,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/process/submit/{hash}', methods: ['POST'])]
     public function submitProcess(Request $request, EntityManagerInterface $em, String $hash): Response
     {
 
@@ -229,7 +226,6 @@ class ScenarioController extends AbstractController {
     /**
      * Put status in Run.
      *
-     * @Route("/process/run/{hash}", methods={"POST"})
      * @OA\Response(response=200, description=""),
      * @OA\Response(response=400, description="The hash of the run is invalid"),
      * @RequestParam(
@@ -250,6 +246,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/process/run/{hash}', methods: ['POST'])]
     public function runProcess(Request $request, EntityManagerInterface $em, String $hash): Response
     {
 
@@ -317,7 +314,6 @@ class ScenarioController extends AbstractController {
    /**
      * Put status in Done.
      *
-     * @Route("/process/done/{hash}", methods={"POST"})
      * @OA\Response(response=200, description=""),
      * @OA\Response(response=400, description="The hash of the run is invalid"),
      * @RequestParam(
@@ -338,6 +334,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/process/done/{hash}', methods: ['POST'])]
     public function doneProcess(Request $request, EntityManagerInterface $em, String $hash): Response
     {
         $data = json_decode($request->getContent());
@@ -388,7 +385,6 @@ class ScenarioController extends AbstractController {
     /**
      * Put status in Error.
      *
-     * @Route("/process/error/{hash}", methods={"POST"})
      * @OA\Response(response=200, description=""),
      * @OA\Response(response=400, description="The hash of the run is invalid"),
      * @RequestParam(
@@ -409,6 +405,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/process/error/{hash}', methods: ['POST'])]
     public function errorProcess(Request $request, EntityManagerInterface $em, Run $run): Response
     {
 
@@ -433,7 +430,6 @@ class ScenarioController extends AbstractController {
     /**
      * Notify when Lolapy end the compression of the results of the run
      *
-     * @Route("/results/complete/{hash}", methods={"GET"})
      * @OA\Response(
      *     response=200,
      *     description="",
@@ -447,6 +443,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/results/complete/{hash}', methods: ['GET'])]
     public function resultComplete(Run $run, EntityManagerInterface $em): Response
     {
         $run->setHasOutput(true);
@@ -458,8 +455,6 @@ class ScenarioController extends AbstractController {
     /**
      * Put the status of Workflow in Run
      *
-     * @Route("/workflow/run/{hash}", methods={"POST"})
-     *
      * @OA\Response(response=201, description=""),
      * @OA\Response(response=400, description="The hash of the run is invalid"),
      *
@@ -470,6 +465,7 @@ class ScenarioController extends AbstractController {
      *
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/workflow/run/{hash}', methods: ['POST'])]
     public function workflowRun(Request $request, EntityManagerInterface $em, String $hash): Response
     {
         $data = json_decode($request->getContent());
@@ -497,9 +493,7 @@ class ScenarioController extends AbstractController {
 
     /**
      * Put the status of Workflow in Done
-     *
-     * @Route("/workflow/done/{hash}", methods={"POST"})
-     *
+
      * @OA\Response(response=201, description=""),
      * @OA\Response(response=400, description="The hash of the run is invalid"),
      *
@@ -510,6 +504,7 @@ class ScenarioController extends AbstractController {
      *
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/workflow/done/{hash}', methods: ['POST'])]
     public function workflowDone(Request $request, EntityManagerInterface $em, String $hash): Response
     {
         $data = json_decode($request->getContent());
@@ -537,8 +532,6 @@ class ScenarioController extends AbstractController {
     /**
      * Put the status of Workflow in Error
      *
-     * @Route("/workflow/error/{hash}", methods={"POST"})
-     *
      * @OA\Response(response=201, description=""),
      * @OA\Response(response=400, description="The hash of the run is invalid"),
      *
@@ -552,6 +545,7 @@ class ScenarioController extends AbstractController {
      * )
      * @OA\Tag(name="Scenario")
      */
+    #[Route('/workflow/error/{hash}', methods: ['POST'])]
     public function workflowError(Request $request, EntityManagerInterface $em, String $hash): Response
     {
         $data = json_decode($request->getContent());

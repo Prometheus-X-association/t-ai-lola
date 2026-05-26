@@ -27,7 +27,7 @@ class NextflowCheckEnv():
     config_file_docker: Path
     nextflow_log_listener: str
     run_id: str
-    on_local: bool
+    cluster_type: str
 
     @classmethod
     def from_env(cls, run_workdir: Path, run_id: str) -> "NextflowCheckEnv":
@@ -49,7 +49,7 @@ class NextflowCheckEnv():
             nextflow_log_listener=app_settings.nextflow_log_listener_host,
             config_file_docker=run_workdir / "backend_docker.config",
             run_id=run_id,
-            on_local=app_settings.cluster_is_backend
+            cluster_type=app_settings.cluster_type
         )
 
     def check(self, docker_images_list: list[DockerImage]):
@@ -90,32 +90,41 @@ class NextflowCheckEnv():
         """
         import hashlib
         app_settings = settings.get()
-        # Change the process executor based on on_local.
-        # See https://www.nextflow.io/docs/latest/executor.html#local
-        if self.on_local:
-            process_executor = "local"
-        else:
-            process_executor = "slurm"
+        # Change the process executor based on cluster_type.
+        # See https://www.nextflow.io/docs/latest/executor.html
+        try: 
+            process_executor = self.cluster_type
 
-        docker_config = f"""process.executor = '{process_executor}'
-trace {{
-    enabled = true
-    file = 'workflow_trace.tsv'
-    fields='task_id,hash,native_id,process,tag,name,status,exit,module,container,cpus,time,disk,memory,attempt,submit,start,complete,duration,realtime,queue,%cpu,%mem,rss,vmem,peak_rss,peak_vmem,rchar,wchar,syscr,syscw,read_bytes,write_bytes,vol_ctxt,inv_ctxt,env,workdir,script,scratch,error_action'
-}}
-weblog {{
-    enabled = true
-    url = 'http://{app_settings.lolapy_host_ip}:{app_settings.lolapy_host_port}/nf_logs'
-}}
-docker {{
-       enabled = true
-       runOptions = "--network=host --user \\$(id -u):\\$(id -g)"
-       checkImage = false
-}}"""  # To know why using the --user option instead of fixOwnership = true, see https://gitlab.inria.fr/lola/back-end/lolapy/-/issues/111
-        for docker_image in docker_images_list:
-            docker_config += f"""\n params.{docker_image.name} = '{docker_image.url}'"""
+            docker_config = f"""process.executor = '{process_executor}'
+    trace {{
+        enabled = true
+        file = 'workflow_trace.tsv'
+        fields='task_id,hash,native_id,process,tag,name,status,exit,module,container,cpus,time,disk,memory,attempt,submit,start,complete,duration,realtime,queue,%cpu,%mem,rss,vmem,peak_rss,peak_vmem,rchar,wchar,syscr,syscw,read_bytes,write_bytes,vol_ctxt,inv_ctxt,env,workdir,script,scratch,error_action'
+    }}
+    weblog {{
+        enabled = true
+        url = 'http://{app_settings.lolapy_host_ip}:{app_settings.lolapy_host_port}/nf_logs'
+    }}
+    docker {{
+        enabled = true
+        runOptions = "--network=host --user \\$(id -u):\\$(id -g)"
+        checkImage = false
+    }}"""  # To know why using the --user option instead of fixOwnership = true, see https://gitlab.inria.fr/lola/back-end/lolapy/-/issues/111
+            if self.cluster_type == "k8s":
+                docker_config += f"""
+    k8s {{
+        namespace = '{app_settings.k8s_namespace}'
+        serviceAccount = '{app_settings.k8s_service_account}'
+        storageClaimName = '{app_settings.k8s_pvc_name}'
+        storageMountPath = '{app_settings.k8s_mount_path}'
+        imagePullSecrets = ['my-registry-secret']
 
-        docker_config = docker_config.encode()
+    }}"""
+            for docker_image in docker_images_list:
+                docker_config += f"""\n params.{docker_image.name} = '{docker_image.url}'"""
+        except Exception as e:
+            logging.error(f"Error generating docker config: {e}")
+            raise nextflow_errors.NextflowConfigError(f"Error generating docker config: {e}") 
         try:
             hash_file = hashlib.md5(
                 open(self.config_file_docker, "rb").read()
@@ -124,13 +133,12 @@ docker {{
             # If file not found, use an empty md5 so regenerate the file
             logging.info(f"File {self.config_file_docker} not found. Will be generated")
             hash_file = ""
-        hash_string = hashlib.md5(docker_config).hexdigest()
-
+        hash_string = hashlib.md5(docker_config.encode()).hexdigest()
         # Generate the file if md5sum are not the same
         if hash_file != hash_string:
             logging.info(f"Generate {self.config_file_docker} because wrong md5sum")
             with open(self.config_file_docker, "wb") as conf_file:
-                conf_file.write(docker_config)
+                conf_file.write(docker_config.encode())
 
 
 class RunNextflow():
@@ -160,10 +168,8 @@ class RunNextflow():
         Raises:
             scenario_errors.ScenarioError: If there is an error when starting the run
         """
-        logging.debug("running on nextflow")
         # Generate parameter file
         self.generate_parameter_file()
-        logging.debug("generated parameter file")
 
         command_line_parameters = [
             str(self.nextflow_env.nextflow_executable),
@@ -195,8 +201,6 @@ class RunNextflow():
         #     command_line_parameters.append(
         #         f"-with-weblog {self.nextflow_env.nextflow_log_listener}"
         #     )
-        logging.debug(command_line_parameters)
-        print("running command")
         # Use the parameter cwd to force nextflow to use the correct working-directory.
         # The parameter -work-dir given to nextflow change just where to store temporary results
         cmd_result = shell_command.ShellCommand.new(
@@ -204,7 +208,6 @@ class RunNextflow():
             on_localhost=True,
             background=self.background,
             work_dir=self.nextflow_env.run_work_dir).run()
-        print(cmd_result)
         # If the command return a stderr, try to parse it to raise errors
         if cmd_result.stderr:
             # If __get_error find the correct error, raise it.

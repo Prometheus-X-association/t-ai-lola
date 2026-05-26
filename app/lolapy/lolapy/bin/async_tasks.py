@@ -77,7 +77,6 @@ def start_scenario(
         """
     try:
         my_scenario = Scenario.from_hash(scenario_hash)
-        logging.debug("getting scenario")
         run_scenario.RunScenario(
             run_id=run_hash,
             scenario=my_scenario,
@@ -86,7 +85,6 @@ def start_scenario(
             parameters=parameters,
             algorithm=algorithm,
         ).run()
-        logging.debug("scenario ran")
     except LolapyGlobalError as lolapy_error:
         logging.error(lolapy_error.message)
         frontend_api.FrontendRequest.log(
@@ -183,9 +181,7 @@ def import_dataset(data_path):
         # TODO: Change this to log all request to frontend here !!
         # For example, create a function to extract_from_archive, then send /api/dataset//start and then
         # method install()
-        print("begin")
         installation.install_from_archive()
-        print(f"installation: {installation.dataset_hash}")
         frontend_api.FrontendRequest.post(
             f"/api/dataset/{installation.dataset_hash}/complete/{installation.import_id}",
             data={"size": 10},

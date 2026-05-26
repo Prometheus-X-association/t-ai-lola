@@ -19,42 +19,38 @@ use Gregwar\CaptchaBundle\Type\CaptchaType;
 
 class RegistrationFormType extends AbstractType {
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
                 ->add('firstname', TextType::class, [
                     'label' => 'Prénom',
                     'constraints' => [
-                        new NotBlank(['message' => 'Le prénom est requis.']),
+                        new NotBlank(message: 'Le prénom est requis.'),
                     ],
                 ])
                 ->add('lastname', TextType::class, [
                     'label' => 'Nom',
                     'constraints' => [
-                        new NotBlank(['message' => 'Le nom est requis.']),
+                        new NotBlank(message: 'Le nom est requis.'),
                     ],
                 ])
                 ->add('agreeTerms', CheckboxType::class, [
                     'label' => 'Condition d\'utilisation',
                     'mapped' => false,
                     'constraints' => [
-                        new IsTrue([
-                            'message' => 'Vous devez accepter les conditions.',
-                                ]),
+                        new IsTrue(message: 'Vous devez accepter les conditions.'),
                     ],
                 ])
                 ->add('plainPassword', PasswordType::class, [
                     'mapped' => false,
                     'label' => 'Mot de passe',
                     'constraints' => [
-                        new NotBlank([
-                            'message' => 'Veuillez entrer un mot de passe',
-                                ]),
-                        new Length([
-                            'min' => 6,
-                            'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères',
-                            'max' => 50,
-                                ]),
+                        new NotBlank(message: 'Veuillez entrer un mot de passe'),
+                        new Length(
+                            min: 6,
+                            minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères',
+                            max: 50
+                        ),
                     ],
                 ])
                 // add the login field only if we create a new account (not in edit mode)
@@ -65,7 +61,7 @@ class RegistrationFormType extends AbstractType {
         ;
     }
 
-    public function onPreSetData(FormEvent $event)
+    public function onPreSetData(FormEvent $event): void
     {
         $form = $event->getForm();
         $user = $event->getData();
@@ -78,7 +74,7 @@ class RegistrationFormType extends AbstractType {
             $form->add('email', EmailType::class, [
                 'label' => 'Email',
                 'constraints' => [
-                    new NotBlank(['message' => 'L\'email est requis.']),
+                    new NotBlank(message: 'L\'email est requis.'),
                 ],
             ]);
         } else {
@@ -90,7 +86,7 @@ class RegistrationFormType extends AbstractType {
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
