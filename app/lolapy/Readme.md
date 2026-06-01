@@ -8,7 +8,7 @@ Python API to manage trax in Lola project.
 
 ## Requirements
 
-- python==3.10
+- python==3.12
 - pip==20.3.3
   
 You have to install all required packages with python. Use pip and requirements.txt to do it:
@@ -76,7 +76,7 @@ $ gunicorn --workers=2 --bind 0.0.0.0:5000 lolapy.bin.wsgi:flask_app
 $ conda install conda-pack
 
 ## Création de l'environnement python contenant les dépendances
-$ conda create -n lolapy python=3.10
+$ conda create -n lolapy python=3.12
 $ conda activate lolapy
 $ pip install -f requirements.txt
 
@@ -109,7 +109,7 @@ $ python -c "import flask"
 $ conda install conda-pack
 
 ## Création de l'environnement python contenant les dépendances
-$ conda create -n lolapy_conda python=3.8
+$ conda create -n lolapy_conda python=3.12
 $ conda activate lolapy_conda
 $ pip install -f requirements.txt
 

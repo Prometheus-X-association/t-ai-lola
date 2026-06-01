@@ -526,43 +526,43 @@ class LolapyServiceApi {
     }
 
 
-    // /**
-    //  * Add server usage statistics
-    //  * @return string|json
-    //  */
-    // public function addServerUsage()
-    // {
-    //     if ($_ENV["LOLAPY_API_FAKE"] === "false") {
-    //         // Build the URL
-    //         $url = "http://" . $this->url . ":" . $this->port . $this->resourceServerUsage;
+    /**
+      * Add server usage statistics
+      * @return string|json
+    */
+    public function addServerUsage()
+    {
+        if ($_ENV["LOLAPY_API_FAKE"] === "false") {
+            // Build the URL
+            $url = "http://" . $this->url . ":" . $this->port . $this->resourceServerUsage;
 
-    //         // Initiate cURL
-    //         $curl = curl_init();
+            // Initiate cURL
+            $curl = curl_init();
 
-    //         // Set cURL options
-    //         curl_setopt($curl, CURLOPT_URL, $url);
-    //         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-    //         // Execute the cURL request
-    //         $response = curl_exec($curl);
-
-    //         // Check for errors
-    //         if (curl_errno($curl)) {
-    //             $error_message = curl_error($curl);
-    //             curl_close($curl);
-    //             return "Curl error: " . $error_message;
-    //         }
-
-    //         // Close the cURL session
-    //         curl_close($curl);
-
-    //         // Decode the JSON response
-    //         $json = json_decode($response, true);
-
-    //         return $json;
-    //     } else {
-    //         return false;
-    //     }
-    // }
+            // Set cURL options
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            
+            // Execute the cURL request
+            $response = curl_exec($curl);
+            
+            // Check for errors
+            if (curl_errno($curl)) {
+                $error_message = curl_error($curl);
+                curl_close($curl);
+                return "Curl error: " . $error_message;
+            }
+            
+            // Close the cURL session
+            curl_close($curl);
+            
+            // Decode the JSON 
+            $json = json_decode($response, true);
+            
+            return $json;
+        } else {
+                return false;
+        }
+    }
 }
 

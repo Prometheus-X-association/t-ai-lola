@@ -39,9 +39,6 @@ flask_app.register_blueprint(scenario_blueprint)
 flask_app.register_blueprint(dataset_blueprint)
 flask_app.register_blueprint
 
-print(flask_app.blueprints)
-for rule in flask_app.url_map.iter_rules():
-    print(rule)
 # Config swagger routes
 flask_app.config["SWAGGER"] = {
     "title": "Lolapy API",
@@ -125,7 +122,6 @@ def parse_nextflow_logs():
     send them to the frontend
     """
     json_data = request.get_json()
-    logging.info(json_data)
     async_tasks.parse_nextflow_logs(json_data)
     return Response(status=200)
 

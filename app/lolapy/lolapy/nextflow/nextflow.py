@@ -88,14 +88,11 @@ class NextflowCheckEnv():
         This file enable option to force nextflow behavior. It force the use of slurm and the usage of Docker.
         The method check the md5sum of the config file on the machine to update it if needed.
         """
-        logging.info("before")
         import hashlib
         app_settings = settings.get()
-        logging.info("settings")
         # Change the process executor based on cluster_type.
         # See https://www.nextflow.io/docs/latest/executor.html
         try: 
-            logging.info("try")
             process_executor = self.cluster_type
 
             docker_config = f"""process.executor = '{process_executor}'
@@ -113,7 +110,6 @@ class NextflowCheckEnv():
         runOptions = "--network=host --user \\$(id -u):\\$(id -g)"
         checkImage = false
     }}"""  # To know why using the --user option instead of fixOwnership = true, see https://gitlab.inria.fr/lola/back-end/lolapy/-/issues/111
-            logging.info(docker_config)
             if self.cluster_type == "k8s":
                 docker_config += f"""
     k8s {{
@@ -124,7 +120,6 @@ class NextflowCheckEnv():
         imagePullSecrets = ['my-registry-secret']
 
     }}"""
-            logging.info(docker_config)
             for docker_image in docker_images_list:
                 docker_config += f"""\n params.{docker_image.name} = '{docker_image.url}'"""
         except Exception as e:
@@ -138,10 +133,7 @@ class NextflowCheckEnv():
             # If file not found, use an empty md5 so regenerate the file
             logging.info(f"File {self.config_file_docker} not found. Will be generated")
             hash_file = ""
-        logging.info("hash")
-        logging.info(docker_config)
         hash_string = hashlib.md5(docker_config.encode()).hexdigest()
-        logging.info("hash string: {hash_string}")
         # Generate the file if md5sum are not the same
         if hash_file != hash_string:
             logging.info(f"Generate {self.config_file_docker} because wrong md5sum")
@@ -176,10 +168,8 @@ class RunNextflow():
         Raises:
             scenario_errors.ScenarioError: If there is an error when starting the run
         """
-        logging.debug("running on nextflow")
         # Generate parameter file
         self.generate_parameter_file()
-        logging.debug("generated parameter file")
 
         command_line_parameters = [
             str(self.nextflow_env.nextflow_executable),
@@ -211,8 +201,6 @@ class RunNextflow():
         #     command_line_parameters.append(
         #         f"-with-weblog {self.nextflow_env.nextflow_log_listener}"
         #     )
-        logging.debug(command_line_parameters)
-        print("running command")
         # Use the parameter cwd to force nextflow to use the correct working-directory.
         # The parameter -work-dir given to nextflow change just where to store temporary results
         cmd_result = shell_command.ShellCommand.new(
@@ -220,7 +208,6 @@ class RunNextflow():
             on_localhost=True,
             background=self.background,
             work_dir=self.nextflow_env.run_work_dir).run()
-        print(cmd_result)
         # If the command return a stderr, try to parse it to raise errors
         if cmd_result.stderr:
             # If __get_error find the correct error, raise it.

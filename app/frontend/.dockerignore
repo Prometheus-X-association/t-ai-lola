@@ -1,22 +1,40 @@
-**/.git
+# Version Control
+.git
+.gitignore
 
-###> symfony/framework-bundle ###
-**/.env.local
-**/.env.local.php
-**/.env.*.local
-**/config/secrets/prod/prod.decrypt.private.php
-**/public/bundles/
-**/var/
-**/vendor/
-###< symfony/framework-bundle ###
+# Symfony local envs, secrets, cache, logs & dependencies
+build/app/var/
+build/app/vendor/
+build/app/node_modules/
+build/app/public/bundles/
+build/app/public/node_modules/
+build/app/yarn-error.log
+build/app/.phpunit.result.cache
+build/app/.phpunit
+build/app/phpunit.xml
+build/app/config/secrets/prod/prod.decrypt.private.php
+build/app/.env.local
+build/app/.env.local.php
+build/app/.env.*.local
 
-###> symfony/phpunit-bridge ###
-**/.phpunit
-**/.phpunit.result.cache
-*//phpunit.xml
-###< symfony/phpunit-bridge ###
-**/nbproject/
+# Databases & local uploads
+database/
+upload/
 
-# Yarn
-**/public/node_modules/
-**/yarn-error.log
+# Docker & Deployment files
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose-dev.yml
+.env
+.env.sample
+.envrc
+Makefile
+
+# System & IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

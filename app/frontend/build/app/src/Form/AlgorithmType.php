@@ -6,6 +6,7 @@ use App\Entity\Algorithm;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class AlgorithmType extends AbstractType
 {
@@ -19,7 +20,16 @@ class AlgorithmType extends AbstractType
             ->add('urlRepository', \Symfony\Component\Form\Extension\Core\Type\TextType::class, [
                 'required' => true,
             ])
-            ->add('isPublic')
+            ->add('isPublic', ChoiceType::class, [
+                'label' => 'Should this algorithm be visible to other users?',
+                'choices' => [
+                    'Yes' => true,
+                    'No' => false,
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'required' => true,
+            ])
         ;
     }
 

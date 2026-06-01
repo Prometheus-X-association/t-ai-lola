@@ -1,10 +1,10 @@
 {{ form_start(form) }}
-{{ form_row(form.name, {'label': 'Titre'}) }}
-{{ form_row(form.urlRepository, {'label': 'Url Repository'}) }}
+{{ form_row(form.name, {'label': 'Title'}) }}
+{{ form_row(form.urlRepository, {'label': 'Repository URL'}) }}
 {{ form_row(form.description, {'label': 'Description'}) }}
-{{ form_row(form.isPublic, {'label': 'Public ?'}) }}
+{{ form_row(form.isPublic) }}
 <button class="btn btn-success float-right btn-block">
-    {{ button_label|default('Enregistrer') }}
+    {{ button_label|default('Save') }}
 </button>
 {{ form_end(form) }}
 

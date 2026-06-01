@@ -6,6 +6,13 @@
         <meta name="description" content="">
 
         <title>Lola - {% block title %}{% trans %}dashboard.title.accueil{% endtrans %}{% endblock %}</title>
+        <script>
+            (function () {
+                var d = document.documentElement;
+                d.classList.add('dt-loading');
+                setTimeout(function () { d.classList.remove('dt-loading'); }, 3000);
+            })();
+        </script>
 
         <!-- Bootstrap -->
         <link href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">

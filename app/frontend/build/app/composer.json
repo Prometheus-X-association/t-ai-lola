@@ -42,7 +42,7 @@
         "symfony/web-link": "^7.4",
         "symfony/yaml": "^7.4",
         "twig/extra-bundle": "^3.0",
-        "twig/twig": "^3.14.1"
+        "twig/twig": "^3.26"
     },
     "require-dev": {
         "symfony/browser-kit": "^7.4",
@@ -61,23 +61,7 @@
         "sort-packages": true,
         "allow-plugins": {
             "symfony/flex": true
-        },
-    "audit": {
-      "ignore": [
-        "PKSA-4k7v-pfvw-nqvp",
-        "PKSA-wws7-mr54-jsny",
-        "PKSA-4w9w-fp7s-ddy7",
-        "PKSA-w2tw-kmfg-rt9s",
-        "PKSA-yhcn-xrg3-68b1",
-        "PKSA-2wrf-1xmk-1pky",
-        "PKSA-6319-ffpf-gx66",
-        "PKSA-n7sg-8f52-pqtf",
-        "PKSA-hr4y-jwk2-1yb9",
-        "PKSA-365x-2zjk-pt47",
-        "PKSA-b35n-565h-rs4q",
-        "PKSA-ztgh-x9c8-k66g"
-      ]
-    }
+        }
     },
     "autoload": {
         "psr-4": {

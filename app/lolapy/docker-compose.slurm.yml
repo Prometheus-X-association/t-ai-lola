@@ -1,0 +1,77 @@
+services:
+  backend:
+    image: backend
+    build:
+      context: .
+    ports:
+      - 5000:5000
+    environment:
+      - ENV_FILE=/app/.env
+    volumes:
+      - .env:/app/.env:ro
+      - lolasqlite:/tmp
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/docker:/etc/docker:ro
+      - ./certs/:/tmp/certs:ro
+      - /home/lolauser:/home/lolauser 
+    command: 
+      - ./venv/bin/gunicorn
+      - -w
+      - "4"
+      - -b
+      - 0.0.0.0:5000
+      - lolapy.bin.wsgi:flask_app
+  hueyconsumer:
+    image: backend
+    hostname: hueyconsumer
+    build:
+      context: .
+    environment:
+      - ENV_FILE=/app/.env
+    network_mode: host
+    privileged: true
+    group_add: 
+      - ${DOCKER_GROUP}
+    user: lolauser
+    volumes:
+      - .env:/app/.env:ro
+      - lolasqlite:/tmp
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/docker:/etc/docker:ro
+      - ./certs/:/tmp/certs:ro
+      - /etc/slurm/slurm.conf:/etc/slurm/slurm.conf:ro
+      - /home/lolauser:/home/lolauser
+      - /var/run/munge:/var/run/munge:ro
+      - /etc/munge:/etc/munge:ro
+    command:
+      - "venv/bin/huey_consumer"
+      - "lolapy.bin.async_tasks.huey"
+      - "-w 1"
+
+  sftp:
+    image: atmoz/sftp
+    volumes: 
+      - /home/lolauser/nf-workdir/datasets:/home/${SFTP_USER}/upload
+    ports:
+      - 2222:22
+    command:
+      - ${SFTP_USER}:${SFTP_PASSWORD}:1001
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - lolasql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Europe/Paris
+    restart: ${RESTART_SERVICES:-no}
+     
+volumes: 
+  lolasqlite: 
+  lolasql:
+  scenarios_data:
+  ssh_data:

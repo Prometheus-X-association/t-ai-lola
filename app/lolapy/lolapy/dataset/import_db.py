@@ -16,7 +16,6 @@ import time
 import shutil
 
 from cryptncompress import crypto, compress, errors as crypt_errors
-import ijson
 import jsonschema
 from lolapy.dataset.dataset_information import DatasetInformation
 

@@ -47,7 +47,6 @@ class ScenarioExecuteJSON(BaseModel):
 def start_scenario():
     """Start a nextflow scenario."""
     data: ScenarioExecuteJSON = g.request_data
-    logging.info(data)
     async_tasks.start_scenario(
         scenario_hash=data.tag_hash,
         run_hash=data.run_hash,

@@ -1,1 +1,73 @@
-*/Dockerfile.fake_app
+# Version Control
+.git
+.gitattributes
+.gitignore
+
+# Virtual Environments & Build Tools
+.venv
+venv
+env
+ENV
+build/
+dist/
+*.egg-info
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Nextflow & Workflows
+.nextflow
+.nextflow.log*
+work/
+
+# Tests & Quality Assurance
+tests/
+.pytest_cache
+.mypy_cache
+.coverage
+htmlcov/
+/cov_html/
+.scannerwork/
+
+# Documentation
+docs/*
+!docs/swagger.yaml
+site/
+mkdocs.yml
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Secrets & Environment Configurations
+.env
+.env.local
+.envrc
+kubeconfig
+kubeconfig.yml
+kubeconfig.yaml
+kubeconfig.*
+.kube/
+
+# Certs (exclude private secrets, keep folder structure if needed)
+certs/private.key
+*.key
+*.pem
+
+# Slurm Outputs
+slurm-*.out
+slurm-*.err
+
+# Docker / Build artifacts
+Dockerfile
+Dockerfile.*
+docker-compose.yml
+docker-compose.*.yml
+.dockerignore
+
+# Temporary / Local Data
+/tmp/sftp_path/

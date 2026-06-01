@@ -442,7 +442,7 @@
 												<!-- Display the last 3 metascenarios in the dashboard -->
 												{% for metascenario in metascenarios|sort((a, b) => b.createdAt <=> a.createdAt)|slice(0, 3) %}
 													<li class="list-group-item text-gray-800">{{ metascenario.name }}
-														{% if metascenario.createdBy.isAdmin %}
+														{% if metascenario.createdBy is not null and metascenario.createdBy.isAdmin %}
 															<br><span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
 														{% endif %}
 													</li>

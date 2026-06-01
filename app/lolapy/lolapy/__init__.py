@@ -1,7 +1,6 @@
 import sys
 import types
 import logging
-
 # Monkey-patch for cryptography compatibility with older versions of cryptncompress
 # Newer cryptography (35+) moved RSA classes from hazmat.backends.openssl.rsa 
 # to hazmat.primitives.asymmetric.rsa.

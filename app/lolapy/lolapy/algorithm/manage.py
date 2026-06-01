@@ -53,9 +53,7 @@ class InstallAlgorithm:
         docker_image_url = docker.SanitizeDockerUrl(
             new_algo.get_recipe().harbor_url
         ).sanitize()
-        #docker.PullDockerImages(
-        #    [docker.DockerImage(name="", url=docker_image_url)]
-        #).pull()
+
         # everything is Done. Log complete to the frontend
         frontend_api.FrontendRequest.get(
             url=f"/api/algorithm/{self.algo_hash}/complete"

@@ -51,6 +51,8 @@ class LolapyLogs:
         self.log_file: str = str(app_settings.lolapy_log_file)
         self.log_file_async: str = self.log_file + ".async"
         self.log_level: str = app_settings.lolapy_log_level.value
+        if self.log_level == "PRODUCTION":
+            self.log_level = "WARNING"
         self.log_to_fronted: bool = app_settings.lolapy_disable_frontend_logs
         LolapyLogs.__instance__ = self
 

@@ -123,7 +123,6 @@ class RunScenario:
         try:
             # Add dataset path for scenario (instead of Trax)
             dataset_dir = settings.get().lolapy_dataset_path / self.dataset
-            logging.info(dataset_dir)
             self.parameters["datasetDir"] = str(dataset_dir)
 
             json_candidates = [p for p in dataset_dir.rglob("*.json") if p.is_file()]
