@@ -1,23 +1,21 @@
 services:
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    depends_on:
-      - db
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      APACHE_HTTP_PORT_NUMBER: 9010
-      PMA_HOST: db
-      PMA_PORT: 3306
-      TZ: Europe/Paris
-    command: /bin/bash -c "sed -i \"s/80/$$APACHE_HTTP_PORT_NUMBER/g\" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && /docker-entrypoint.sh apache2-foreground"
-    restart: ${RESTART_SERVICES:-no}
+  # In Case you need phpmyadmin, uncomment the following lines:
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #     APACHE_HTTP_PORT_NUMBER: 9010
+  #     PMA_HOST: ${PMA_HOST}
+  #     PMA_PORT: 3306
+  #     TZ: Europe/Paris
+  #   command: /bin/bash -c "sed -i \"s/80/$$APACHE_HTTP_PORT_NUMBER/g\" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && /docker-entrypoint.sh apache2-foreground"
+  #   restart: ${RESTART_SERVICES:-no}
 
   app:
     image: frontend
     build:
       context: '.'
     volumes:
-    #  - ${APACHE_ROOT_DIR}:/var/www/html
       - .env:/var/www/html/.env
     environment:
       TZ: Europe/Paris
@@ -26,14 +24,15 @@ services:
     restart: ${RESTART_SERVICES:-no}
     ports:
       - 8080:80
+
   sftp:
     image: atmoz/sftp
     volumes:
-      - sftp_data:/home/aziz/upload
+      - sftp_data:/home/${SFTP_USER}/upload
     ports:
-      - 2222:22
+      - ${SFTP_PORT}:22
     command:
-      - aziz:password:1001
+      - ${SFTP_USER}:${SFTP_PASSWORD}:1001
 
 volumes:
   sftp_data: 
