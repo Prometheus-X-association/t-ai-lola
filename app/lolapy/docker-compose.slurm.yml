@@ -38,7 +38,7 @@ services:
       - lolasqlite:/tmp
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/docker:/etc/docker:ro
-      - ./certs/:/tmp/certs:ro
+      - ./certs/:/tmp/certs
       - /etc/slurm/slurm.conf:/etc/slurm/slurm.conf:ro
       - /home/lolauser:/home/lolauser
       - /var/run/munge:/var/run/munge:ro 
