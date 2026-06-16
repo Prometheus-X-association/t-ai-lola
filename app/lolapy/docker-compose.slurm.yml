@@ -41,7 +41,7 @@ services:
       - ./certs/:/tmp/certs:ro
       - /etc/slurm/slurm.conf:/etc/slurm/slurm.conf:ro
       - /home/lolauser:/home/lolauser
-      - /var/run/munge:/var/run/munge:ro
+      - /var/run/munge:/var/run/munge
       - /etc/munge:/etc/munge:ro
     command:
       - "venv/bin/huey_consumer"
