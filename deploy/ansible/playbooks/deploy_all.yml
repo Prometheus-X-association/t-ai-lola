@@ -1,3 +1,6 @@
+- name: Gather facts from all hosts
+  gather_facts: yes
+  hosts: all
 # - name: Global Setup (All Nodes)
 #   hosts: all
 #   become: yes
@@ -6,11 +9,22 @@
 #     - docker
 #     - create_user
 
-# - name: Setup Slurm Controller (Calc)
-#   hosts: calc
+- name: Setup Calc Master Node (Slurm Controller, Kubernetes Control Plane)
+  hosts: calc_master
+  become: yes
+  roles:
+    - { role: kubernetes_control_plane, when: setup_kubernetes | default(false) | bool }
+    - { role: slurm_controller, when: orchestrator | default('slurm') == 'slurm' }
+
+# - name: Setup Arch Node (Slurm Client, NFS, Harbor, Lolapy)
+#   hosts: arch
 #   become: yes
 #   roles:
-#     - slurm_controller
+#     - { role: slurm_client, when: orchestrator | default('slurm') == 'slurm' }
+#     - nfs_server
+#     - harbor
+#     - cron_script
+#     - lolapy
 
 # - name: Setup DMZ Services (Harbor, Frontend)
 #   hosts: dmz
@@ -19,20 +33,11 @@
 #     - harbor
 #     - frontend
 
-# - name: Setup Arch Node (Slurm Client, NFS, Harbor, Lolapy)
-#   hosts: arch
-#   become: yes
-#   roles:
-#     - slurm_client
-#     - nfs_server
-#     - harbor
-#     - cron_script
-#     - lolapy
-
-- name: Finish Calc Setup (NFS Client, Workers, SSH Keys)
-  hosts: calc
+- name: Finish Calc Workers Setup (NFS Client, Workers, SSH Keys, Kubernetes Workers)
+  hosts: calc_worker
   become: yes
   roles:
-    - nfs_client
-    - slurm_worker
-    - ssh_key
+    - { role: kubernetes_worker, when: setup_kubernetes | default(false) | bool }
+    - { role: nfs_client, when: orchestrator | default('slurm') == 'slurm' }
+    - { role: slurm_worker, when: orchestrator | default('slurm') == 'slurm' }
+    - { role: ssh_key, when: orchestrator | default('slurm') == 'slurm' }

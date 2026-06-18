@@ -13,5 +13,5 @@
     - cron_script
     - harbor
     - nfs_server
-    - slurm_client
+    - { role: slurm_client, when: orchestrator | default('slurm') == 'slurm' }
     - lolapy

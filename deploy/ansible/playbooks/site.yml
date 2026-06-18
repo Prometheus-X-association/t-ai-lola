@@ -1,21 +1,3 @@
-- name: Configure DMZ servers
-  hosts: dmz
-  become: yes
-  roles:
-    - common
-    - docker
-    - harbor
-    - frontend
-
-- name: Configure CALC servers
-  hosts: calc
-  become: yes
-  roles:
-    - common
-    - create_user
-    - slurm_controller
-    - slurm_worker
-
 - name: Configure ARCH servers
   hosts: arch
   become: yes
@@ -26,11 +8,42 @@
     - cron_script
     - harbor
     - nfs_server
-    - slurm_client
+    - { role: slurm_client, when: orchestrator | default('slurm') == 'slurm' }
     - lolapy
 
-- name: Configure CALC servers
+- name: Configure DMZ servers
+  hosts: dmz
+  become: yes
+  roles:
+    - common
+    - docker
+    - harbor
+    - frontend
+
+- name: Configure Common CALC environment
   hosts: calc
   become: yes
   roles:
-    - nfs_client
+    - { role: common, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+    - { role: docker, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+    - { role: create_user, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+
+- name: Configure CALC Master node
+  hosts: calc_master
+  become: yes
+  roles:
+    - { role: kubernetes_control_plane, when: setup_kubernetes | default(false) | bool }
+    - { role: slurm_controller, when: orchestrator | default('slurm') == 'slurm' }
+
+- name: Configure CALC Worker nodes
+  hosts: calc_worker
+  become: yes
+  roles:
+    - { role: kubernetes_worker, when: setup_kubernetes | default(false) | bool }
+    - { role: slurm_worker, when: orchestrator | default('slurm') == 'slurm' }
+
+- name: Configure CALC Workers NFS mount
+  hosts: calc_worker
+  become: yes
+  roles:
+    - { role: nfs_client, when: orchestrator | default('slurm') == 'slurm' }

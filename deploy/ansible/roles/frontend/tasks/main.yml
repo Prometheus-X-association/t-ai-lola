@@ -1,9 +1,25 @@
-- name: Clone Git repository
+- name: Clone Git repository to temp directory
   git:
     repo: "{{ git_repo_url }}"
-    dest: "{{ git_repo_dest }}"
-    version: fix/devops
+    dest: /tmp/t-ai-lola_frontend
+    version: "{{ git_repo_version | default('main') }}"
     force: yes
+
+- name: Ensure target directory exists
+  file:
+    path: "{{ git_repo_dest }}"
+    state: directory
+
+- name: Copy frontend application folder
+  copy:
+    src: "/tmp/t-ai-lola_frontend/app/frontend/"
+    dest: "{{ git_repo_dest }}/"
+    remote_src: yes
+
+- name: Remove temp directory
+  file:
+    path: /tmp/t-ai-lola_frontend
+    state: absent
     
 - name: Copy environment variables file
   copy:
@@ -19,8 +35,13 @@
   with_items:
     - { key: 'LOLAPY_API_ADRESS', value: '{{ arch_ip }}' }
     - { key: 'ENABLE_API_ACCESS_CONTROL', value: 'true' }
-    - { key: 'MYSQL_HOST', value: 'db' }
+    - { key: 'MYSQL_HOST', value: '{{ arch_ip}}' }
     - { key: 'ROOT_DIR', value: '{{ git_repo_dest }}' }
+    - { key: 'DATABASE_HOST', value: '{{ arch_ip }}' }
+    - { key: 'DATABASE_NAME', value: '{{ database_name }}' }
+    - { key: 'MYSQL_ROOT_PASSWORD', value: '{{ mysql_root_password }}' }
+    - { key: 'MYSQL_USER', value: '{{ mysql_user }}' }
+    - { key: 'MYSQL_PASSWORD', value: '{{ mysql_password }}' }
 
 - name: Copy environment variables file
   copy:
@@ -32,11 +53,11 @@
   community.docker.docker_compose_v2:
     project_src: "{{ git_repo_dest }}"
     state: present
+  environment:
+    SFTP_USER: "{{ dmz_sftp_user }}"
+    SFTP_PASSWORD: "{{ dmz_sftp_password }}"
+    SFTP_PORT: "{{ dmz_sftp_port | default('2222') }}"
   register: compose_output
-
-- name: Pause for 1 minute for database to start
-  ansible.builtin.pause:
-    seconds: 60
 
 - name: Run database fixture command
   command: "{{ app_fixture_command }}"

@@ -1,0 +1,218 @@
+---
+- name: Setup Kubernetes Control Plane Cluster
+  block:
+    - name: Disable swap
+      command: swapoff -a
+      changed_when: false
+
+    - name: Disable swap in fstab
+      replace:
+        path: /etc/fstab
+        regexp: '^([^#].*?\sswap\s+.*)$'
+        replace: '# \1'
+
+    - name: Load kernel modules for Kubernetes
+      modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - overlay
+        - br_netfilter
+
+    - name: Configure kernel modules to load on boot
+      copy:
+        dest: /etc/modules-load.d/k8s.conf
+        content: |
+          overlay
+          br_netfilter
+        mode: '0644'
+
+    - name: Set sysctl parameters for Kubernetes
+      sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        sysctl_file: /etc/sysctl.d/k8s.conf
+        state: present
+        reload: yes
+      loop:
+        - { key: 'net.bridge.bridge-nf-call-iptables', value: '1' }
+        - { key: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
+        - { key: 'net.ipv4.ip_forward', value: '1' }
+
+    - name: Ensure containerd config directory exists
+      file:
+        path: /etc/containerd
+        state: directory
+        mode: '0755'
+
+    - name: Check if containerd config.toml exists
+      stat:
+        path: /etc/containerd/config.toml
+      register: containerd_config_stat
+
+    - name: Initialize containerd config
+      shell: containerd config default > /etc/containerd/config.toml
+      when: not containerd_config_stat.stat.exists or containerd_config_stat.stat.size == 0
+      notify: restart containerd
+
+    - name: Configure SystemdCgroup for containerd
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: 'SystemdCgroup = false'
+        replace: 'SystemdCgroup = true'
+      notify: restart containerd
+
+    - name: Flush handlers to restart containerd if config changed
+      meta: flush_handlers
+
+    - name: Install Kubernetes prerequisites (Debian/Ubuntu)
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gpg
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Create apt keyrings directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+      when: ansible_os_family == "Debian"
+
+    - name: Download Kubernetes APT signing key
+      get_url:
+        url: "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/Release.key"
+        dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
+        mode: '0644'
+        force: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Add Kubernetes APT repository
+      apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/ /"
+        state: present
+        filename: kubernetes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Kubernetes components (Debian/Ubuntu)
+      apt:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Hold Kubernetes packages from automatic updates (Debian/Ubuntu)
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      loop:
+        - kubelet
+        - kubeadm
+        - kubectl
+      when: ansible_os_family == "Debian"
+
+    - name: Add Kubernetes YUM repository (RedHat/CentOS)
+      yum_repository:
+        name: kubernetes
+        description: Kubernetes
+        baseurl: "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/rpm/"
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: "https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/rpm/repodata/repomd.xml.key"
+      when: ansible_os_family == "RedHat"
+
+    - name: Install Kubernetes components (RedHat/CentOS)
+      yum:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        disable_excludes: kubernetes
+      when: ansible_os_family == "RedHat"
+
+    - name: Enable and start kubelet service
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
+
+    - name: Check if Kubernetes is already initialized
+      stat:
+        path: /etc/kubernetes/admin.conf
+      register: k8s_admin_conf
+
+    - name: Initialize Kubernetes cluster using kubeadm
+      command: "kubeadm init --pod-network-cidr={{ kubernetes_pod_network_cidr }}"
+      register: kubeadm_init_output
+      when: not k8s_admin_conf.stat.exists
+
+    - name: Create .kube directory for root user
+      file:
+        path: ~/.kube
+        state: directory
+        mode: '0700'
+
+    - name: Copy admin.conf to root user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: ~/.kube/config
+        remote_src: yes
+        mode: '0600'
+
+    - name: Create .kube directory for lolauser
+      file:
+        path: /home/lolauser/.kube
+        state: directory
+        owner: lolauser
+        group: lolauser
+        mode: '0700'
+
+    - name: Copy admin.conf to lolauser's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/lolauser/.kube/config
+        remote_src: yes
+        owner: lolauser
+        group: lolauser
+        mode: '0600'
+
+    - name: Untaint control plane node (allow scheduling)
+      command: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+      register: untaint_output
+      failed_when: false
+      changed_when: "'untainted' in untaint_output.stdout"
+
+    - name: Install CNI network plugin (Flannel)
+      command: "kubectl apply -f {{ kubernetes_cni_manifest_url }}"
+      register: cni_output
+      changed_when: "'created' in cni_output.stdout or 'configured' in cni_output.stdout"
+
+    - name: Install NFS CSI driver
+      command: "kubectl apply -f {{ kubernetes_nfs_csi_manifest_url }}"
+      register: nfs_csi_output
+      changed_when: "'created' in nfs_csi_output.stdout or 'configured' in nfs_csi_output.stdout"
+
+    - name: Generate join command
+      command: kubeadm token create --print-join-command
+      register: join_command_raw
+      changed_when: false
+
+    - name: Set join command fact on control plane
+      set_fact:
+        kubernetes_join_command: "{{ join_command_raw.stdout_lines[0] }}"
+
+    - name: Fetch kubeconfig to Ansible controller
+      fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: "{{ kubernetes_kubeconfig_path }}"
+        flat: yes
+      run_once: yes
+
+  when: setup_kubernetes | default(false) | bool
