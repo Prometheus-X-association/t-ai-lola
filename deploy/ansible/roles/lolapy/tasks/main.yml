@@ -89,14 +89,6 @@
     mode: '0600'
   when: orchestrator | default('slurm') == 'kubernetes'
 
-- name: Ensure NFS CSI driver is installed
-  command: "docker run --net=host --rm -v {{ git_repo_dest }}/kubeconfig.yml:/kubeconfig.yml -e KUBECONFIG=/kubeconfig.yml bitnami/kubectl:latest apply -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.6.0/deploy/kubernetes/install-driver.yaml"
-  when: orchestrator | default('slurm') == 'kubernetes'
-
-- name: Apply Kubernetes objects (PV, PVC, Secret)
-  command: "docker run --net=host --rm -v {{ git_repo_dest }}/kubeconfig.yml:/kubeconfig.yml -v {{ git_repo_dest }}/k8s-objects.yml:/k8s-objects.yml -e KUBECONFIG=/kubeconfig.yml bitnami/kubectl:latest apply -f /k8s-objects.yml"
-  when: orchestrator | default('slurm') == 'kubernetes'
-
 - name: Generate private key
   command: "openssl genpkey -algorithm RSA -out private.key -pkeyopt rsa_keygen_bits:2048"
   args:

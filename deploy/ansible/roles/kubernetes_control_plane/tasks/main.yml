@@ -50,9 +50,30 @@
         path: /etc/containerd/config.toml
       register: containerd_config_stat
 
+    - name: Check if SystemdCgroup is defined in config.toml
+      shell: grep -q "SystemdCgroup" /etc/containerd/config.toml
+      register: systemdcgroup_exists
+      ignore_errors: true
+      changed_when: false
+      when: containerd_config_stat.stat.exists
+
     - name: Initialize containerd config
       shell: containerd config default > /etc/containerd/config.toml
       when: not containerd_config_stat.stat.exists or containerd_config_stat.stat.size == 0
+      notify: restart containerd
+
+    - name: Add SystemdCgroup block to containerd config if missing
+      blockinfile:
+        path: /etc/containerd/config.toml
+        block: |
+          [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc]
+          [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc.options]
+            SystemdCgroup = true
+        marker: "# {mark} ANSIBLE MANAGED BLOCK FOR SYSTEMD CGROUP"
+        state: present
+      when:
+        - containerd_config_stat.stat.exists
+        - systemdcgroup_exists.rc is defined and systemdcgroup_exists.rc != 0
       notify: restart containerd
 
     - name: Configure SystemdCgroup for containerd
@@ -60,6 +81,13 @@
         path: /etc/containerd/config.toml
         regexp: 'SystemdCgroup = false'
         replace: 'SystemdCgroup = true'
+      notify: restart containerd
+
+    - name: Ensure cri is not in disabled_plugins
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: 'disabled_plugins\s*=\s*\[\s*"cri"\s*\]'
+        replace: 'disabled_plugins = []'
       notify: restart containerd
 
     - name: Flush handlers to restart containerd if config changed
@@ -148,10 +176,32 @@
         path: /etc/kubernetes/admin.conf
       register: k8s_admin_conf
 
+    - name: Check whether the API server is actually healthy
+      command: kubectl --kubeconfig=/etc/kubernetes/admin.conf get nodes
+      register: k8s_health_check
+      failed_when: false
+      changed_when: false
+      when: k8s_admin_conf.stat.exists
+
+    - name: Reset kubeadm if a previous init was incomplete
+      command: kubeadm reset -f
+      when:
+        - k8s_admin_conf.stat.exists
+        - k8s_health_check.rc is defined
+        - k8s_health_check.rc != 0
+
+    - name: Re-check admin.conf state after potential reset
+      stat:
+        path: /etc/kubernetes/admin.conf
+      register: k8s_admin_conf
+
     - name: Initialize Kubernetes cluster using kubeadm
       command: "kubeadm init --pod-network-cidr={{ kubernetes_pod_network_cidr }}"
       register: kubeadm_init_output
       when: not k8s_admin_conf.stat.exists
+      retries: 2
+      delay: 15
+      until: kubeadm_init_output.rc == 0
 
     - name: Create .kube directory for root user
       file:
@@ -195,7 +245,8 @@
       changed_when: "'created' in cni_output.stdout or 'configured' in cni_output.stdout"
 
     - name: Install NFS CSI driver
-      command: "kubectl apply -f {{ kubernetes_nfs_csi_manifest_url }}"
+      shell: |
+        curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/{{ kubernetes_nfs_csi_version }}/deploy/install-driver.sh | bash -s {{ kubernetes_nfs_csi_version }} --
       register: nfs_csi_output
       changed_when: "'created' in nfs_csi_output.stdout or 'configured' in nfs_csi_output.stdout"
 
