@@ -38,7 +38,7 @@ services:
       - ./kubeconfig.yml:/app/kubeconfig.yml:ro
       - lolasqlite:/tmp
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./certs/:/tmp/certs:ro
+      - ./certs/:/tmp/certs
       - /home/lolauser:/home/lolauser
     command:
       - "venv/bin/huey_consumer"
