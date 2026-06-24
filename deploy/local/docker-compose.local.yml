@@ -1,0 +1,114 @@
+services:
+  # In Case you need phpmyadmin, uncomment the following lines:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      APACHE_HTTP_PORT_NUMBER: 9010
+      PMA_HOST: db
+      PMA_PORT: 3306
+      TZ: Europe/Paris
+    command: /bin/bash -c "sed -i \"s/80/$$APACHE_HTTP_PORT_NUMBER/g\" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && /docker-entrypoint.sh apache2-foreground"
+    restart: ${RESTART_SERVICES:-no}
+    ports: 
+      - 9010:9010
+
+  app:
+    image: frontend
+    build:
+      context: '../../app/frontend'
+    volumes:
+      - ../../app/frontend/.env:/var/www/html/.env
+    environment:
+      TZ: Europe/Paris
+    restart: ${RESTART_SERVICES:-no}
+    ports:
+      - 8080:80
+
+  backend:
+    image: backend
+    build:
+      context: '../../app/lolapy'
+    ports:
+      - 5000:5000
+    environment:
+      - ENV_FILE=/app/.env
+    volumes:
+      - ../../app/lolapy/.env:/app/.env:ro
+      - lolasqlite:/tmp
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../../app/lolapy/certs/:/tmp/certs:ro
+      - /tmp/lolauser:/tmp/lolauser
+    command: 
+      - ./venv/bin/gunicorn
+      - -w
+      - "4"
+      - -b
+      - 0.0.0.0:5000
+      - lolapy.bin.wsgi:flask_app
+      
+  hueyconsumer:
+    image: backend
+    hostname: hueyconsumer
+    build:
+      context: '../../app/lolapy'
+    environment:
+      - ENV_FILE=/app/.env
+    privileged: true
+    group_add: 
+      - ${DOCKER_GROUP}
+    user: lolauser
+    volumes:
+      - ../../app/lolapy/.env:/app/.env:ro
+      - lolasqlite:/tmp
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../../app/lolapy/certs/:/tmp/certs
+      - /tmp/lolauser/nf-workdir:/tmp/lolauser/nf-workdir
+    command:
+      - "venv/bin/huey_consumer"
+      - "lolapy.bin.async_tasks.huey"
+      - "-w 1"
+
+  sftp:
+    image: atmoz/sftp
+    volumes: 
+      - /tmp/lolauser/nf-workdir/datasets:/home/${SFTP_USER}/upload
+    ports:
+      - 2222:22
+    command:
+      - ${SFTP_USER}:${SFTP_PASSWORD}:1001
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - lolasql:/var/lib/mysql
+    ports: 
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Europe/Paris
+    restart: ${RESTART_SERVICES:-no}
+     
+  registry:
+    image: registry:3
+    ports:
+      - 5001:5000
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+      REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+    volumes:
+      - ./auth:/auth
+      - ./certs:/certs
+
+volumes: 
+  lolasqlite: 
+  lolasql:
+  scenarios_data:
+  ssh_data:
