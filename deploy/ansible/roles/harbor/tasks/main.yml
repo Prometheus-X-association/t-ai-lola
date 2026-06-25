@@ -67,6 +67,13 @@
       args:
         creates: /data/cert/harbor.crt
 
+    - name: Remove http block from harbor.yml when SSL is enabled
+      replace:
+        path: /opt/harbor/harbor.yml
+        regexp: '^http:\s*\n(\s*#.*\n)*\s*port:\s*\d+.*\n'
+        replace: ''
+      when: harbor_ssl | default(true) | bool
+
     - name: Enable HTTPS line in harbor.yml
       lineinfile:
         path: /opt/harbor/harbor.yml
@@ -105,9 +112,9 @@
         dest: "/tmp/harbor_certs/{{ harbor_hostname }}.crt"
         flat: yes
 
-    - name: Ensure Docker certs directory exists on all hosts
+    - name: Ensure system CA certificates directory exists on all hosts
       file:
-        path: "/etc/docker/certs.d/{{ harbor_hostname }}"
+        path: "/usr/local/share/ca-certificates"
         state: directory
         mode: '0755'
       delegate_to: "{{ item }}"
@@ -115,13 +122,29 @@
       ignore_unreachable: yes
       become: yes
 
-    - name: Copy Harbor certificate to Docker certs directory on all hosts
+    - name: Copy Harbor certificate to system CA certificates on all hosts
       copy:
         src: "/tmp/harbor_certs/{{ harbor_hostname }}.crt"
-        dest: "/etc/docker/certs.d/{{ harbor_hostname }}/ca.crt"
+        dest: "/usr/local/share/ca-certificates/{{ harbor_hostname }}.crt"
         owner: root
         group: root
         mode: '0644'
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['all'] }}"
+      ignore_unreachable: yes
+      become: yes
+
+    - name: Update CA certificates on all hosts
+      command: update-ca-certificates
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['all'] }}"
+      ignore_unreachable: yes
+      become: yes
+
+    - name: Restart containerd service on all hosts
+      systemd:
+        name: containerd
+        state: restarted
       delegate_to: "{{ item }}"
       loop: "{{ groups['all'] }}"
       ignore_unreachable: yes

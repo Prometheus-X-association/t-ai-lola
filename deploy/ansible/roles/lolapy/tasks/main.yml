@@ -35,7 +35,8 @@
   set_fact:
     lolapy_env_vars:
       - { key: 'FRONTEND_API_IP', value: '{{ dmz_ip }}' }
-      - { key: 'HARBOR_HOST', value: '{{ dmz_ip }}' }
+      - { key: 'FRONTEND_API_PORT', value: '{{ dmz_web_port }}' }
+      - { key: 'HARBOR_HOST', value: '{{ harbor_hostname }}' }
       - { key: 'HARBOR_USER', value: 'backend' }
       - { key: 'HARBOR_PASSWORD', value: '{{ harbor_password }}' }
       - { key: 'LOLAPY_HOST_IP', value: '{{ arch_ip }}' }

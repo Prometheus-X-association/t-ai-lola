@@ -224,7 +224,7 @@
         group: lolauser
         mode: '0700'
 
-    - name: Copy admin.conf to lolauser's kube config
+    - name: Cyop admin.conf to lolauser's kube config
       copy:
         src: /etc/kubernetes/admin.conf
         dest: /home/lolauser/.kube/config
@@ -265,5 +265,72 @@
         dest: "{{ kubernetes_kubeconfig_path }}"
         flat: yes
       run_once: yes
+    - name: Wait 1 minute
+      pause:
+        minutes: 1
+    - name: Create Kubernetes objects manifest file
+      copy:
+        dest: /tmp/k8s-setup.yml
+        content: |
+          apiVersion: v1
+          kind: PersistentVolume
+          metadata:
+            name: pv-nfs
+            annotations:
+              pv.kubernetes.io/provisioned-by: nfs.csi.k8s.io
+          spec:
+            accessModes:
+              - ReadWriteMany
+            capacity:
+              storage: 10Gi
+            csi:
+              driver: nfs.csi.k8s.io
+              volumeAttributes:
+                server: "{{ hostvars[groups['arch'][0]]['arch_ip'] }}"
+                share: "{{ hostvars[groups['arch'][0]]['nfs_export_path'] | default('/home/lolauser/nf-workdir') }}"
+              volumeHandle: "{{ hostvars[groups['arch'][0]]['arch_ip'] }}#{{ hostvars[groups['arch'][0]]['nfs_export_path'] | default('/home/lolauser/nf-workdir') }}#"
+            mountOptions:
+              - nfsvers=4.1
+            persistentVolumeReclaimPolicy: Retain
+            storageClassName: nfs-csi
+            volumeMode: Filesystem
+          ---
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: pvc-nfs-static
+            namespace: default
+          spec:
+            accessModes:
+              - ReadWriteMany
+            resources:
+              requests:
+                storage: 10Gi
+            storageClassName: nfs-csi
+            volumeName: pv-nfs
+        mode: '0644'
+
+    - name: Apply Kubernetes PV and PVC
+      command: kubectl apply -f /tmp/k8s-setup.yml
+      ignore_errors: true
+
+    - name: Clean up temporary manifest
+      file:
+        path: /tmp/k8s-setup.yml
+        state: absent
+
+    - name: Create Harbor registry secret in Kubernetes
+      shell: |
+        kubectl create secret docker-registry secure-registry \ 
+        --docker-server="{{ hostvars[groups['arch'][0]]['harbor_hostname'] }}" \
+        --docker-username="admin" \
+        --docker-password="{{ hostvars[groups['arch'][0]]['harbor_password'] }}" \
+        --docker-email="admin@gmail.com" \
+        --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Link default service account to Harbor registry secret
+      command: >
+        kubectl patch serviceaccount default
+        -p '{"imagePullSecrets": [{"name": "secure-registry"}]}'
 
   when: setup_kubernetes | default(false) | bool

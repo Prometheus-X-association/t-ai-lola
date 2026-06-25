@@ -85,3 +85,5 @@ slurm-*.err
 *.swo
 .DS_Store
 Thumbs.db
+
+certs/

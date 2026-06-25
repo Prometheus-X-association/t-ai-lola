@@ -9,7 +9,7 @@ import requests
 
 
 class sftp:
-    def __init__(self, host="171.33.77.155", user="aziz", password="password", port=2222):
+    def __init__(self, host="", user="", password="", port=2222):
         self.host = host
         self.user = user
         self.password = password

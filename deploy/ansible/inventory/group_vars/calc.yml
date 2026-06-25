@@ -1,7 +1,16 @@
-slurm_role: "both"  # can be 'client', 'server', or 'both'
-nfs_server_ip: ""
+# Orchestration Configuration
+orchestrator: kubernetes # options: kubernetes, slurm
+kubernetes_nfs_csi_version: v4.13.2
+slurm_role: "both" # options: client, server, both
 slurm_cluster_name: "cluster-lola"
+
+# NFS Storage Configuration
+nfs_server_ip: ""
 nfs_user: "lolauser"
 nfs_mount_path: "/home/lolauser/nf-workdir"
+
+# Harbor Registry Configuration
+harbor_ssl: true # options: true, false
+
+# Network & Host Configuration
 arch_ip: ""
-harbor_ssl: false
