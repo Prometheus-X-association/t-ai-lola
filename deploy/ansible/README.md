@@ -10,6 +10,82 @@ The deployment is split into three main components:
 - **Arch (Archive/Registry)**: Hosts the Harbor registry, GitLab-linked services, and the NFS server for shared storage.
 - **Calc (Calculation)**: Hosts the Slurm cluster for heavy computation and acts as an NFS client.
 
+## 💻 Compute Clusters (Slurm vs. Kubernetes)
+
+The compute environment supports two orchestrators for running workloads, which can be configured via the `orchestrator` variable in your inventory:
+- **Slurm**: A traditional HPC queue scheduler.
+- **Kubernetes**: A container orchestration cluster.
+
+### Existing Kubernetes Cluster Configuration
+If you already have a Kubernetes cluster up and running (and thus set `setup_kubernetes: false` in `arch.yml`), you do not need Ansible to build or bootstrap the cluster from scratch. However, you **must** ensure the following resources are created and configured in your existing cluster:
+
+#### 1. NFS CSI Driver
+Install the NFS CSI Driver to allow pods to mount NFS shares:
+```bash
+curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.13.2/deploy/install-driver.sh | bash -s v4.13.2 --
+```
+
+#### 2. Persistent Volume (PV) and Persistent Volume Claim (PVC)
+Deploy the PV and PVC so that containers can mount the shared NFS storage directory hosted on the Arch machine.
+
+Create a manifest `nfs-storage.yaml`:
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs
+  annotations:
+    pv.kubernetes.io/provisioned-by: nfs.csi.k8s.io
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  csi:
+    driver: nfs.csi.k8s.io
+    volumeAttributes:
+      server: "<ARCH_IP>"
+      share: "/home/lolauser/nf-workdir"
+    volumeHandle: "<ARCH_IP>#/home/lolauser/nf-workdir#"
+  mountOptions:
+    - nfsvers=4.1
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-csi
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs-static
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: nfs-csi
+  volumeName: pv-nfs
+```
+Apply it to your cluster:
+```bash
+kubectl apply -f nfs-storage.yaml
+```
+
+#### 3. Harbor Registry Secret and Linkage
+Create a Docker registry secret using your Harbor host address and credentials so pods can pull private images, then patch the default service account to automatically use it:
+```bash
+# Create the secret
+kubectl create secret docker-registry secure-registry \
+  --docker-server="<HARBOR_HOSTNAME>" \
+  --docker-username="admin" \
+  --docker-password="<HARBOR_PASSWORD>" \
+  --docker-email="admin@example.com"
+
+# Patch the default service account
+kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "secure-registry"}]}'
+```
+
 ## 📋 Prerequisites
 
 Before running the playbooks, ensure the following are installed and configured:
