@@ -143,6 +143,6 @@ app_db_fixture_prod: ## !! DELETE DATABASE + recreate database + load fixtures f
 	@docker compose exec app bin/console doctrine:schema:create
 	@docker compose exec app bin/console doctrine:fixtures:load --group=ProdFixtures --no-interaction
 	@docker compose exec app rm -rf var/cache/prod
-	@docker compose exec app chown -R www-data:www-data var/cache var/log
+	@docker compose exec app chown -R www-data:www-data var/cache
 	@docker compose exec -u www-data app bin/console cache:clear --env=prod --no-debug
 	@docker compose exec -u www-data app bin/console cache:warmup --env=prod --no-debug

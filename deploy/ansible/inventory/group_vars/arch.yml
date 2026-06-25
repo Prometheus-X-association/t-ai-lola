@@ -1,27 +1,47 @@
-git_repo_url: ""
+# Git Configuration
+git_repo_url: "https://github.com/Prometheus-X-association/t-ai-lola"
+git_repo_version: "main"
 git_repo_dest: "/opt/lola/lolapy"
+
+# Database Configuration (SQL)
+mysql_root_password: ""
+mysql_password: ""
+database_name: "lola"
+mysql_user: "lola"
+
+# Orchestration Configuration
+orchestrator: "kubernetes" # options: kubernetes, slurm
+setup_kubernetes: true # options: true, false
+kubernetes_kubeconfig_path: "kubeconfig.yml"
+slurm_role: "client" # options: client, server, both
+slurm_cluster_name: "cluster-lola"
+
+# Harbor Registry Configuration
 harbor_version: "2.13.3"
-nfs_allowed_network: "*"
-lolauser_password: ""
+harbor_hostname: ""
+harbor_password: ""
+harbor_ssl: true # options: true, false
+
+# SFTP & Cron Configuration
 cron_script_name: "sftp.sh"
 cron_job_name: "SFTP Sync"
 cron_minute: "*"
-cron_hour: "*"
 cron_day: "*"
 cron_month: "*"
 cron_weekday: "*"
-arch_ip: ""
-harbor_hostname: ""
-harbor_password: ""
-nfs_user: "lolauser"
-nfs_export_path: "/home/lolauser/nf-workdir"
-slurm_role: "client"
-dmz_ip: ""
-dmz_sftp_user: ""
+dmz_sftp_user: "lolauser"
 dmz_sftp_password: ""
 dmz_sftp_port: "2222"
-arch_sftp_user: ""
+arch_sftp_user: "lolauser"
 arch_sftp_password: ""
 arch_sftp_port: "2222"
-slurm_cluster_name: "cluster-lola"
-harbor_ssl: false
+
+# NFS Storage Configuration
+nfs_user: "lolauser"
+nfs_export_path: "/home/lolauser/nf-workdir"
+
+# System & Network Configuration
+lolauser_password: ""
+arch_ip: ""
+dmz_ip: ""
+dmz_web_port: "8080"

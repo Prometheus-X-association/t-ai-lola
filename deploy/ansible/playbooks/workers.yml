@@ -3,5 +3,8 @@
   become: yes
   
   roles:
-    - common
-    - slurm_worker
+    - { role: common, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+    - { role: docker, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+    - { role: create_user, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+    - { role: kubernetes_worker, when: setup_kubernetes | default(false) | bool }
+    - { role: slurm_worker, when: orchestrator | default('slurm') == 'slurm' }

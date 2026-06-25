@@ -38,7 +38,7 @@ services:
       - ./kubeconfig.yml:/app/kubeconfig.yml:ro
       - lolasqlite:/tmp
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./certs/:/tmp/certs:ro
+      - ./certs/:/tmp/certs
       - /home/lolauser:/home/lolauser
     command:
       - "venv/bin/huey_consumer"
@@ -59,6 +59,8 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - lolasql:/var/lib/mysql
+    ports: 
+      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DATABASE_NAME}

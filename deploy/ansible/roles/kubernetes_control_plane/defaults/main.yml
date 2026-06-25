@@ -1,0 +1,7 @@
+---
+setup_kubernetes: false
+kubernetes_version: "1.35"
+kubernetes_pod_network_cidr: "10.244.0.0/16"
+kubernetes_kubeconfig_path: "kubeconfig.yml"
+kubernetes_cni_manifest_url: "https://github.com/flannel-io/flannel/releases/download/v0.28.4/kube-flannel.yml"
+kubernetes_nfs_csi_version: v4.13.2

@@ -1,9 +1,25 @@
-- name: Clone Git repository
+- name: Clone Git repository to temp directory
   git:
     repo: "{{ git_repo_url }}"
-    dest: "{{ git_repo_dest }}"
-    version: test/devops
+    dest: /tmp/t-ai-lola_lolapy
+    version: "{{ git_repo_version | default('main') }}"
     force: yes
+
+- name: Ensure target directory exists
+  file:
+    path: "{{ git_repo_dest }}"
+    state: directory
+
+- name: Copy lolapy application folder
+  copy:
+    src: "/tmp/t-ai-lola_lolapy/app/lolapy/"
+    dest: "{{ git_repo_dest }}/"
+    remote_src: yes
+
+- name: Remove temp directory
+  file:
+    path: /tmp/t-ai-lola_lolapy
+    state: absent
 - name: Create certs directory
   file:
     path: "{{ git_repo_dest }}/certs"
@@ -15,17 +31,65 @@
     dest: "{{ git_repo_dest }}/.env"
     remote_src: yes
 
+- name: Define default environment variables
+  set_fact:
+    lolapy_env_vars:
+      - { key: 'FRONTEND_API_IP', value: '{{ dmz_ip }}' }
+      - { key: 'FRONTEND_API_PORT', value: '{{ dmz_web_port }}' }
+      - { key: 'HARBOR_HOST', value: '{{ harbor_hostname }}' }
+      - { key: 'HARBOR_USER', value: 'backend' }
+      - { key: 'HARBOR_PASSWORD', value: '{{ harbor_password }}' }
+      - { key: 'LOLAPY_HOST_IP', value: '{{ arch_ip }}' }
+
+- name: Append Slurm specific environment variables
+  set_fact:
+    lolapy_env_vars: "{{ lolapy_env_vars + [ { 'key': 'CLUSTER_TYPE', 'value': 'slurm' }, { 'key': 'CLUSTER_HOST', 'value': '{{ groups[\"calc_master\"][0] | default(\"calc-master-1\") }}' } ] }}"
+  when: orchestrator | default('slurm') == 'slurm'
+
+- name: Append Kubernetes specific environment variables
+  set_fact:
+    lolapy_env_vars: "{{ lolapy_env_vars + [ { 'key': 'CLUSTER_TYPE', 'value': 'k8s' }, { 'key': 'K8S_PVC_NAME', 'value': 'pvc-nfs-static' }, { 'key': 'K8S_NAMESPACE', 'value': 'default' } ] }}"
+  when: orchestrator | default('slurm') == 'kubernetes'
+
 - name: Set environment variables
   lineinfile:
     path: "{{ git_repo_dest }}/.env"
     regexp: '^{{ item.key }}='
     line: "{{ item.key }}={{ item.value }}"
-  with_items:
-    - { key: 'FRONTEND_API_IP', value: '{{ dmz_ip }}' }
-    - { key: 'HARBOR_HOST', value: '{{ dmz_ip }}' }
-    - { key: 'HARBOR_USER', value: 'backend' }
-    - { key: 'HARBOR_PASSWORD', value: '{{ harbor_password }}' }
-    - { key: 'LOLAPY_HOST_IP', value: '{{ arch_ip }}' }
+  with_items: "{{ lolapy_env_vars }}"
+
+- name: Copy docker-compose file for Slurm
+  copy:
+    src: "{{ git_repo_dest }}/docker-compose.slurm.yml"
+    dest: "{{ git_repo_dest }}/docker-compose.yml"
+    remote_src: yes
+  when: orchestrator | default('slurm') == 'slurm'
+
+- name: Copy docker-compose file for Kubernetes
+  copy:
+    src: "{{ git_repo_dest }}/docker-compose.k8s.yml"
+    dest: "{{ git_repo_dest }}/docker-compose.yml"
+    remote_src: yes
+  when: orchestrator | default('slurm') == 'kubernetes'
+
+- name: Copy kubeconfig file to host
+  copy:
+    src: "{{ kubernetes_kubeconfig_path | default('kubeconfig.yml') }}"
+    dest: "{{ git_repo_dest }}/kubeconfig.yml"
+    owner: lolauser
+    group: lolauser
+    mode: '0600'
+  when: orchestrator | default('slurm') == 'kubernetes'
+
+- name: Deploy Kubernetes objects manifest
+  template:
+    src: k8s-objects.yml.j2
+    dest: "{{ git_repo_dest }}/k8s-objects.yml"
+    owner: lolauser
+    group: lolauser
+    mode: '0600'
+  when: orchestrator | default('slurm') == 'kubernetes'
+
 - name: Generate private key
   command: "openssl genpkey -algorithm RSA -out private.key -pkeyopt rsa_keygen_bits:2048"
   args:
@@ -50,15 +114,24 @@
     state: present
   environment:
     DOCKER_GROUP: "{{ docker_group }}"
+    SFTP_USER: "{{ arch_sftp_user }}"
+    SFTP_PASSWORD: "{{ arch_sftp_password }}"
+    MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+    DATABASE_NAME: "{{ database_name }}"
+    MYSQL_USER: "{{ mysql_user }}"
+    MYSQL_PASSWORD: "{{ mysql_password }}"
   register: compose_output
 
 - name: change munge key permissions
   command: 
     cmd: docker exec -u root lolapy-hueyconsumer-1 chown munge:munge /etc/munge/munge.key
+  when: orchestrator | default('slurm') == 'slurm'
 
 - name: restart hueyconsumer
   command: 
     cmd: docker compose -f {{ git_repo_dest }}/docker-compose.yml restart hueyconsumer
+  environment: 
+    DOCKER_GROUP: "{{ docker_group }}"
 
 - name: prepare sftp container
   command: "docker exec lolapy-sftp-1 chown {{ dmz_sftp_user }} /home/{{ dmz_sftp_user }}/upload"
@@ -69,20 +142,42 @@
 - name: give user lola access to home
   command: "docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /home/lolauser"
 
-# - name: give access to group docker of host to lolauser inside container
-#   command: "docker exec -u root lolapy-hueyconsumer-1 usermod -aG $DOCKER_GROUP lolauser"
-#   environment:
-#     DOCKER_GROUP: "{{ docker_group }}"
     
-- name: create ssh key
-  command: "docker exec lolapy-hueyconsumer-1 ssh-keygen -q -t rsa -b 4096 -N \"\" -f /home/lolauser/.ssh/id_rsa"
+- name: Generate SSH key on the host
+  user:
+    name: lolauser
+    generate_ssh_key: yes
+    ssh_key_bits: 4096
+    ssh_key_type: rsa
+    ssh_key_file: .ssh/id_rsa
+  when: orchestrator | default('slurm') == 'slurm'
 
-- name: retrieve ssh key
-  command: "docker cp lolapy-hueyconsumer-1:/home/lolauser/.ssh/id_rsa.pub ."
+- name: Create .ssh directory inside the container
+  command: "docker exec -u root lolapy-hueyconsumer-1 mkdir -p /home/lolauser/.ssh"
+  changed_when: false
+  when: orchestrator | default('slurm') == 'slurm'
+
+- name: Copy SSH private key to container
+  command: "docker cp /home/lolauser/.ssh/id_rsa lolapy-hueyconsumer-1:/home/lolauser/.ssh/id_rsa"
+  when: orchestrator | default('slurm') == 'slurm'
+
+- name: Copy SSH public key to container
+  command: "docker cp /home/lolauser/.ssh/id_rsa.pub lolapy-hueyconsumer-1:/home/lolauser/.ssh/id_rsa.pub"
+  when: orchestrator | default('slurm') == 'slurm'
+
+- name: Set permissions on SSH files in container
+  command: "{{ item }}"
+  loop:
+    - "docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser:lolauser /home/lolauser/.ssh"
+    - "docker exec -u root lolapy-hueyconsumer-1 chmod 700 /home/lolauser/.ssh"
+    - "docker exec -u root lolapy-hueyconsumer-1 chmod 600 /home/lolauser/.ssh/id_rsa"
+    - "docker exec -u root lolapy-hueyconsumer-1 chmod 644 /home/lolauser/.ssh/id_rsa.pub"
+  when: orchestrator | default('slurm') == 'slurm'
 
 - name: Fetch ssh key
   fetch:
-    src: id_rsa.pub
+    src: /home/lolauser/.ssh/id_rsa.pub
     dest: /tmp/id_rsa.pub
     flat: yes
   run_once: yes
+  when: orchestrator | default('slurm') == 'slurm'

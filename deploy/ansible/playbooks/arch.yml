@@ -1,7 +1,3 @@
-- name: Gather facts from all hosts
-  hosts: all
-  gather_facts: yes
-  
 - name: Configure ARCH servers
   hosts: arch
   become: yes
@@ -13,5 +9,5 @@
     - cron_script
     - harbor
     - nfs_server
-    - slurm_client
+    - { role: slurm_client, when: orchestrator | default('slurm') == 'slurm' }
     - lolapy

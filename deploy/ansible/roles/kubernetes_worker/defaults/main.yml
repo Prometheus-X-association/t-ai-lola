@@ -1,0 +1,4 @@
+---
+setup_kubernetes: false
+kubernetes_version: "1.35"
+kubernetes_control_plane_host: "{{ groups['calc_master'][0] | default(groups['arch'][0]) | default('calc-master-1') }}"

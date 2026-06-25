@@ -1,9 +1,26 @@
-git_repo_url: ""
+# Git Configuration
+git_repo_url: "https://github.com/Prometheus-X-association/t-ai-lola"
+git_repo_version: "main"
 git_repo_dest: "/opt/lola/frontend"
+
+# Database Configuration (SQL)
+mysql_root_password: ""
+mysql_password: ""
+database_name: "lola"
+mysql_user: "lola"
+
+# Harbor Registry Configuration
 harbor_version: "2.13.3"
-app_fixture_command: "make app_db_fixture_dev"
 harbor_hostname: ""
 harbor_password: ""
+harbor_ssl: true # options: true, false
+
+# SFTP Configuration
+dmz_sftp_user: "lolauser"
+dmz_sftp_password: ""
+
+# Network & Host Configuration
 arch_ip: ""
-dmz_sftp_user: ""
-harbor_ssl: false
+
+# Application Configuration
+app_fixture_command: "make app_db_fixture_prod"

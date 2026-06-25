@@ -107,7 +107,7 @@ class NextflowCheckEnv():
     }}
     docker {{
         enabled = true
-        runOptions = "--network=host --user \\$(id -u):\\$(id -g)"
+        runOptions = "--network=host --user \\$(id -u):\\$(id -g) -e SURPRISE_DATA_FOLDER={app_settings.nextflow_workdir}"
         checkImage = false
     }}"""  # To know why using the --user option instead of fixOwnership = true, see https://gitlab.inria.fr/lola/back-end/lolapy/-/issues/111
             if self.cluster_type == "k8s":

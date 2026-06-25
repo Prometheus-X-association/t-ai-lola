@@ -1,12 +1,23 @@
-- name: Configure CALC servers
+- name: Configure Common CALC environment
   hosts: calc
   become: yes
-  
   roles:
-    - common
-    - docker
-    - create_user
-    - nfs_client
-    - slurm_controller
-    - slurm_worker
-    - ssh_key
+    - { role: common, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+    - { role: docker, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+    - { role: create_user, when: (orchestrator | default('slurm') == 'slurm') or (setup_kubernetes | default(false) | bool) }
+
+- name: Configure CALC Master node
+  hosts: calc_master
+  become: yes
+  roles:
+    - { role: kubernetes_control_plane, when: setup_kubernetes | default(false) | bool }
+    - { role: slurm_controller, when: orchestrator | default('slurm') == 'slurm' }
+
+- name: Configure CALC Worker nodes
+  hosts: calc_worker
+  become: yes
+  roles:
+    - { role: kubernetes_worker, when: setup_kubernetes | default(false) | bool }
+    - { role: nfs_client, when: orchestrator | default('slurm') == 'slurm' }
+    - { role: slurm_worker, when: orchestrator | default('slurm') == 'slurm' }
+    - { role: ssh_key, when: orchestrator | default('slurm') == 'slurm' }

@@ -34,29 +34,157 @@
     regexp: '^harbor_admin_password:'
     line: "harbor_admin_password: {{ harbor_password }}"
 
-- name: Comment out HTTPS port line
-  lineinfile:
-    path: /opt/harbor/harbor.yml
-    regexp: '^https:'
-    line: '# https:'
+- name: Configure Harbor HTTPS settings when SSL is enabled
+  block:
+    - name: Ensure certificate directory exists
+      file:
+        path: /data/cert
+        state: directory
+        mode: '0755'
 
-- name: Comment out HTTPS certificate path
-  replace:
-    path: /opt/harbor/harbor.yml
-    regexp: '^(\s+certificate:.*)'
-    replace: '#\1'
+    - name: Generate Harbor private key
+      command: openssl genrsa -out /data/cert/harbor.key 2048
+      args:
+        creates: /data/cert/harbor.key
 
-- name: Comment out HTTPS private key path
-  replace:
-    path: /opt/harbor/harbor.yml
-    regexp: '^(\s+private_key:.*)'
-    replace: '#\1'
+    - name: Set subjectAltName for IP
+      set_fact:
+        harbor_san: "IP:{{ harbor_hostname }}"
+      when: harbor_hostname is match('^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$')
 
-- name: Comment out HTTPS port number
-  replace:
-    path: /opt/harbor/harbor.yml
-    regexp: '^(\s+port: 443.*)'
-    replace: '#\1'
+    - name: Set subjectAltName for DNS
+      set_fact:
+        harbor_san: "DNS:{{ harbor_hostname }}"
+      when: not (harbor_hostname is match('^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$'))
+
+    - name: Generate Harbor self-signed certificate
+      command: >
+        openssl req -new -x509 -days 3650
+        -key /data/cert/harbor.key
+        -out /data/cert/harbor.crt
+        -subj "/CN={{ harbor_hostname }}"
+        -addext "subjectAltName = {{ harbor_san }}"
+      args:
+        creates: /data/cert/harbor.crt
+
+    - name: Remove http block from harbor.yml when SSL is enabled
+      replace:
+        path: /opt/harbor/harbor.yml
+        regexp: '^http:\s*\n(\s*#.*\n)*\s*port:\s*\d+.*\n'
+        replace: ''
+      when: harbor_ssl | default(true) | bool
+
+    - name: Enable HTTPS line in harbor.yml
+      lineinfile:
+        path: /opt/harbor/harbor.yml
+        regexp: '^#?\s*https:'
+        line: 'https:'
+      register: harbor_https_line
+
+    - name: Configure HTTPS port in harbor.yml
+      lineinfile:
+        path: /opt/harbor/harbor.yml
+        regexp: '^#?\s*port:\s*443'
+        line: '  port: 443'
+      register: harbor_https_port
+
+    - name: Configure HTTPS certificate path in harbor.yml
+      lineinfile:
+        path: /opt/harbor/harbor.yml
+        regexp: '^#?\s*certificate:.*'
+        line: '  certificate: /data/cert/harbor.crt'
+      register: harbor_https_cert
+
+    - name: Configure HTTPS private key path in harbor.yml
+      lineinfile:
+        path: /opt/harbor/harbor.yml
+        regexp: '^#?\s*private_key:.*'
+        line: '  private_key: /data/cert/harbor.key'
+      register: harbor_https_key
+
+    - name: Set fact to track configuration changes
+      set_fact:
+        harbor_config_changed: "{{ harbor_https_line is changed or harbor_https_port is changed or harbor_https_cert is changed or harbor_https_key is changed }}"
+
+    - name: Fetch Harbor certificate to Ansible controller
+      fetch:
+        src: /data/cert/harbor.crt
+        dest: "/tmp/harbor_certs/{{ harbor_hostname }}.crt"
+        flat: yes
+
+    - name: Ensure system CA certificates directory exists on all hosts
+      file:
+        path: "/usr/local/share/ca-certificates"
+        state: directory
+        mode: '0755'
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['all'] }}"
+      ignore_unreachable: yes
+      become: yes
+
+    - name: Copy Harbor certificate to system CA certificates on all hosts
+      copy:
+        src: "/tmp/harbor_certs/{{ harbor_hostname }}.crt"
+        dest: "/usr/local/share/ca-certificates/{{ harbor_hostname }}.crt"
+        owner: root
+        group: root
+        mode: '0644'
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['all'] }}"
+      ignore_unreachable: yes
+      become: yes
+
+    - name: Update CA certificates on all hosts
+      command: update-ca-certificates
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['all'] }}"
+      ignore_unreachable: yes
+      become: yes
+
+    - name: Restart containerd service on all hosts
+      systemd:
+        name: containerd
+        state: restarted
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['all'] }}"
+      ignore_unreachable: yes
+      become: yes
+  when: harbor_ssl | default(true) | bool
+
+- name: Comment out HTTPS settings in harbor.yml when SSL is disabled
+  block:
+    - name: Comment out HTTPS port line
+      lineinfile:
+        path: /opt/harbor/harbor.yml
+        regexp: '^https:'
+        line: '# https:'
+      register: harbor_comment_https
+
+    - name: Comment out HTTPS certificate path
+      replace:
+        path: /opt/harbor/harbor.yml
+        regexp: '^(\s+certificate:.*)'
+        replace: '#\1'
+      register: harbor_comment_cert
+
+    - name: Comment out HTTPS private key path
+      replace:
+        path: /opt/harbor/harbor.yml
+        regexp: '^(\s+private_key:.*)'
+        replace: '#\1'
+      register: harbor_comment_key
+
+    - name: Comment out HTTPS port number
+      replace:
+        path: /opt/harbor/harbor.yml
+        regexp: '^(\s+port: 443.*)'
+        replace: '#\1'
+      register: harbor_comment_port
+
+    - name: Set fact to track configuration changes when SSL is disabled
+      set_fact:
+        harbor_config_changed: "{{ harbor_comment_https is changed or harbor_comment_cert is changed or harbor_comment_key is changed or harbor_comment_port is changed }}"
+  when: not (harbor_ssl | default(true) | bool)
 
 - name: Check if Harbor is already installed
   stat:
@@ -68,9 +196,3 @@
   args:
     chdir: /opt/harbor
   when: not harbor_installed.stat.exists
-
-- name: Start Harbor if already installed
-  command: docker-compose up -d
-  args:
-    chdir: /opt/harbor
-  when: harbor_installed.stat.exists
