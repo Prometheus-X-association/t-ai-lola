@@ -1,5 +1,5 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} HashObjet {% endblock %}
+{% block title %} {% trans %}dashboard.hash_objet.index.titre{% endtrans %} {% endblock %}
 
 {% block content%}
       
@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <br><div class="accordion" id="accordionExample">
+    <br><div class="accordion hash-object-accordion" id="accordionExample">
       <div class="card">
         <div class="card-header" id="headingOne">
           <h2 class="mb-0">
@@ -19,9 +19,9 @@
             </button>
           </h2>
         </div>
-        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-          <br><div class="table-responsive"><br>
-            <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+          <div class="table-responsive hash-object-table-wrap">
+            <table class="table table-bordered dt-basic" id="table_hash_datasets" width="100%" cellspacing="0">
               <thead>
                 <tr>
                   <th>{% trans %}dashboard.hash_objet.index.th_titre{% endtrans %}</th>
@@ -52,8 +52,8 @@
         </h2>
       </div>
       <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
-        <br><div class="table-responsive"><br>
-          <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+        <div class="table-responsive hash-object-table-wrap">
+          <table class="table table-bordered dt-basic" id="table_hash_scenarios" width="100%" cellspacing="0">
             <thead> 
                 <tr>
                 <th>{% trans %}dashboard.hash_objet.index.th_template_scenario{% endtrans %}</th>
@@ -86,8 +86,8 @@
           </h2>
       </div>
       <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
-        <br><div class="table-responsive">
-          <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+        <div class="table-responsive hash-object-table-wrap">
+          <table class="table table-bordered dt-basic" id="table_hash_users" width="100%" cellspacing="0">
             <thead>
               <tr>
                 <th>{% trans %}dashboard.hash_objet.index.th_nom{% endtrans %} </th>
@@ -100,13 +100,13 @@
             <tbody>
                 {% for user in users %}
                 <tr>
-                  <td> {{user.firstname}} </td>
                   <td> {{user.lastname}} </td>
+                  <td> {{user.firstname}} </td>
                   <td> {{user.email}} </td>
                   <td>
                        {{ user.roles|map(role => user.getRole(role))|join(', ', '') }}
                             {% if user.upgradeRequest %}
-                                <span class="badge badge-info float-right">Upgrade</span>
+                                <span class="badge badge-info float-right">{% trans %}dashboard.hash_objet.index.upgrade{% endtrans %}</span>
                             {% endif %}</td> 
                   <td> {{user.hash}} </td>
                 </tr>
@@ -126,8 +126,8 @@
       </h2>
     </div>
     <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
-      <br><div class="table-responsive">
-        <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+      <div class="table-responsive hash-object-table-wrap">
+        <table class="table table-bordered dt-basic" id="table_hash_tags" width="100%" cellspacing="0">
           <thead>
             <tr>
               <th>{% trans %}dashboard.hash_objet.index.th_template_scenario{% endtrans %}</th> 
@@ -162,8 +162,8 @@
       </h2>
     </div>
     <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
-      <br><div class="table-responsive">
-        <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+      <div class="table-responsive hash-object-table-wrap">
+        <table class="table table-bordered dt-basic" id="table_hash_runs" width="100%" cellspacing="0">
           <thead>
             <tr>
               <th>{% trans %}dashboard.hash_objet.index.th_template_scenario{% endtrans %}</th> 
@@ -198,8 +198,8 @@
       </h2>
     </div>
     <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordionExample">
-      <br><div class="table-responsive">
-        <table class="table table-bordered dt-basic" id="table_datasets" width="98%" cellspacing="0">
+      <div class="table-responsive hash-object-table-wrap">
+        <table class="table table-bordered dt-basic" id="table_hash_algorithms" width="100%" cellspacing="0">
           <thead>
             <tr>
               <th>{% trans %}dashboard.hash_objet.index.th_algorithm{% endtrans %}</th>

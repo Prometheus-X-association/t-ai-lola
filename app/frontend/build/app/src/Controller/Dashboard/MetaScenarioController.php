@@ -48,7 +48,7 @@ class MetaScenarioController extends LolaController {
             $this->getEm()->persist($metaScenario);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "Le méta-scénario a bien été ajouté");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.metascenario.controller.flash_metascenario_ajoute'));
             return $this->redirectToRoute('dashboard_metascenario_index');
         }
 
@@ -78,9 +78,9 @@ class MetaScenarioController extends LolaController {
             $this->getEm()->persist($tag);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "Le tag a bien été ajouté");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.metascenario.controller.flash_tag_ajoute'));
         } else {
-            $this->addFlash("error", "Le nom du tag est requis");
+            $this->addFlash('error', $this->getTranslator()->trans('dashboard.metascenario.controller.flash_tag_requis'));
         }
         return $this->redirectToRoute('dashboard_metascenario_index');
     }
@@ -95,7 +95,7 @@ class MetaScenarioController extends LolaController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->flush();
 
-            $this->addFlash("success", "Le méta-scénario a bien été modifié");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.metascenario.controller.flash_metascenario_modifie'));
             return $this->redirectToRoute('dashboard_metascenario_index');
         }
 
@@ -155,7 +155,7 @@ class MetaScenarioController extends LolaController {
         $this->getEm()->remove($tag);
         $this->getEm()->flush();
 
-        $this->addFlash("success", "Le tag a été supprimé");
+        $this->addFlash('success', $this->getTranslator()->trans('dashboard.metascenario.controller.flash_tag_supprime'));
         return $this->redirectToRoute("dashboard_metascenario_index");
     }
 
@@ -185,8 +185,8 @@ class MetaScenarioController extends LolaController {
 
         // check if the tag and dataset exist and if user has permission to view the dataset
         if (!$tag || !$dataset || !$this->getUser()->hasPermission($dataset, $this->getDatasetRepository())) {
-            $this->addFlash("danger", "Une erreur est survenue lors de la préparation du scénario");
-            $this->redirectToRoute("dashboard_metascenario_index");
+            $this->addFlash('error', $this->getTranslator()->trans('dashboard.metascenario.controller.flash_prepare_error'));
+            return $this->redirectToRoute("dashboard_metascenario_index");
         }
 
         $dataSession = $this->getSession()?->get('create_scenario', []);

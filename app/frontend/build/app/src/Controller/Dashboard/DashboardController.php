@@ -56,15 +56,15 @@ class DashboardController extends LolaController
         if (User::isUserProfil($userProfil)) {
             $this->getUser()->setUpgradeRequest(strtoupper($userProfil));
             $this->getEm()->flush();
-            $this->addFlash('success', 'Votre demande à bien été prise en compte.');
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.controller.flash_upgrade_request_success'));
 
             try {
                 $mailer->upgradeRequest($this->getUser());
             } catch (TransportException) {
-                $this->addFlash('warning', "L'envoi de la notification par email à échoué.");
+                $this->addFlash('warning', $this->getTranslator()->trans('dashboard.controller.flash_upgrade_email_error'));
             }
         } else {
-            $this->addFlash('error', 'Une erreur est survenue lors de la prise en compte de votre demande.');
+            $this->addFlash('error', $this->getTranslator()->trans('dashboard.controller.flash_upgrade_request_error'));
         }
         return $this->render('dashboard/upgrade.html.twig');
     }

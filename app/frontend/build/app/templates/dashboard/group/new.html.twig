@@ -16,7 +16,7 @@
 
     <div class="row">
         <div class="col-8">
-            {{ include('dashboard/group/_form.html.twig', {'button_label': 'dashboard.groupe.new.btn_ajouter'|trans}) }}
+            {{ include('dashboard/group/_form.html.twig', {'button_label': 'dashboard.groupe.new.btn_ajouter'}) }}
         </div>
         <div class="col-4">
             <div class="card">
@@ -25,7 +25,7 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{% trans %}dashboard.groupe.new.aide_titre{% endtrans %}</h5>
-                    {% trans %}dashboard.groupe.new.aide{% endtrans %}
+                    {{ 'dashboard.groupe.new.aide'|trans|raw }}
                 </div>
             </div>                
         </div>

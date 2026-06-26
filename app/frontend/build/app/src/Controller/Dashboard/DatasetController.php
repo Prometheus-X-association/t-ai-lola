@@ -112,12 +112,12 @@ class DatasetController extends LolaController {
 
 //            $this->addFlash("success", "Le dataset " . $dataset->getName() . " a été partagé avec le groupe " . $group->getName());
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_partage_ajout', [
-                'dataset_name' => $dataset->getName(),
-                'group_name' => $group->getName()
+                '%dataset_name%' => $dataset->getName(),
+                '%group_name%' => $group->getName(),
             ]));
         }
         else {
-            $this->addFlash("danger", $this->getTranslator()->trans('dashboard.dataset.controller.flash_partage_erreur'));
+            $this->addFlash("error", $this->getTranslator()->trans('dashboard.dataset.controller.flash_partage_erreur'));
         }
         return $this->redirectToRoute("dashboard_dataset_index");
     }
@@ -131,12 +131,12 @@ class DatasetController extends LolaController {
             $this->getEm()->flush();
 
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_partage_suppression', [
-                'dataset_name' => $dataset->getName(),
-                'group_name' => $group->getName()
+                '%dataset_name%' => $dataset->getName(),
+                '%group_name%' => $group->getName(),
             ]));
         }
         else {
-            $this->addFlash("danger", $this->getTranslator()->trans('dashboard.dataset.controller.flash_partage_erreur'));
+            $this->addFlash("error", $this->getTranslator()->trans('dashboard.dataset.controller.flash_partage_erreur'));
         }
 
         return $this->redirectToRoute("dashboard_dataset_index");

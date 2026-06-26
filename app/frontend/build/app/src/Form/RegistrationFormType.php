@@ -23,40 +23,39 @@ class RegistrationFormType extends AbstractType {
     {
         $builder
                 ->add('firstname', TextType::class, [
-                    'label' => 'Prénom',
+                    'label' => 'public.form.firstname',
                     'constraints' => [
-                        new NotBlank(message: 'Le prénom est requis.'),
+                        new NotBlank(message: 'public.form.firstname_required'),
                     ],
                 ])
                 ->add('lastname', TextType::class, [
-                    'label' => 'Nom',
+                    'label' => 'public.form.lastname',
                     'constraints' => [
-                        new NotBlank(message: 'Le nom est requis.'),
+                        new NotBlank(message: 'public.form.lastname_required'),
                     ],
                 ])
                 ->add('agreeTerms', CheckboxType::class, [
-                    'label' => 'Condition d\'utilisation',
+                    'label' => 'public.form.agree_terms',
                     'mapped' => false,
                     'constraints' => [
-                        new IsTrue(message: 'Vous devez accepter les conditions.'),
+                        new IsTrue(message: 'public.form.agree_terms_required'),
                     ],
                 ])
                 ->add('plainPassword', PasswordType::class, [
                     'mapped' => false,
-                    'label' => 'Mot de passe',
+                    'label' => 'public.form.password',
                     'constraints' => [
-                        new NotBlank(message: 'Veuillez entrer un mot de passe'),
+                        new NotBlank(message: 'public.form.password_required'),
                         new Length(
                             min: 6,
-                            minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères',
+                            minMessage: 'public.form.password_min_length',
                             max: 50
                         ),
                     ],
                 ])
-                // add the login field only if we create a new account (not in edit mode)
                 ->addEventListener(
-                        FormEvents::PRE_SET_DATA,
-                        array($this, 'onPreSetData')
+                    FormEvents::PRE_SET_DATA,
+                    [$this, 'onPreSetData']
                 )
         ;
     }
@@ -69,20 +68,20 @@ class RegistrationFormType extends AbstractType {
         // check if the object is "new"
         if (!$user || !$user->getId()) {
             $form->add('captcha', CaptchaType::class, [
-                    'label' => 'Captcha'
-                ]);
+                'label' => 'public.form.captcha',
+            ]);
+
             $form->add('email', EmailType::class, [
-                'label' => 'Email',
+                'label' => 'public.form.email',
                 'constraints' => [
-                    new NotBlank(message: 'L\'email est requis.'),
+                    new NotBlank(message: 'public.form.email_required'),
                 ],
             ]);
         } else {
-            $form->add('email', null, [
+            $form->add('email', EmailType::class, [
                 'disabled' => true,
-                'label' => 'Email'
-                    ]
-            );
+                'label' => 'public.form.email',
+            ]);
         }
     }
 

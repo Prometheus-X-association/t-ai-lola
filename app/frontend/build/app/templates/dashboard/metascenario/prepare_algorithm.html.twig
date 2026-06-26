@@ -1,11 +1,11 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Scenario configuration - switchable algorithms {% endblock %}
+{% block title %} {% trans %}dashboard.scenario.creation_etape2.titre_switchable_algorithms{% endtrans %} {% endblock %}
 
 {% block content %}
     <div class="breadcrumb d-flex justify-content-between align-items-center">
         <div class="d-flex">
             <i class="fas fa-database fa-2x sidebar-brand-icon"></i>
-            <span class="text-monospace sidebar-brand-text ml-4 mt-1">Scenario configuration - switchable algorithms</span>
+            <span class="text-monospace sidebar-brand-text ml-4 mt-1">{% trans %}dashboard.scenario.creation_etape2.titre_switchable_algorithms{% endtrans %}</span>
         </div>
         <span class="float-right">
             <a class="btn btn-sm btn-primary" href="{{ path("dashboard_metascenario_index") }}">
@@ -21,7 +21,7 @@
                 <div class="card-header">
                     <div class="col mr-2">
                         <div class="text-md font-weight-bold text-primary text-uppercase mb-1">
-                            Algorithms
+                            {% trans %}dashboard.scenario.creation_etape2.algorithms{% endtrans %}
                         </div>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                                     </div>
                                 </div>
                                 <span id="scenario_algorithms_selection" class="d-none">
-                                    aucun algo
+                                    {% trans %}dashboard.scenario.creation_etape2.aucun_algo{% endtrans %}
                                 </span>
                             </div>
                         </div>
@@ -54,7 +54,7 @@
                 <div class="card-header">
                     <div class="col mr-2">
                         <div class="text-md font-weight-bold text-info text-uppercase mb-1">
-                            Algorithms parameters
+                            {% trans %}dashboard.scenario.creation_etape2.algorithms_parameters{% endtrans %}
                         </div>
                     </div>
                 </div>
@@ -155,7 +155,7 @@
                                         </div>
                                         <div class="col">
                                             <button type="button" class="btn btn-primary btn-block btn_selection_algorithm" data-nfvariable="${switchableAlgorithms[algorithm].nf_variable}" id="btn_selection_algorithm_${switchableAlgorithms[algorithm].nf_variable}">
-                                                Select algorithm
+                                                {{ 'dashboard.scenario.creation_etape2.select_algorithm'|trans|e('js') }}
                                             </button>
                                         </div>
                                     </div>
@@ -177,14 +177,14 @@
                                 <span id="selected_algorithm_${switchableAlgorithms[algorithm].nf_variable}">
                                     <span class="pr-3"><i class="fas fa-angle-double-down"> </i></span>
                                     <i class="far fa-circle fa-lg"> </i>
-                                    No algorithm selected
+                                    {{ 'dashboard.scenario.creation_etape2.no_algorithm_selected'|trans|e('js') }}
                                 </span>
                             </button>
                             <a href="#" id="btn_readme_modal_${switchableAlgorithms[algorithm].nf_variable}"
                                 data-toggle="modal"
                                 data-target="#modal_algorithm_readme_${switchableAlgorithms[algorithm].nf_variable}"
                                 class="btn btn-outline-info float-right disabled">
-                                Readme
+                                {{ 'dashboard.scenario.creation_etape2.readme'|trans|e('js') }}
                             </a>
                         </div>
                         <div id="collapse_${switchableAlgorithms[algorithm].nf_variable}" class="collapse" aria-labelledby="heading_${switchableAlgorithms[algorithm].nf_variable}" data-parent="#accordionExample">
@@ -200,7 +200,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h4 class="modal-title">
-                                        <strong><em>Readme</em></strong>
+                                        <strong><em>{{ 'dashboard.scenario.creation_etape2.readme'|trans|e('js') }}</em></strong>
                                         <blockquote class="subtitle"><h6> ${switchableAlgorithms[algorithm].name} </h6></blockquote>
                                     </h4>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -213,7 +213,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.index.modal_btn_fermer{% endtrans %}</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.creation_etape2.btn_fermer{% endtrans %}</button>
                                 </div>
                             </div>
                         </div>
@@ -360,10 +360,10 @@
                         // Show the actual response in the UI for debugging
                         $("#algorithm_detail_" + nf_variable).html(
                             `<div class="alert alert-danger">
-                                <strong>Error loading parameters!</strong><br>
-                                Status: ${xhr.status}<br>
+                                <strong>{{ 'dashboard.scenario.creation_etape2.error_loading_parameters'|trans|e('js') }}</strong><br>
+                                {{ 'dashboard.scenario.creation_etape2.status'|trans|e('js') }}: ${xhr.status}<br>
                                 <details>
-                                    <summary>Click to see response</summary>
+                                    <summary>{{ 'dashboard.scenario.creation_etape2.click_to_see_response'|trans|e('js') }}</summary>
                                     <pre>${xhr.responseText}</pre>
                                 </details>
                             </div>`
@@ -380,7 +380,7 @@
                 error: error,
                 response: xhr.responseText
             });
-            alert("Failed to load switchable algorithms. Please check the console for details.");
+            alert("{{ 'dashboard.scenario.creation_etape2.error_loading_switchable_algorithms'|trans|e('js') }}");
         }
     });
 

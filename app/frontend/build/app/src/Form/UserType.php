@@ -21,24 +21,25 @@ class UserType extends AbstractType {
     {
         $builder
                 ->add('email', EmailType::class, [
-                    'label' => 'Email',
+                    'label' => 'dashboard.user.edit.email',
                     'constraints' => [
-                        new NotBlank(message: 'L\'email est requis.'),
+                        new NotBlank(message: 'dashboard.user.form.email_required'),
                     ],
                 ])
                 ->add('firstname', TextType::class, [
-                    'label' => 'Prénom',
+                    'label' => 'dashboard.user.edit.prenom',
                     'constraints' => [
-                        new NotBlank(message: 'Le prénom est requis.'),
+                        new NotBlank(message: 'dashboard.user.form.firstname_required'),
                     ],
                 ])
                 ->add('lastname', TextType::class, [
-                    'label' => 'Nom',
+                    'label' => 'dashboard.user.edit.nom',
                     'constraints' => [
-                        new NotBlank(message: 'Le nom est requis.'),
+                        new NotBlank(message: 'dashboard.user.form.lastname_required'),
                     ],
                 ])
                 ->add('roles', ChoiceType::class, [
+                    'label' => 'dashboard.user.edit.liste_roles',
                     "multiple" => true,
                     "choices" => array_flip(User::$listRoles)
                 ])

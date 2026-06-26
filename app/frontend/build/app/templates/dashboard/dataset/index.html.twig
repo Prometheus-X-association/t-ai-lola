@@ -1,5 +1,5 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Datasets {% endblock %}
+{% block title %} {% trans %}dashboard.dataset.index.titre_page{% endtrans %} {% endblock %}
 
 {% block content %}
 
@@ -29,7 +29,7 @@
                 <tr>
                     <th scope="col">{% trans %}dashboard.dataset.index.th_partage{% endtrans %}</th>
                     <th scope="col">{% trans %}dashboard.dataset.index.th_etat{% endtrans %}</th>
-                    <th scope="col">{% trans %}dashboard.dataset.index.th_titre{% endtrans %} <sup><span class="badge badge-info">Size</span></sup> </th>
+                    <th scope="col">{% trans %}dashboard.dataset.index.th_titre{% endtrans %} <sup><span class="badge badge-info">{% trans %}dashboard.dataset.index.size{% endtrans %}</span></sup> </th>
                     <th scope="col">{% trans %}dashboard.dataset.index.th_date_creation{% endtrans %}</th>
                     <th scope="col">{% trans %}dashboard.dataset.index.th_derniere_modification{% endtrans %}</th>
                     <th scope="col">&nbsp;</th>
@@ -88,7 +88,7 @@
                             <td data-sort="{{ dataset.createdAt|date('U') }}">{{ dataset.createdAt | date('d-m-Y H:i:s') }}</td>
 {#                          <br /><i>({{ dataset.createdBy }})</i>#}
                         {% else %}
-                            <td><i>non défini</i></td>
+                            <td><i>{{ 'dashboard.dataset.index.modale_aide'|trans|raw }}</i></td>
                         {% endif %}
                         </td>
                         {% if dataset.updatedBy is not null and dataset.updatedAt is not null%}
@@ -270,6 +270,136 @@
                         </div>
                     </div>
                     <!-- modal partage -->
+
+                    {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                        <!-- modal dataset -->
+                        <div class="modal fade dataset-detail-modal"
+                             tabindex="-1"
+                             role="dialog"
+                             id="modal_dataset_detail_{{ dataset.hash }}">
+                            <div class="modal-dialog modal-xl" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">
+                                            <strong><em>{{ dataset.name }}</em></strong>
+                                        </h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {% set datasetDescription = dataset.description|default('')|striptags|trim %}
+                                        {% set statusBadgeClass = 'secondary' %}
+                                        {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                                            {% set statusBadgeClass = 'success' %}
+                                        {% elseif dataset.status == constant('\\App\\Entity\\Dataset::STATUS_PROCESSING') %}
+                                            {% set statusBadgeClass = 'warning' %}
+                                        {% elseif dataset.status == constant('\\App\\Entity\\Dataset::STATUS_ERROR') or dataset.status == constant('\\App\\Entity\\Dataset::STATUS_DELETING') %}
+                                            {% set statusBadgeClass = 'danger' %}
+                                        {% endif %}
+
+                                        <div class="dataset-detail-hero">
+                                            <div>
+                                                <span class="dataset-detail-kicker">{% trans %}dashboard.dataset.index.details_overview{% endtrans %}</span>
+                                                <p class="dataset-detail-description">
+                                                    {% if datasetDescription is not empty %}
+                                                        {{ datasetDescription }}
+                                                    {% else %}
+                                                        {% trans %}dashboard.dataset.index.details_description_empty{% endtrans %}
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="dataset-detail-status">
+                                                <span class="badge badge-{{ statusBadgeClass }}">{{ dataset.status }}</span>
+                                                <span class="dataset-detail-size">{{ dataset.size }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="dataset-detail-grid">
+                                            <div class="dataset-detail-item">
+                                                <span>{% trans %}dashboard.dataset.index.th_titre{% endtrans %}</span>
+                                                <strong>{{ dataset.name }}</strong>
+                                            </div>
+                                            <div class="dataset-detail-item">
+                                                <span>{% trans %}dashboard.dataset.index.date_creation{% endtrans %}</span>
+                                                <strong>
+                                                    {% if dataset.createdAt is not null %}
+                                                        {{ dataset.createdAt | date('d-m-Y H:i:s') }}
+                                                    {% else %}
+                                                        {% trans %}dashboard.dataset.index.non_defini{% endtrans %}
+                                                    {% endif %}
+                                                </strong>
+                                            </div>
+                                            <div class="dataset-detail-item">
+                                                <span>{% trans %}dashboard.dataset.index.th_derniere_modification{% endtrans %}</span>
+                                                <strong>
+                                                    {% if dataset.updatedAt is not null %}
+                                                        {{ dataset.updatedAt | date('d-m-Y H:i:s') }}
+                                                    {% else %}
+                                                        {% trans %}dashboard.dataset.index.non_defini{% endtrans %}
+                                                    {% endif %}
+                                                </strong>
+                                            </div>
+                                            <div class="dataset-detail-item">
+                                                <span>{% trans %}dashboard.dataset.index.th_partage{% endtrans %}</span>
+                                                <strong>
+                                                    {{ dataset.isShared ? 'dashboard.dataset.index.partage_global'|trans : 'dashboard.dataset.index.partage_non'|trans }}
+                                                    {% if dataset.groups | length > 0 %}
+                                                        <small>{{ 'dashboard.dataset.index.partage_groupe'|trans }}</small>
+                                                    {% endif %}
+                                                </strong>
+                                            </div>
+                                            <div class="dataset-detail-item">
+                                                <span>{% trans %}dashboard.dataset.index.details_type{% endtrans %}</span>
+                                                <strong>{{ dataset.type|default('file') }}</strong>
+                                            </div>
+                                            <div class="dataset-detail-item">
+                                                <span>{% trans %}dashboard.dataset.index.details_hash{% endtrans %}</span>
+                                                <strong class="text-monospace">{{ dataset.hash }}</strong>
+                                            </div>
+                                        </div>
+
+                                        <div class="dataset-detail-section">
+                                            <h5>{% trans %}dashboard.dataset.index.details_recent_activity{% endtrans %}</h5>
+                                            <div class="dataset-log-list">
+                                                {% for token, datasetLogs in dataset.logs %}
+                                                    {% set detailLogState = 'START' %}
+                                                    {% set detailLogDate = datasetLogs.START is defined ? datasetLogs.START : null %}
+                                                    {% if datasetLogs.COMPLETE is defined %}
+                                                        {% set detailLogState = 'COMPLETE' %}
+                                                        {% set detailLogDate = datasetLogs.COMPLETE %}
+                                                    {% elseif datasetLogs.ERROR is defined %}
+                                                        {% set detailLogState = 'ERROR' %}
+                                                        {% set detailLogDate = datasetLogs.ERROR %}
+                                                    {% endif %}
+                                                    {% set detailLogBadge = detailLogState == 'COMPLETE' ? 'success' : (detailLogState == 'ERROR' ? 'danger' : 'secondary') %}
+                                                    <div class="dataset-log-item">
+                                                        <span class="badge badge-{{ detailLogBadge }}">{{ detailLogState }}</span>
+                                                        <span class="dataset-log-token">{{ token }}</span>
+                                                        <span class="dataset-log-date">
+                                                            {% if detailLogDate is not null %}
+                                                                {{ detailLogDate | date('d-m-Y H:i:s') }}
+                                                            {% else %}
+                                                                {% trans %}dashboard.dataset.index.non_defini{% endtrans %}
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="dataset-log-empty">
+                                                        {% trans %}dashboard.dataset.index.details_no_logs{% endtrans %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.dataset.index.btn_fermer{% endtrans %}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- modal dataset -->
+                    {% endif %}
 
                 {% else %}
                     <tr>

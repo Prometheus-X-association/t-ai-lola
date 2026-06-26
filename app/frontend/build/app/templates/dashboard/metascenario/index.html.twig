@@ -1,5 +1,5 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Méta-scénarios {% endblock %}
+{% block title %} {% trans %}dashboard.metascenario.index.titre{% endtrans %} {% endblock %}
 
 {% block content %}
 
@@ -37,7 +37,7 @@
                 {% for metaScenario in metaScenarios %}
                     <tr>
                         <td>
-                            {{ metaScenario.name }} <span class="badge badge-primary badge-pill float-right">{{ metaScenario.isPublic ? 'Public' : 'Privé'}}</span>
+                            {{ metaScenario.name }} <span class="badge badge-primary badge-pill float-right">{{ metaScenario.isPublic ? 'dashboard.metascenario.index.public'|trans : 'dashboard.metascenario.index.private'|trans }}</span>
                             {% if metaScenario.urlRepository %}
                                 <hr />
                                 <a href="{{ metaScenario.urlRepositoryNoToken }}" target="_blank">
@@ -48,17 +48,17 @@
                         <td>
                             {% for tag in metaScenario.tags %}
                                 {% if tag.status == constant('\\App\\Entity\\Tag::STATUS_PROCESSING') %}
-                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_tag1{{ tag.hash }}" title="Le tag est en cours de création, cliquer pour plus d'information." class="text-warning">
+                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_tag1{{ tag.hash }}" title="{% trans %}dashboard.metascenario.index.tooltip_processing{% endtrans %}" class="text-warning">
                                         <i class="fas fa-info-circle"> </i>
                                         {{ tag.name }}
                                     </a>
                                 {% elseif tag.status == constant('\\App\\Entity\\Tag::STATUS_ERROR') %}
-                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_tag2{{ tag.hash }}" title="Le tag est en erreur, cliquer pour plus d'information." class="text-danger">
+                                    <a href="#" data-toggle="modal" data-target="#modal_suppression_tag2{{ tag.hash }}" title="{% trans %}dashboard.metascenario.index.tooltip_error{% endtrans %}" class="text-danger">
                                         <i class="fas fa-times-circle"> </i>
                                         {{ tag.name }}
                                     </a>
                                 {% elseif tag.status == constant('\\App\\Entity\\Tag::STATUS_AVAILABLE') %}
-                                    <a class="text-success" role="button" data-toggle="tooltip" data-placement="right" title="Le tag est disponible.">
+                                    <a class="text-success" role="button" data-toggle="tooltip" data-placement="right" title="{% trans %}dashboard.metascenario.index.tooltip_available{% endtrans %}">
                                         <i class="fas fa-info-circle"> </i>
                                         {{ tag.name }}
                                     </a>
@@ -321,7 +321,9 @@
 
             {% else %}
                 <tr>
-                    <td colspan="4"><em>{% trans %}dashboard.metascenario.index.aucun_scenario{% endtrans %}</em></td>
+                    <td colspan="5">
+                        <em>{% trans %}dashboard.metascenario.index.aucun_scenario{% endtrans %}</em>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

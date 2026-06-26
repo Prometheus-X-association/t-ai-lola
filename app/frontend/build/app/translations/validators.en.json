@@ -1,0 +1,12 @@
+{
+    "public": {
+        "form": {
+            "firstname_required": "First name is required.",
+            "lastname_required": "Last name is required.",
+            "agree_terms_required": "You must accept the terms of use.",
+            "password_required": "Please enter a password.",
+            "password_min_length": "The password must contain at least {{ limit }} characters.",
+            "email_required": "Email is required."
+        }
+    }
+}

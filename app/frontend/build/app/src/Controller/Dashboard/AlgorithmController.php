@@ -34,7 +34,7 @@ class AlgorithmController extends LolaController {
             $this->getEm()->persist($algorithm);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "L'algorithme a bien été ajouté");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.algorithm.controller.flash_algorithm_ajoute'));
             return $this->redirectToRoute('dashboard_algorithm_index');
         }
 
@@ -52,7 +52,7 @@ class AlgorithmController extends LolaController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->flush();
 
-            $this->addFlash("success", "L'algorithme a bien été modifié");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.algorithm.controller.flash_algorithm_modifie'));
             return $this->redirectToRoute('dashboard_algorithm_index');
         }
 
@@ -68,7 +68,7 @@ class AlgorithmController extends LolaController {
             $this->getEm()->remove($algorithm);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "L'algorithme a bien été supprimée");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.algorithm.controller.flash_algorithm_supprime'));
         }
 
         return $this->redirectToRoute('dashboard_algorithm_index');
@@ -104,9 +104,9 @@ class AlgorithmController extends LolaController {
             $this->getEm()->persist($algorithmVersion);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "La version de l'algorithm a bien été ajouté");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.algorithm.controller.flash_version_ajoute'));
         } else {
-            $this->addFlash("error", "La version de l'algorithm est requis");
+            $this->addFlash('error', $this->getTranslator()->trans('dashboard.algorithm.controller.flash_version_requise'));
         }
         return $this->redirectToRoute('dashboard_algorithm_index');
     }
@@ -128,7 +128,7 @@ class AlgorithmController extends LolaController {
         $this->getEm()->remove($version);
         $this->getEm()->flush();
 
-        $this->addFlash("success", "La version a été supprimée");
+        $this->addFlash('success', $this->getTranslator()->trans('dashboard.algorithm.controller.flash_version_supprimee'));
         return $this->redirectToRoute("dashboard_algorithm_index");
     }
     

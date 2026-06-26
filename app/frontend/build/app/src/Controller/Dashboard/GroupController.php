@@ -34,7 +34,7 @@ class GroupController extends LolaController {
             $this->getEm()->persist($group);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "Le groupe a bien été ajouté");
+            $this->addFlash('success', $translator->trans('dashboard.groupe.controller.flash_groupe_ajoute'));
             return $this->redirectToRoute('dashboard_group_index');
         }
 
@@ -53,7 +53,7 @@ class GroupController extends LolaController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->flush();
 
-            $this->addFlash("success", "Le groupe a bien été modifié");
+            $this->addFlash('success', $translator->trans('dashboard.groupe.controller.flash_groupe_modifie'));
             return $this->redirectToRoute('dashboard_group_index');
         }
 
@@ -70,7 +70,7 @@ class GroupController extends LolaController {
             $this->getEm()->remove($group);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "Le groupe a bien été supprimé");
+            $this->addFlash('success',$translator->trans('dashboard.groupe.controller.flash_groupe_supprime'));
         }
 
         return $this->redirectToRoute('dashboard_group_index');

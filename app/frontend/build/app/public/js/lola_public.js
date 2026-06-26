@@ -1,18 +1,24 @@
 $(document).ready(function () {
+    let loginWrap = $("#login-wrap");
 
-    $("#tab-1").click(function() {
-       $("#login-wrap").css("min-height","520px");
+    function updateAuthTabs() {
+        let registerIsActive = $("#tab-2").prop("checked");
+
+        $("#tab-login").attr("aria-selected", registerIsActive ? "false" : "true");
+        $("#tab-register").attr("aria-selected", registerIsActive ? "true" : "false");
+        $("#login-panel").attr("aria-hidden", registerIsActive ? "true" : "false");
+        $("#register-panel").attr("aria-hidden", registerIsActive ? "false" : "true");
+    }
+
+    if ($("#formHasError").val() === "1") {
+        loginWrap.addClass("register-has-error");
+        $("#tab-2").prop("checked", true);
+    }
+
+    $("#tab-1, #tab-2").on("change click", function() {
+       loginWrap.css("min-height", "");
+       updateAuthTabs();
     });
 
-    $("#tab-2").click(function() {
-       let size = $("#formHasError").val() === "1" ? "850px" : "760px";
-       $("#login-wrap").css("min-height", size);
-    });
-
+    updateAuthTabs();
 });
-
-// Registering error on form
-if( $("#formHasError").val() === "1" ) {
-    $("#tab-2").click();
-    $("#login-wrap").css("min-height","850px");
-}

@@ -1,5 +1,7 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Utilisateurs {% endblock %}
+{% block title %}
+    {% trans %}dashboard.user.index.titre_page{% endtrans %}
+{% endblock %}
 
 {% block content %}
 
@@ -29,20 +31,24 @@
                     <th scope="col">{% trans %}dashboard.user.index.th_date_creation{% endtrans %}</th>
                     <th scope="col">{% trans %}dashboard.user.index.th_date_modification{% endtrans %}</th>
                     <th scope="col">{% trans %}dashboard.user.index.th_derniere_connexion{% endtrans %}</th>
-                    {% if is_granted('ROLE_ADMIN_SISR') %} <th scope="col">Details</th> {% endif %}
+                    {% if is_granted('ROLE_ADMIN_SISR') %}
+                        <th scope="col">{% trans %}dashboard.user.index.th_details{% endtrans %}</th>
+                    {% endif %}
                     <th>&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
                 {% for user in listUsers %}
                     <tr>
-                        <td>{{ user.firstname }}</td>
                         <td>{{ user.lastname }}</td>
+                        <td>{{ user.firstname }}</td>
                         <td>{{ user.email }}</td>
                         <td>
                             {{ user.roles|map(role => user.getRole(role))|join(', ', '') }}
                             {% if user.upgradeRequest %}
-                                <span class="badge badge-info float-right">Upgrade</span>
+                                <span class="badge badge-info float-right">
+                                    {% trans %}dashboard.user.index.upgrade{% endtrans %}
+                                </span>
                             {% endif %}
                         </td>
                         <td>{% for group in user.groups %}
@@ -73,7 +79,9 @@
                         </td>
                         {% if is_granted('ROLE_ADMIN_SISR') %}
                             <td>
-                                <a href="#" id="link_modal_user_token" data-toggle="modal" data-target="#modal_user_detail_{{ user.id }}">Tokens</a>
+                                <a href="#" id="link_modal_user_token" data-toggle="modal" data-target="#modal_user_detail_{{ user.id }}">
+                                    {% trans %}dashboard.user.index.tokens{% endtrans %}
+                                </a>
                             </td>
                         {% endif %}
                         <td>
@@ -88,22 +96,22 @@
                                 {% endif %} 
                                 {%  if user.hasRole('ROLE_ADMIN') %}
                                     <a href="{{ path("dashboard_user_toggle_admin", {'id': user.id}) }}" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-medal"></i> Admin
+                                        <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
                                     </a>
                                 {% else %}
                                     <a href="{{ path("dashboard_user_toggle_admin", {'id': user.id}) }}" class="btn btn-outline-warning btn-sm">
-                                        <i class="fas fa-medal"></i> Admin
+                                        <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
                                     </a>
                                 {% endif %}                                
                             {% endif %}
                             {% if is_granted('ROLE_ADMIN_SISR') %}
                                 {%  if user.hasRole('ROLE_ADMIN_SISR') %}
                                     <a href="{{ path("dashboard_user_toggle_admin_sisr", {'id': user.id}) }}" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-crown"></i> SISR
+                                        <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
                                     </a>
                                 {% else %}
                                     <a href="{{ path("dashboard_user_toggle_admin_sisr", {'id': user.id}) }}" class="btn btn-outline-warning btn-sm">
-                                        <i class="fas fa-crown"></i> SISR
+                                        <i class="fas fa-crown"></i> {% trans %}dashboard.user.index.sisr{% endtrans %}
                                     </a>
                                 {% endif %}                                 
                             {% endif %}
@@ -127,12 +135,15 @@
                                 <div class="modal-body">
                                     <div class="card mt-3">
                                         <div class="card-body">
-                                            <u><strong>Hash</strong></u> : <pre>{{ user.hash }}</pre>
+                                            <u><strong>{% trans %}dashboard.user.index.th_hash{% endtrans %}</strong></u> :
+                                            <pre>{{ user.hash }}</pre>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        {% trans %}dashboard.user.index.modal_maj_profile_fermer{% endtrans %}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -160,7 +171,7 @@
                                                 <strong>{{ user.firstname }} {{ user.lastname }}</strong><br />
                                                 {{ user.getProfil() }} 
                                                 <i class="fas fa-long-arrow-alt-right"></i> 
-                                                {{ user.getProfilFromRole(user.getUpgradeRequest()) ?? "Pas de profil Lola" }} 
+                                                {{ user.getProfilFromRole(user.getUpgradeRequest()) ?? 'dashboard.user.index.pas_profil_lola'|trans }}
                                             </span>
                                             <span class="btn float-right">
                                                 {% if user.getProfilFromRole(user.getUpgradeRequest()) %}
@@ -173,7 +184,8 @@
                                                     </a>
                                                 {% else %}
                                                     <a class="btn btn-secondary disabled" href="#">
-                                                        Erreur <i class="fas fa-exclamation-circle"></i>
+                                                        {% trans %}dashboard.user.index.erreur{% endtrans %}
+                                                        <i class="fas fa-exclamation-circle"></i>
                                                     </a>
                                                 {% endif %}
                                             </span>
@@ -198,7 +210,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h4 class="modal-title">
-                                        <strong><em>Infos</em></strong>
+                                        <strong><em>{% trans %}dashboard.user.index.infos{% endtrans %}</em></strong>
                                     </h4>                                    
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
@@ -213,7 +225,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.index.modal_btn_fermer{% endtrans %}</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.user.index.modal_maj_profile_fermer{% endtrans %}</button>
                                 </div>
                             </div>
                         </div>

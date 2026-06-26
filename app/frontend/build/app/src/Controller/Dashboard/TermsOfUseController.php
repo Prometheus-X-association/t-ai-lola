@@ -34,7 +34,7 @@ class TermsOfUseController extends LolaController {
             $this->getEm()->persist($termsOfUse);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "La nouvelle charte a bien été ajoutée");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.termsofuse.controller.flash_termsofuse_ajoute'));
             return $this->redirectToRoute('dashboard_termsofuse_index');
         }
 
@@ -53,7 +53,7 @@ class TermsOfUseController extends LolaController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->flush();
 
-            $this->addFlash("success", "La charte a bien été modifiée");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.termsofuse.controller.flash_termsofuse_modifie'));
             return $this->redirectToRoute('dashboard_termsofuse_index');
         }
 
@@ -70,7 +70,7 @@ class TermsOfUseController extends LolaController {
             $this->getEm()->remove($termsOfUse);
             $this->getEm()->flush();
 
-            $this->addFlash("success", "La charte a bien été supprimée");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.termsofuse.controller.flash_termsofuse_supprime'));
         }
 
         return $this->redirectToRoute('dashboard_termsofuse_index');
@@ -90,7 +90,7 @@ class TermsOfUseController extends LolaController {
         // Users must agree to the new terms of use before access to dashboard
         $this->getUserRepository()->updateTermsOfUseReset();
 
-        $this->addFlash("success", "La nouvelle charte à bien été prise en compte");
+        $this->addFlash('success', $this->getTranslator()->trans('dashboard.termsofuse.controller.flash_termsofuse_active'));
         return $this->redirectToRoute("dashboard_termsofuse_index");
     }
 

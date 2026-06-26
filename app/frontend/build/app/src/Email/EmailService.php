@@ -4,6 +4,7 @@ namespace App\Email;
 
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\User;
 
 class EmailService {
@@ -14,11 +15,23 @@ class EmailService {
     protected $mailer;
 
     /**
-     * @param MailerInterface $mailer
+     * @var TranslatorInterface $translator
      */
-    public function __construct(MailerInterface $mailer)
+    protected $translator;
+
+    /**
+     * @var string $lolaTeamEmail
+     */
+    protected $lolaTeamEmail;
+
+    /**
+     * @param MailerInterface $mailer
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(MailerInterface $mailer, TranslatorInterface $translator)
     {
         $this->mailer = $mailer;
+        $this->translator = $translator;
         $this->lolaTeamEmail = $_ENV["LOLA_TEAM_EMAIL"];
     }
 
@@ -32,8 +45,8 @@ class EmailService {
         $email = (new Email())
                 ->from($this->lolaTeamEmail)
                 ->to($user->getEmail())
-                ->subject("LOLA : votre demande de mise à jour")
-                ->html("<p>La demande de mise à niveau de votre compte LOLA a été acceptée.</p>");
+                ->subject($this->translator->trans('email.upgrade_accepted.subject'))
+                ->html($this->translator->trans('email.upgrade_accepted.html'));
 
         $this->mailer->send($email);
     }
@@ -48,8 +61,8 @@ class EmailService {
         $email = (new Email())
                 ->from($this->lolaTeamEmail)
                 ->to($user->getEmail())
-                ->subject("LOLA : votre demande de mise à jour")
-                ->html("<p>La demande de mise à niveau de votre compte LOLA a été refusée.</p>");
+                ->subject($this->translator->trans('email.upgrade_denied.subject'))
+                ->html($this->translator->trans('email.upgrade_denied.html'));
 
         $this->mailer->send($email);
     }
@@ -62,11 +75,15 @@ class EmailService {
     public function upgradeRequest(User $user): void
     {
         $email = (new Email())
-                ->from($this->lolaTeamEmail)
-                ->to($this->lolaTeamEmail)
-                ->subject("LOLA : Demande d'upgrade")
-                ->html("<p>Demande d'upgrade vers le profil <strong>" . User::getProfilFromRole($user->getUpgradeRequest()) . "</strong> "
-                . "de " . $user->getFirstname() . " " . $user->getLastname() . " (" . $user->getEmail() . ").");
+            ->from($this->lolaTeamEmail)
+            ->to($this->lolaTeamEmail)
+            ->subject($this->translator->trans('email.upgrade_request.subject'))
+            ->html($this->translator->trans('email.upgrade_request.html', [
+                'profile' => htmlspecialchars(User::getProfilFromRole($user->getUpgradeRequest()), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+                'firstname' => htmlspecialchars((string) $user->getFirstname(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+                'lastname' => htmlspecialchars((string) $user->getLastname(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+                'email' => htmlspecialchars((string) $user->getEmail(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+            ]));
 
         $this->mailer->send($email);
     }

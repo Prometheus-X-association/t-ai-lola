@@ -49,7 +49,7 @@ $(document).ready(function () {
     $(".format_json").each(function () {
         let data = $(this).html();
         if( isJsonString(data) ) {
-            $(this).html(syntaxHighlight(JSON.stringify($.parseJSON(data), undefined, 4)));
+            $(this).html(syntaxHighlight(JSON.stringify(JSON.parse(data), undefined, 4)));
         }       
     });
 
@@ -84,33 +84,6 @@ $(document).ready(function () {
             return '<span class="' + cls + '">' + match + '</span>';
         });
     }
-
-    $("a[id^='button_modal_dataset_']").on('click', function () {
-
-        let hash = $(this).attr('data-hash');
-
-        $.ajax({
-            url: window.location.origin + "/dashboard/dataset/ajax/show/" + hash,
-            method: "GET",
-            dataType: "json",
-            complete: function (data) {
-                if (isJsonString(data.responseText)) { 
-                    let datasetStat = $.parseJSON(data.responseText);
-                    if (datasetStat !== null) {
-                        $("#modal_dataset_detail_totalstatements_" + hash).html("<strong>Statements</strong> : " + datasetStat.statements_number);
-                        $("#modal_dataset_detail_uniqueactor_" + hash).html("<strong>Nombre d'acteurs</strong> : " + datasetStat.unique_actor_number);
-                        $("#modal_dataset_detail_uniqueverb_" + hash).html("<strong>Nombre d'objets</strong> : " + datasetStat.unique_verbs_number);
-                            $("#modal_dataset_detail_statements_" + hash).html(syntaxHighlight(JSON.stringify(datasetStat.statements, undefined, 4)));
-                    } else {
-                        $("#modal_dataset_detail_totalstatements_" + hash).html("<strong>-</strong>");
-                        $("#modal_dataset_detail_uniqueactor_" + hash).html("<strong>-</strong>");
-                        $("#modal_dataset_detail_uniqueverb_" + hash).html("<strong>-</strong>");
-                        $("#modal_dataset_detail_statements_" + hash).html("Une erreur est survenue lors de la récupération des données. API non disponible.");
-                    }
-                }
-            }
-        })
-    });
 
     // selection of the dataset before the execution of a scenario
     // and check if the button to next step must be activated

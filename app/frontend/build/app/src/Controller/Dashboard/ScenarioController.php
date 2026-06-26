@@ -78,8 +78,8 @@ class ScenarioController extends LolaController {
 
         // check if the tag and dataset exist and if user has permission to view the dataset
         if (!$tag || !$dataset || !$this->getUser()->hasPermission($dataset, $this->getDatasetRepository())) {
-            $this->addFlash("danger", "Une erreur est survenue lors de la préparation du scénario");
-            $this->redirectToRoute("dashboard_metascenario_index");
+            $this->addFlash('error', $this->getTranslator()->trans('dashboard.scenario.controller.flash_prepare_error'));            
+            return $this->redirectToRoute("dashboard_scenario_index");
         }
 
         $dataSession = $this->getSession()?->get('edit_scenario', []);
@@ -157,7 +157,7 @@ class ScenarioController extends LolaController {
         $this->getEm()->persist($scenario);
         $this->getEm()->flush();
 
-        $this->addFlash("success", "Le scénario a bien été modifié");
+        $this->addFlash('success', $this->getTranslator()->trans('dashboard.scenario.controller.flash_scenario_modifie'));
     }
 
     /**
@@ -178,7 +178,7 @@ class ScenarioController extends LolaController {
         $this->getEm()->persist($scenario);
         $this->getEm()->flush();
 
-        $this->addFlash("success", "Le scénario a bien été créé");
+        $this->addFlash('success', $this->getTranslator()->trans('dashboard.scenario.controller.flash_scenario_cree'));
 
         return $scenario;
     }

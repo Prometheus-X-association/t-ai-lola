@@ -13,18 +13,22 @@ class AlgorithmType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
+            ->add('name', null, [
+                'label' => 'dashboard.algorithm.form.title',
+            ])
             ->add('description', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class, [
+                'label' => 'dashboard.algorithm.form.description',    
                 'required' => false,
             ])
             ->add('urlRepository', \Symfony\Component\Form\Extension\Core\Type\TextType::class, [
+                'label' => 'dashboard.algorithm.form.repository_url',    
                 'required' => true,
             ])
             ->add('isPublic', ChoiceType::class, [
-                'label' => 'Should this algorithm be visible to other users?',
+                'label' => 'dashboard.algorithm.form.visibility',
                 'choices' => [
-                    'Yes' => true,
-                    'No' => false,
+                    'dashboard.common.yes' => true,
+                    'dashboard.common.no' => false,
                 ],
                 'expanded' => true,
                 'multiple' => false,

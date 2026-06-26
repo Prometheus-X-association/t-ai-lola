@@ -25,7 +25,7 @@ class UserChecker implements UserCheckerInterface {
         }
         
         if (!$user->isActive()) {
-            throw new CustomUserMessageAuthenticationException("Votre compte est inactif.");
+            throw new CustomUserMessageAuthenticationException('login.account_inactive');
         }
     }
 

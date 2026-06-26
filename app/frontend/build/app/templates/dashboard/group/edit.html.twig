@@ -1,5 +1,5 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Groupes - Modification {% endblock %}
+{% block title %} {% trans %}dashboard.groupe.edit.title{% endtrans %} {% endblock %}
 
 {% block content %}
 
@@ -16,7 +16,7 @@
 
     <div class="row">
         <div class="col-8">
-            {{ include('dashboard/group/_form.html.twig', {'button_label': 'dashboard.groupe.edit.btn_modifier'|trans}) }}
+            {{ include('dashboard/group/_form.html.twig', {'button_label': 'dashboard.groupe.edit.btn_modifier'}) }}
         </div>
         <div class="col-4">
             <div class="card">
@@ -25,7 +25,7 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{% trans %}dashboard.groupe.edit.modification_group{% endtrans %}</h5>
-                    {% trans %}dashboard.groupe.edit.aide{% endtrans %}
+                    {{ 'dashboard.groupe.edit.aide'|trans|raw }}
                 </div>
             </div>                
         </div>

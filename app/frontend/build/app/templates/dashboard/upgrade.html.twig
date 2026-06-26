@@ -1,4 +1,7 @@
 {% extends "dashboard/base/layout.html.twig" %}
+{% block title %}
+    {% trans %}dashboard.upgrade.index.titre_page{% endtrans %}
+{% endblock %}
 
 {% block content %}
 
@@ -7,7 +10,9 @@
     </div>
     {% if app.user.upgradeRequest is not null and app.user.upgradeRequest is defined %}
         <div class="alert alert-warning ml-4 mr-4">
-            Vous avez une demande de mise à niveau (<em>{{ app.user.getProfilFromRole(app.user.upgradeRequest) }}</em>) en attente.
+            {{ 'dashboard.upgrade.index.demande_en_attente'|trans({
+                'profile': app.user.getProfilFromRole(app.user.upgradeRequest)
+            }) }}
         </div>
     {% endif %}
     <div class="row">
@@ -18,14 +23,14 @@
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-header">
                     <div class="col mr-2">
-                        {% trans %}dashboard.upgrade.index.profil2{% endtrans %}
+                        {{ 'dashboard.upgrade.index.profil2'|trans|raw }}
                     </div>
                 </div>
                 <div class="card-body d-flex flex-column">
                     <div class="row no-gutters align-items-center">
                         <div class="mb-0 text-gray-800 w-100">
                             <ul class="list-group list-group-flush">
-                                {% trans %}dashboard.upgrade.index.profil2_details{% endtrans %}
+                                {{ 'dashboard.upgrade.index.profil2_details'|trans|raw }}
                             </ul>
                         </div>      
                     </div>
@@ -41,14 +46,14 @@
             <div class="card border-left-info shadow h-100 py-2">
                 <div class="card-header">
                     <div class="col mr-2">
-                        {% trans %}dashboard.upgrade.index.profil3{% endtrans %}
+                        {{ 'dashboard.upgrade.index.profil3'|trans|raw }}
                     </div>
                 </div>                
                 <div class="card-body d-flex flex-column">
                     <div class="row no-gutters align-items-center">
                         <div class="mb-0 text-gray-800 w-100">
                             <ul class="list-group list-group-flush">
-                                {% trans %}dashboard.upgrade.index.profil3_details{% endtrans %}
+                                {{ 'dashboard.upgrade.index.profil3_details'|trans|raw }}
                             </ul>
                         </div>                        
                     </div>
@@ -65,14 +70,14 @@
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-header">
                     <div class="col mr-2">
-                        {% trans %}dashboard.upgrade.index.profil4{% endtrans %}
+                        {{ 'dashboard.upgrade.index.profil4'|trans|raw }}
                     </div>
                 </div>                
                 <div class="card-body d-flex flex-column">
                     <div class="row no-gutters align-items-center">
                         <div class="mb-0 text-gray-800 w-100">
                             <ul class="list-group list-group-flush">
-                                {% trans %}dashboard.upgrade.index.profil4_details{% endtrans %}
+                                {{ 'dashboard.upgrade.index.profil4_details'|trans|raw }}
                             </ul>
                         </div>                        
                     </div>
@@ -89,14 +94,14 @@
             <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-header">
                     <div class="col mr-2">
-                        {% trans %}dashboard.upgrade.index.profil5{% endtrans %}
+                        {{ 'dashboard.upgrade.index.profil5'|trans|raw }}
                     </div>
                 </div>                 
                 <div class="card-body d-flex flex-column">
                     <div class="row no-gutters align-items-center">
                         <div class="mb-0 text-gray-800 w-100">
                             <ul class="list-group list-group-flush">
-                                {% trans %}dashboard.upgrade.index.profil5_details{% endtrans %}
+                                {{ 'dashboard.upgrade.index.profil5_details'|trans|raw }}
                             </ul>
                         </div>                        
                     </div>

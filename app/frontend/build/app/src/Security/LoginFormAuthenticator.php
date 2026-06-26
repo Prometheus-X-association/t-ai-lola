@@ -45,7 +45,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator{
                     ->findOneBy(['email' => $userIdentifier]);
 
                 if (!$user) {
-                    throw new CustomUserMessageAuthenticationException('Le compte n\'existe pas.');
+                    throw new CustomUserMessageAuthenticationException('login.account_not_found');
                 }
 
                 return $user;

@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AdminController!{% endblock %}
+{% block title %}
+    {% trans %}admin.index.title{% endtrans %}
+{% endblock %}
 
 {% block body %}
 <style>
@@ -9,12 +11,19 @@
 </style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <h1>{% trans %}admin.index.heading{% endtrans %}</h1>
 
-    This friendly message is coming from:
+    <p>{% trans %}admin.index.message{% endtrans %}</p>
+
     <ul>
-        <li>Your controller at <code><a href="{{ '/var/www/lola/src/Controller/AdminController.php'|file_link(0) }}">src/Controller/AdminController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/var/www/lola/templates/admin/index.html.twig'|file_link(0) }}">templates/admin/index.html.twig</a></code></li>
+        <li>
+            {% trans %}admin.index.controller_file{% endtrans %} :
+            <code>src/Controller/AdminController.php</code>
+        </li>
+        <li>
+            {% trans %}admin.index.template_file{% endtrans %} :
+            <code>templates/admin/index.html.twig</code>
+        </li>
     </ul>
 </div>
 {% endblock %}

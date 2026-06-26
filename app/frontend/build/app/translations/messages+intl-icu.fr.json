@@ -1,0 +1,728 @@
+{
+    "dashboard": {
+        "accueil": {
+            "titre": "Accueil",
+            "connexion": "Connexion",
+            "inscription": "S'inscrire",
+            "btn_dashboard": "Accéder au tableau de bord",
+            "btn_compte": "Mon compte",
+            "btn_connexion": "Se connecter",
+            "btn_deconnexion": "Se déconnecter",
+            "btn_lola_site_publique": "Accéder au site public Lola",
+            "password": "Mot de passe",
+            "email": "Email",
+            "prenom": "Prénom",
+            "nom": "Nom",
+            "institution": "Institution",
+            "fonction": "Fonction",
+            "voir_conditions": "Voir les conditions d'utilisations",
+            "accepter_conditions": "Accepter les conditions d'utilisations"
+        },
+        "titre": {
+            "accueil": "Accueil"
+        },
+        "navbar": {
+            "groupes": "Groupes",
+            "deconnexion": "Déconnexion",
+            "lolapy_inaccessible": "Le service Lolapy est indisponible.",
+            "lola_public_site": "Site public Lola",
+            "lolapy_configuration": "Configuration de Lolapy"
+        },
+        "left_menu": {
+            "dashboard": "Tableau de bord",
+            "dataset": "Jeux de données",
+            "scenario": "Scénarios",
+            "run": "Exécutions",
+            "algorithme": "Algorithmes",
+            "template-scenario": "Modèles de scénario",
+            "groupes": "Groupes",
+            "utilisateurs": "Utilisateurs",
+            "lolapy_logs": "Logs Lolapy",
+            "demande_nouveau_profil": "Demander une mise à jour de profil",
+            "voir_les_profils": "Voir les profils",
+            "termsofuse": "Conditions d'utilisation",
+            "hash_objet": "Hash / Objet",
+            "admin": "Administration"
+        },
+        "controller": {
+            "flash_upgrade_request_success": "Votre demande a bien été prise en compte.",
+            "flash_upgrade_email_error": "L'envoi de la notification par email a échoué.",
+            "flash_upgrade_request_error": "Une erreur est survenue lors de la prise en compte de votre demande."
+        },
+        "runs": {
+            "index": {
+                "titre_page": "Exécutions",
+                "titre": "Liste des exécutions",
+                "btn_liste_scenario": "Liste des scénarios",
+                "btn_details": "Détails",
+                "btn_resultats": "Résultats",
+                "btn_fermer": "Fermer",
+                "th_date_creation": "Date de création",
+                "th_status": "Statut",
+                "th_scenario": "Scénario",
+                "th_tag": "Tag",
+                "th_dataset": "Jeu de données",
+                "th_aucun_run": "Aucune exécution disponible",
+                "non_defini": "Non défini"
+            },
+            "details": {
+                "titre": "Détails d'une exécution",
+                "btn_retour": "Retour à la liste des exécutions",
+                "user": "Utilisateur",
+                "date": "Date",
+                "hash": "Hash de l'exécution",
+                "status": "Statut",
+                "scenario": "Scénario",
+                "tag": "Tag",
+                "dataset": "Jeu de données",
+                "parametre": "Paramètres",
+                "public": "Public",
+                "private": "Privé",
+                "telecharger_resultats": "Télécharger les résultats",
+                "resultats_non_disponible": "Résultats non disponibles",
+                "maj": "Mise à jour",
+                "log_run": "Logs de l'exécution",
+                "statistiques": "Statistiques",
+                "datetime": "Date et heure",
+                "type": "Type",
+                "nomProcess": "Nom du processus",
+                "evenement": "Événement",
+                "erreur": "Erreur",
+                "config_lolapy": "Configuration de Lolapy",
+                "rapport_erreur": "Rapport d'erreur",
+                "btn_fermer": "Fermer",
+                "execution_en_cours": "Exécution en cours, en attente des logs..."
+            }
+        },
+        "algorithm": {
+            "index": {
+                "titre": "Algorithmes",
+                "titre_2": "Administration des algorithmes",
+                "btn_ajout_algorithm": "Ajouter un algorithme",
+                "th_nom": "Nom",
+                "th_version": "Version",
+                "th_date_creation": "Date de création",
+                "th_derniere_modification": "Dernière modification",
+                "public": "Public",
+                "private": "Privé",
+                "tooltip_processing": "Cette version est en cours de création. Cliquez pour plus d'informations",
+                "tooltip_error": "Cette version contient une erreur. Cliquez pour plus d'informations.",
+                "tooltip_available": "Cette version est disponible.",
+                "non_defini": "non défini",
+                "btn_modifier": "Modifier",
+                "btn_ajout_version": "Ajouter une version",
+                "btn_make_private": "Rendre privé",
+                "btn_make_public": "Rendre visible aux utilisateurs",
+                "version_nom": "Nom de la version",
+                "version_help": "Saisissez le nom de la version à créer. Il peut s'agir d'une branche Git, d'un tag ou d'une release, selon la manière dont le dépôt de l'algorithme est géré.",
+                "delete_version": "Supprimer la version",
+                "from_algorithm": "de l'algorithme",
+                "modal_processing_message": "Cette version est en cours de création. Vous pouvez la supprimer si le processus est bloqué ou si elle n'est plus nécessaire.",
+                "btn_cancel": "Annuler",
+                "btn_confirm_delete": "Confirmer",
+                "modal_error_message": "Cette version n'a pas pu être créée correctement. Vous pouvez la supprimer et essayer de l'ajouter à nouveau après avoir corrigé le problème.",
+                "aucun_algorithm": "Aucun algorithme trouvé"
+            },
+            "new": {
+                "titre": "Algorithme - Ajout",
+                "titre_2": "Créer un nouvel algorithme",
+                "btn_retour": "Retour à la liste des algorithmes",
+                "card_header": "Algorithme",
+                "card_title": "Création d'un algorithme",
+                "card_text_1": "Cette page permet d'ajouter un nouvel algorithme à la plateforme. Vous devez renseigner son titre, l'URL de son dépôt, sa description et sa visibilité.",
+                "card_text_2": "L'URL du dépôt doit pointer vers le code source de l'algorithme. La description doit expliquer brièvement ce que fait l'algorithme, à quoi il sert, ainsi que toute information utile pour les utilisateurs qui pourraient avoir besoin de l'exécuter ou de l'inclure dans un scénario.",
+                "card_text_3": "Si l'algorithme est visible par les autres utilisateurs, ils pourront le voir dans l'application et l'utiliser selon leurs droits d'accès."
+            },
+            "edit": {
+                "titre": "Algorithme - Modification",
+                "titre_2": "Modifier l'algorithme",
+                "btn_retour": "Retour à la liste des algorithmes",
+                "card_header": "Algorithme",
+                "card_title": "Modification d'un algorithme",
+                "card_text_1": "Cette page permet de modifier les principales informations d'un algorithme. Vous pouvez modifier son titre, l'URL de son dépôt, sa description et sa visibilité.",
+                "card_text_2": "La description doit expliquer brièvement ce que fait l'algorithme, à quoi il sert, ainsi que toute information utile pour les utilisateurs qui pourraient avoir besoin de l'exécuter ou de l'inclure dans un scénario."
+            },
+            "form": {
+                "title": "Titre",
+                "repository_url": "URL du dépôt",
+                "description": "Description",
+                "visibility": "Cet algorithme doit-il être visible par les autres utilisateurs ?",
+                "btn_add": "Ajouter",
+                "btn_update": "Mettre à jour",
+                "btn_save": "Enregistrer"
+            },
+            "controller": {
+                "flash_algorithm_ajoute": "L'algorithme a bien été ajouté",
+                "flash_algorithm_modifie": "L'algorithme a bien été modifié",
+                "flash_algorithm_supprime": "L'algorithme a bien été supprimé",
+                "flash_version_ajoute": "La version de l'algorithme a bien été ajoutée",
+                "flash_version_requise": "Le nom de la version de l'algorithme est requis",
+                "flash_version_supprimee": "La version a bien été supprimée"
+            }
+        },
+        "apilog": {
+            "index": {
+                "titre": "Logs Lolapy",
+                "titre_2": "Consultation des logs de l'API Lola (Lolapy)",
+                "btn_api_documentation": "Documentation de l'API Frontend",
+                "th_datetime": "Date et heure",
+                "th_type": "Type",
+                "th_message": "Message",
+                "th_details": "Détails",
+                "aucun_log": "Aucun log"
+            }
+        },
+        "user": {
+            "index": {
+                "titre_page": "Utilisateurs",
+                "titre": "Administration des utilisateurs",
+                "btn_demande_maj": "Voir les demandes de mise à jour de profil",
+                "th_nom": "Nom",
+                "th_prenom": "Prénom",
+                "th_email": "Email",
+                "th_profile": "Profil",
+                "th_groupe": "Groupes",
+                "th_date_creation": "Date de création",
+                "th_date_modification": "Date de modification",
+                "th_derniere_connexion": "Dernière connexion",
+                "th_hash": "Hash",
+                "th_details": "Détails",
+                "tokens": "Tokens",
+                "upgrade": "Mise à niveau",
+                "admin": "Admin",
+                "sisr": "SISR",
+                "infos": "Informations",
+                "erreur": "Erreur",
+                "pas_profil_lola": "Pas de profil Lola",
+                "non_defini": "Non défini",
+                "modifier": "Modifier",
+                "desactiver": "Désactiver",
+                "activer": "Activer",
+                "modal_maj_profile_titre": "Liste des demandes de mise à jour de profil",
+                "modal_maj_profile_pas_maj": "Aucune demande de mise à jour",
+                "modal_maj_profile_refuser": "Refuser",
+                "modal_maj_profile_accepter": "Autoriser",
+                "modal_maj_profile_fermer": "Fermer"
+            },
+            "edit": {
+                "titre": "Modifier",
+                "modifier_utilisateur": "Modifier l'utilisateur",
+                "nom": "Nom",
+                "prenom": "Prénom",
+                "email": "Email",
+                "liste_roles": "Liste des profils",
+                "btn_modifier": "Enregistrer les modifications",
+                "btn_retour": "Retour à la liste des utilisateurs",
+                "aide_titre": "Modification d'un utilisateur",
+                "aide": "<p class=\"card-text\">Modifiez les informations d'un utilisateur.<br>Ces informations pourront être modifiées plus tard.<br>La modification d'un utilisateur ne crée pas de conflit avec les permissions, les jeux de données, les exécutions ou les scénarios déjà existants.</p>"
+            },
+            "form": {
+                "email_required": "L'email est requis.",
+                "firstname_required": "Le prénom est requis.",
+                "lastname_required": "Le nom est requis."
+            },
+            "controller": {
+                "flash_user_modifie": "L'utilisateur a bien été modifié",
+                "flash_upgrade_validation_success": "La mise à jour du compte a bien été effectuée. L'utilisateur a été notifié par email.",
+                "flash_upgrade_deny_success": "La demande de mise à niveau a bien été refusée. L'utilisateur a été notifié par email.",
+                "flash_upgrade_email_error": "L'envoi de la notification par email a échoué.",
+                "flash_upgrade_error": "Une erreur est survenue lors de la mise à jour du compte."
+            }
+        },
+        "groupe": {
+            "index": {
+                "titre": "Administration des groupes",
+                "titre_page": "Groupes",
+                "btn_ajout_groupe": "Ajouter un groupe",
+                "btn_modifier": "Modifier",
+                "btn_supprimer": "Supprimer",
+                "th_nom": "Nom du groupe",
+                "th_description": "Description",
+                "th_utilisateur": "Utilisateurs",
+                "th_date_creation": "Date de création",
+                "th_date_modification": "Date de modification",
+                "non_defini": "Non défini",
+                "hash": "Hash",
+                "aucun_groupe": "Aucun groupe",
+                "btn_fermer": "Fermer"
+            },
+            "new": {
+                "title": "Création d'un groupe",
+                "btn_retour": "Retour à la liste des groupes",
+                "btn_ajouter": "Créer le groupe",
+                "aide_titre": "Créer un nouveau groupe",
+                "aide": "<p class=\"card-text\">Le nom du groupe est requis. Tous les utilisateurs de Lola sont présents dans la liste des utilisateurs.</p><hr><h5 class=\"card-title\">Informations sur les groupes</h5><p class=\"card-text\">Les groupes permettent de partager des jeux de données avec plusieurs utilisateurs de Lola.</p>"
+            },
+            "edit": {
+                "title": "Modification d'un groupe",
+                "modification_group": "Modification du groupe",
+                "btn_retour": "Retour à la liste des groupes",
+                "btn_modifier": "Valider les modifications",
+                "aide_titre": "Modification d'un groupe",
+                "aide": "<p class=\"card-text\">Le nom du groupe est requis. Tous les utilisateurs de Lola sont présents dans la liste des utilisateurs.</p><hr><h5 class=\"card-title\">Informations sur les groupes</h5><p class=\"card-text\">Les groupes permettent de partager des jeux de données avec plusieurs utilisateurs de Lola.</p>"            },
+            "form": {
+                "nom": "Nom du groupe",
+                "description": "Description",
+                "liste_utilisateurs": "Liste des utilisateurs",
+                "btn_enregistrer": "Enregistrer"
+            },
+            "controller": {
+                "flash_groupe_ajoute": "Le groupe a bien été ajouté",
+                "flash_groupe_modifie": "Le groupe a bien été modifié",
+                "flash_groupe_supprime": "Le groupe a bien été supprimé"
+            }
+        },
+        "upgrade": {
+            "index": {
+                "titre_page": "Mise à niveau du profil",
+                "titre": "Mise à niveau de votre profil",
+                "btn_register": "Demander ce profil",
+                "demande_en_attente": "Vous avez une demande de mise à niveau ({profile}) en attente.",
+                "profil2": "<div class=\"text-xs font-weight-bold text-primary text-uppercase mb-1\">Jeux de données et scénarios</div><div class=\"h5 mb-0 font-weight-bold text-gray-800\">Profil 2</div>",
+                "profil2_details": "<li class=\"list-group-item\">Créer des jeux de données privés</li><li class=\"list-group-item\">Voir les jeux de données partagés</li><li class=\"list-group-item\">Voir les scénarios publics</li><li class=\"list-group-item\">Exécuter des scénarios</li>",
+                "profil3": "<div class=\"text-xs font-weight-bold text-info text-uppercase mb-1\">Jeux de données partagés</div><div class=\"h5 mb-0 font-weight-bold text-gray-800\">Profil 3</div>",
+                "profil3_details": "<li class=\"list-group-item\"><strong>Profil 2 +</strong></li><li class=\"list-group-item\">Partager des jeux de données</li><li class=\"list-group-item\">Voir les statistiques d’utilisation des jeux de données</li>",
+                "profil4": "<div class=\"text-xs font-weight-bold text-success text-uppercase mb-1\">Scénarios et algorithmes</div><div class=\"h5 mb-0 font-weight-bold text-gray-800\">Profil 4</div>",
+                "profil4_details": "<li class=\"list-group-item\"><strong>Profil 3 +</strong></li><li class=\"list-group-item\">Créer des scénarios</li><li class=\"list-group-item\">Voir les scénarios</li><li class=\"list-group-item\">Créer des algorithmes</li><li class=\"list-group-item\">Voir les algorithmes</li>",
+                "profil5": "<div class=\"text-xs font-weight-bold text-warning text-uppercase mb-1\">Modèles de scénario</div><div class=\"h5 mb-0 font-weight-bold text-gray-800\">Profil 5</div>",
+                "profil5_details": "<li class=\"list-group-item\"><strong>Profil 4 +</strong></li><li class=\"list-group-item\">Créer des modèles de scénario</li>"
+            }
+        },
+        "metascenario": {
+            "index": {
+                "titre": "Administration des template-scenarios",
+                "btn_ajout_metascenario": "Ajouter un template-scenario",
+                "btn_visualiser_run": "Voir les exécutions",
+                "btn_create_scenario": "Créer un scénario",
+                "btn_create_tag": "Créer un nouveau tag",
+                "btn_public_partage": "Partager publiquement",
+                "btn_public_partage_supprimer": "Supprimer le partage public",
+                "btn_modifier": "Modifier",
+                "btn_activer": "Activer",
+                "btn_desactiver": "Désactiver",
+                "btn_confirmer": "Confirmer la suppression",
+                "btn_annuler": "Annuler",
+                "public": "Public",
+                "private": "Privé",
+                "th_titre": "Titre",
+                "th_tags": "Tags",
+                "th_url": "URL du dépôt",
+                "th_description": "Description",
+                "th_date_creation": "Date de création",
+                "th_date_modification": "Date de modification",
+                "non_defini": "Non défini",
+                "aucun_scenario": "Aucun template-scenario disponible",
+                "tooltip_processing": "Le tag est en cours de création. Cliquez pour plus d'informations.",
+                "tooltip_error": "Le tag contient une erreur. Cliquez pour plus d'informations.",
+                "tooltip_available": "Le tag est disponible.",
+                "modal_titre": "Création d'un tag pour le template-scenario",
+                "modal_git_tag": "Tag Git",
+                "modal_git_tag_doc": "Tag du dépôt Git. La plateforme clonera le dépôt Git avec ce tag.",
+                "modal_variant": "Variante",
+                "modal_variant_doc": "TODO",
+                "modal_version": "Version",
+                "modal_version_doc": "Nom de la version affichée sur la plateforme Lola. Il peut être identique au tag Git.",
+                "modal_btn_ajouter": "Créer ce tag",
+                "modal_body_processing": "Le tag est en cours de création. Êtes-vous sûr de vouloir le supprimer ?",
+                "modal_body_error": "Êtes-vous sûr de vouloir le supprimer ?",
+                "modal_title_tag1": "Suppression en cours du tag",
+                "modal_title_tag2": "du template-scenario"
+            },
+            "new": {
+                "title": "Création d'un template-scenario",
+                "creation_metascenario": "Création d'un template-scenario",
+                "btn_retour": "Retour à la liste des template-scenarios",
+                "btn_ajouter": "Créer le template-scenario",
+                "aide_titre": "Créer un nouveau template-scenario",
+                "aide": "<p class=\"card-text\">Renseignez un <b>nom</b>, une <b>URL de dépôt Git</b> et une <b>description</b> pour le nouveau template-scenario. Ces informations pourront être modifiées plus tard.<br><br>Si le <b>dépôt Git</b> n'est pas public, vous devez utiliser une clé ou un token de déploiement afin de permettre à la plateforme de le télécharger. Voir <a href=\"https://docs.github.com/en/developers/overview/managing-deploy-keys\" target=\"_blank\">les clés de déploiement GitHub</a> ou <a href=\"https://docs.gitlab.com/ee/user/project/deploy_tokens/\" target=\"_blank\">les tokens de déploiement GitLab</a>.</p>"
+            },
+            "edit": {
+                "title": "Modification d'un modèle de scénario",
+                "modification_metascenario": "Modification du modèle de scénario",
+                "btn_retour": "Retour à la liste des modèles de scénario",
+                "btn_modifier": "Enregistrer les modifications",
+                "aide_titre": "Modifier un modèle de scénario",
+                "aide": "<p class=\"card-text\">Modifiez le nom, l'URL du dépôt et la description du modèle de scénario. Ces informations pourront être modifiées plus tard.<br>La modification de ces informations ne rompt pas les liens avec les scénarios, les exécutions ou les jeux de données existants.</p>"
+            },
+            "controller": {
+                "flash_metascenario_ajoute": "Le template-scenario a bien été ajouté",
+                "flash_metascenario_modifie": "Le template-scenario a bien été modifié",
+                "flash_tag_ajoute": "Le tag a bien été ajouté",
+                "flash_tag_requis": "Le nom du tag est requis",
+                "flash_tag_supprime": "Le tag a bien été supprimé",
+                "flash_prepare_error": "Une erreur est survenue lors de la préparation du scénario"
+            }
+        },
+        "scenario": {
+            "index": {
+                "titre": "Administration des scénarios",
+                "titre_page": "Scénarios",
+                "btn_ajout_scenario": "Ajouter un scénario",
+                "btn_visualiser_run": "Voir les exécutions",
+                "btn_executer_scenario": "Exécuter le scénario",
+                "btn_create_tag": "Créer un tag",
+                "btn_liste_runs": "Liste des exécutions",
+                "btn_execute": "Exécuter",
+                "btn_parametre": "Paramètres",
+                "btn_public_partage": "Partager publiquement",
+                "btn_public_partage_supprimer": "Supprimer le partage public",
+                "btn_modifier": "Modifier",
+                "btn_activer": "Activer",
+                "btn_desactiver": "Désactiver",
+                "btn_Detail": "Détails",
+                "th_template_scenario": "Template-scenario",
+                "th_titre": "Titre",
+                "th_tag": "Tag",
+                "th_dataset": "Jeu de données",
+                "th_date_creation": "Date de création",
+                "th_date_modification": "Date de modification",
+                "aucun_scenario": "Aucun scénario disponible",
+                "modal_titre": "Création d'un tag pour un scénario",
+                "modal_git_tag": "Tag du dépôt Git",
+                "modal_git_tag_doc": "Tag sur le dépôt Git. La plateforme télécharge le scénario à partir de l'URL du dépôt Git et de son tag.",
+                "modal_variant": "Variante",
+                "modal_variant_doc": "TODO",
+                "modal_version": "Version",
+                "modal_version_doc": "Nom du tag à afficher sur la plateforme Lola.",
+                "modal_btn_ajouter": "Créer le tag",
+                "modal_btn_fermer": "Fermer",
+                "modal_parametres": "Paramètres",
+                "label_scenario": "Scénario",
+                "non_defini": "Non défini"
+            },
+            "creation_etape1": {
+                "titre": "Création du scénario - étape 1",
+                "btn_retour_templatescenario": "Retour à la liste des template-scenarios",
+                "btn_retour_scenario": "Retour à la liste des scénarios",
+                "tag_selection": "Sélectionner le tag",
+                "dataset_selection": "Sélectionner le jeu de données",
+                "btn_selectionner": "Sélectionner",
+                "btn_fermer": "Fermer",
+                "cree_par": "Créé par",
+                "date": "Date",
+                "date_creation": "Date de création",
+                "prive": "Privé",
+                "public": "Public",
+                "btn_validation": "Étape 2 : saisie des paramètres"
+            },
+            "creation_etape2": {
+                "titre": "Configuration du scénario",
+                "titre_switchable_algorithms": "Configuration du scénario - algorithmes interchangeables",
+                "btn_retour_templatescenario": "Retour à la liste des template-scenarios",
+                "btn_retour_scenario": "Retour à la liste des scénarios",
+                "parametres": "Paramètres",
+                "aucun_parametre": "Aucun paramètre",
+                "chargement": "En cours de chargement...",
+                "miseajour_scenario": "Mettre à jour le scénario",
+                "creer_scenario": "Créer un nouveau scénario",
+                "algorithms": "Algorithmes",
+                "algorithms_parameters": "Paramètres des algorithmes",
+                "aucun_algo": "Aucun algorithme",
+                "select_algorithm": "Sélectionner l'algorithme",
+                "no_algorithm_selected": "Aucun algorithme sélectionné",
+                "readme": "Readme",
+                "btn_fermer": "Fermer",
+                "error_loading_parameters": "Erreur lors du chargement des paramètres !",
+                "status": "Statut",
+                "click_to_see_response": "Cliquer pour voir la réponse",
+                "error_loading_switchable_algorithms": "Impossible de charger les algorithmes interchangeables. Veuillez consulter la console pour plus de détails.",
+                "switchable_algorithm": "Algorithme interchangeable"
+            },
+            "controller": {
+                "flash_scenario_cree": "Le scénario a bien été créé",
+                "flash_scenario_modifie": "Le scénario a bien été modifié",
+                "flash_prepare_error": "Une erreur est survenue lors de la préparation du scénario"
+            }
+        },
+        "dataset": {
+            "index": {
+                "titre_page": "Jeux de données",
+                "titre": "Administration des jeux de données",
+                "btn_ajout_dataset": "Ajouter un jeu de données",
+                "btn_aide": "Aide",
+                "th_partage": "Partage",
+                "th_etat": "État",
+                "th_titre": "Titre",
+                "size": "Taille",
+                "th_date_creation": "Date de création",
+                "th_derniere_modification": "Dernière modification",
+                "partage_non": "Non partagé",
+                "partage_global": "Partage global",
+                "partage_global_message": "Active le jeu de données pour tous les utilisateurs de la plateforme Lola",
+                "partage_groupe": "Partage de groupe",
+                "logs": "Logs",
+                "non_defini": "Non défini",
+                "btn_modifier": "Modifier",
+                "btn_supprimer": "Supprimer",
+                "btn_bordereau": "Bordereau",
+                "btn_partage": "Partage",
+                "btn_partage_supprimer": "Supprimer le partage",
+                "btn_partager": "Partager",
+                "btn_details": "Détails",
+                "btn_recipe": "Recette xAPI",
+                "message_aucune_action": "Jeu de données partagé, aucune action possible.",
+                "btn_fermer": "Fermer",
+                "option_de_partage": "Options de partage",
+                "aucun_groupe": "Aucun groupe",
+                "aucun_dataset": "Aucun jeu de données",
+                "date_creation": "Date de création",
+                "details_overview": "Aper\u00e7u",
+                "details_recent_activity": "Activit\u00e9 r\u00e9cente",
+                "details_description_empty": "Aucune description renseign\u00e9e.",
+                "details_no_logs": "Aucun log de traitement pour le moment",
+                "details_hash": "Hash du jeu de donn\u00e9es",
+                "details_type": "Type",
+                "modale_aide_titre": "Comment envoyer un jeu de données sur Lola ?",
+                "modale_aide": "<div class=\"card mb-2\">\n    <h5 class=\"card-header text-white bg-primary\">Comment envoyer un jeu de données sur Lola ?</h5>\n    <div class=\"card-body\">\n        <p>Pour envoyer un jeu de données sur Lola, il faut disposer :</p>\n        <ul>\n            <li>de l’outil data_prepare pour chiffrer et envoyer les données ;</li>\n            <li>d’un jeu de données au format xAPI ;</li>\n            <li>d’un bordereau téléchargeable sur l’application (voir partie 1).</li>\n        </ul>\n    </div>\n    <h5 class=\"card-header text-white bg-primary\">Data_prepare, l’outil pour envoyer ses données sur les serveurs de Lola</h5>\n    <div class=\"card-body\">\n        Télécharger <a href=\"https://gitlab.inria.fr/lola/data_prepare/-/releases\" target=\"_blank\"><strong>Data_prepare <i class=\"fas fa-external-link-alt\"></i></strong></a>.\n    </div>\n    <h5 class=\"card-header text-white bg-primary\">Étape par étape</h5>\n    <div class=\"card-body\">\n        <p><strong><u>1. Renseignement du jeu de données et génération du bordereau</u></strong></p>\n        Cette étape est réalisée sur l’application web Lola. Pour cela, allez dans l’onglet « Jeux de données ». Ensuite, cliquez sur « Ajouter un jeu de données ». Dans la nouvelle fenêtre, il est nécessaire de donner un nom au nouveau jeu de données. Il est possible d’ajouter une description du jeu de données et de modifier les permissions d’accès. Ces informations peuvent être modifiées après l’enregistrement d’un jeu de données. Une fois cette étape réalisée, un bordereau est automatiquement créé.\n        <hr />\n        <p><strong><u>2. Téléchargement du bordereau</u></strong></p>\n        Dans l’onglet « Jeux de données », cliquez sur le bouton « Bordereau » pour enregistrer le fichier de bordereau.\n        <hr />\n        <p><strong><u>3. Envoi des données avec l’outil data_prepare</u></strong></p>\n        Double-cliquez sur l’outil data_prepare. Une fois ouvert, renseignez les chemins vers le jeu de données et vers le bordereau. Le fichier compressé et chiffré est également sauvegardé sur votre ordinateur en cas d’échec du transfert vers le serveur Lola. Cliquez sur « Encrypt » pour démarrer la compression et le chiffrement. Une fois l’opération terminée, il est possible de cliquer sur « Transfer to Lola-platform ».\n        <hr />\n        <p><strong><u>4. Vérifier le statut dans l’application web Lola</u></strong></p>\n        Une fois le fichier transféré, le statut peut être suivi dans l’application web Lola. À noter qu’il peut se passer un peu de temps avant que le statut passe à « en traitement ». Une fois terminé, le statut passe à « disponible », ce qui indique que le jeu de données est prêt.\n    </div>\n</div>\n"
+            },
+            "new": {
+                "title": "Ajout",
+                "creation_dataset": "Création d'un jeu de données",
+                "btn_retour": "Retour à la liste des jeux de données",
+                "btn_ajouter": "Ajouter",
+                "aide_titre": "Ajout d'un jeu de données",
+                "aide": "<h5 class=\"card-title\">Création d'un jeu de données</h5><p class=\"card-text\">Cette page permet d'ajouter un nouveau jeu de données à la plateforme. Vous devez renseigner son nom et sa description. Ces informations pourront être modifiées ultérieurement.</p>"
+            },
+            "edit": {
+                "title": "Modification",
+                "modification_dataset": "Modification du jeu de données",
+                "btn_retour": "Retour à la liste des jeux de données",
+                "btn_modifier": "Modifier",
+                "aide_titre": "Modification d'un jeu de données",
+                "aide": "<h5 class=\"card-title\">Modification d'un jeu de données</h5><p class=\"card-text\">Cette page permet de modifier les informations principales d'un jeu de données. Vous pouvez modifier son nom et sa description. La modification de ces informations ne rompt pas les liens avec les scénarios ou les exécutions existants.</p>"
+            },
+            "form": {
+                "nom": "Nom",
+                "description": "Description",
+                "recipe": "Recette XAPI",
+                "recipe_link": "Lien de la recette XAPI",
+                "btn_enregistrer": "Enregistrer"
+            },
+            "controller": {
+                "flash_dataset_ajoute": "Jeu de données ajouté",
+                "flash_dataset_modifie": "Jeu de données modifié",
+                "flash_suppression_erreur": "Erreur interne du serveur lors de la suppression du jeu de données. L'API n'est pas disponible.",
+                "flash_suppression_confirmation": "La suppression du jeu de données a bien été demandée.",
+                "flash_partage_erreur": "Vous n'avez pas l'autorisation d'effectuer cette action.",
+                "flash_partage_suppression": "Le jeu de données %dataset_name% n'est plus partagé avec le groupe %group_name%.",
+                "flash_partage_ajout": "Le jeu de données %dataset_name% a été partagé avec le groupe %group_name%."
+            }
+        },
+        "termsofuse": {
+            "index": {
+                "titre": "Conditions d'utilisation",
+                "btn_ajout_termsofuse": "Nouvelles conditions d'utilisation",
+                "th_date_creation": "Date de création",
+                "th_derniere_modification": "Dernière modification",
+                "non_defini": "Non défini",
+                "aucun_termsofuse": "Aucune condition d'utilisation disponible",
+                "btn_fermer": "Fermer",
+                "btn_set_active": "Activer",
+                "btn_details": "Détails"
+            },
+            "new": {
+                "title": "Nouvelle",
+                "creation_termsofuse": "Création de conditions d'utilisation",
+                "btn_retour": "Retour à la liste des conditions d'utilisation",
+                "btn_ajouter": "Créer les conditions d'utilisation",
+                "aide_titre": "Créer de nouvelles conditions d'utilisation",
+                "aide": "<p class=\"card-text\">Cette page permet de créer de nouvelles conditions d'utilisation pour la plateforme.<br>Le contenu pourra être modifié plus tard, puis défini comme actif depuis la liste.</p>"
+            },
+            "edit": {
+                "title": "Modification",
+                "modification_termsofuse": "Modification des conditions d'utilisation",
+                "btn_retour": "Retour à la liste des conditions d'utilisation",
+                "btn_modifier": "Enregistrer les modifications",
+                "aide_titre": "Modifier les conditions d'utilisation",
+                "aide": "<p class=\"card-text\">Cette page permet de modifier le contenu des conditions d'utilisation.<br>Les modifications pourront être enregistrées, puis la version pourra être définie comme active depuis la liste.</p>"
+            },
+            "form": {
+                "description": "Description",
+                "btn_enregistrer": "Enregistrer"
+            },
+            "controller": {
+                "flash_termsofuse_ajoute": "Les conditions d'utilisation ont bien été ajoutées",
+                "flash_termsofuse_modifie": "Les conditions d'utilisation ont bien été modifiées",
+                "flash_termsofuse_supprime": "Les conditions d'utilisation ont bien été supprimées",
+                "flash_termsofuse_active": "Les nouvelles conditions d'utilisation ont bien été prises en compte"
+            }
+        },
+       "hash_objet": {
+            "index": {
+                "titre": "Hash / Objet",
+                "Collapsible_1": "Hash / Jeu de données",
+                "Collapsible_2": "Hash / Scénario",
+                "Collapsible_3": "Hash / Utilisateur",
+                "Collapsible_4": "Hash / Tag",
+                "Collapsible_5": "Hash / Exécution",
+                "Collapsible_6": "Hash / Algorithme",
+                "th_titre": "Titre",
+                "th_etat": "Statut",
+                "th_hash": "Hash",
+                "th_template_scenario": "Modèle de scénario",
+                "th_tags": "Tag",
+                "th_dataset": "Jeu de données",
+                "th_nom": "Nom",
+                "th_prenom": "Prénom",
+                "th_email": "Email",
+                "th_profile": "Profil",
+                "th_sftp_hash": "Hash SFTP",
+                "th_version": "Version",
+                "th_algorithm": "Algorithme",
+                "upgrade": "Mise à niveau"
+            }
+        },
+        "home": {
+            "index": {
+                "titre_page": "Tableau de bord",
+                "titre": "Tableau de bord",
+                "last_executions_admin": "Dernières exécutions des scénarios",
+                "last_executions_user": "Mes dernières exécutions des scénarios",
+                "th_template_scenario": "Template-scenario",
+                "th_dataset": "Jeu de données",
+                "th_status": "Statut",
+                "th_results": "Résultats",
+                "owner": "Propriétaire",
+                "execution_histogram_admin": "Histogramme des exécutions",
+                "execution_histogram_user": "Histogramme de mes exécutions",
+                "server_memory": "Mémoire du serveur",
+                "cpu": "CPU",
+                "datasets_admin": "Jeux de données",
+                "datasets_user": "Mes jeux de données",
+                "total_datasets": "Total des jeux de données",
+                "last_datasets": "Derniers jeux de données",
+                "algorithms_admin": "Algorithmes",
+                "algorithms_user": "Mes algorithmes",
+                "total_algorithms": "Total des algorithmes",
+                "last_algorithms": "Derniers algorithmes",
+                "templates_admin": "Templates",
+                "templates_user": "Mes templates",
+                "total_templates": "Total des templates",
+                "last_templates": "Derniers templates",
+                "status_waiting": "En attente",
+                "status_processing": "En traitement",
+                "status_available": "Disponible",
+                "status_error": "Erreur",
+                "status_deleting": "Suppression",
+                "status_completed": "Terminé",
+                "status_scheduling_trax_db": "Planification Trax DB",
+                "status_waiting_nextflow": "En attente de Nextflow",
+                "status_running_scenario": "Exécution du scénario",
+                "chart_executions_by_status": "Nombre d'exécutions par statut",
+                "chart_memory_used": "Mémoire utilisée en Go",
+                "chart_memory_available": "Mémoire disponible en Go",
+                "chart_cpu_used": "Nombre de CPU utilisés",
+                "chart_cpu_available": "Nombre de CPU disponibles"
+            }
+        },
+        "common": {
+            "yes": "Oui",
+            "no": "Non"
+        },
+        "language": {
+            "switch": "Langue",
+            "english": "English",
+            "french": "Français"
+        }
+    },
+    "public": {
+        "base": {
+            "accueil": "Accueil"
+        },
+        "layout": {
+            "invalid_csrf": "Une erreur est survenue lors de la soumission du formulaire. Veuillez vider le cache de votre navigateur ou utiliser un onglet privé."
+        },
+        "accessibility": {
+            "skip_to_content": "Aller au contenu principal",
+            "auth_tabs": "Mode d'authentification",
+            "captcha_help": "Saisissez les caractères affichés dans l'image captcha."
+        },
+        "accueil": {
+            "title": "Accueil",
+            "connexion": "Connexion",
+            "inscription": "Inscription",
+            "btn_dashboard": "Tableau de bord",
+            "btn_compte": "Mon compte",
+            "btn_deconnexion": "Déconnexion",
+            "btn_connexion": "Se connecter",
+            "btn_lola_site_publique": "Site public Lola",
+            "email": "Email",
+            "password": "Mot de passe",
+            "prenom": "Prénom",
+            "nom": "Nom",
+            "captcha": "Captcha",
+            "voir_conditions": "Voir les conditions d'utilisation",
+            "accepter_conditions": "J'accepte les conditions d'utilisation",
+            "terms_modal_title": "Conditions générales d'utilisation du service",
+            "terms_update_warning": "Pour accéder au tableau de bord Lola, veuillez accepter les nouvelles conditions d'utilisation du service.",
+            "btn_accepter": "Accepter",
+            "btn_fermer": "Fermer"
+        },
+        "account": {
+            "title": "Compte",
+            "email": "Email",
+            "firstname": "Prénom",
+            "lastname": "Nom",
+            "password": "Mot de passe",
+            "voir_conditions": "Consulter les conditions d'utilisation",
+            "accepter_conditions": "J'accepte les conditions d'utilisation",
+            "btn_enregistrer": "Enregistrer",
+            "terms_modal_title": "Conditions générales d'utilisation du service",
+            "btn_fermer": "Fermer"
+        },
+        "register": {
+            "title": "Inscription",
+            "inscription_service": "Inscription au service",
+            "email": "Email",
+            "firstname": "Prénom",
+            "lastname": "Nom",
+            "password": "Mot de passe",
+            "voir_conditions": "Consulter",
+            "accepter_conditions": "J'accepte les conditions d'utilisation",
+            "btn_register": "S'inscrire",
+            "terms_modal_title": "Conditions générales d'utilisation du service",
+            "btn_fermer": "Fermer"
+        },
+        "form": {
+            "firstname": "Prénom",
+            "lastname": "Nom",
+            "agree_terms": "Conditions d'utilisation",
+            "password": "Mot de passe",
+            "captcha": "Captcha",
+            "email": "Email",
+            "firstname_required": "Le prénom est requis.",
+            "lastname_required": "Le nom est requis.",
+            "agree_terms_required": "Vous devez accepter les conditions d'utilisation.",
+            "password_required": "Veuillez entrer un mot de passe.",
+            "password_min_length": "Le mot de passe doit contenir au moins {{ limit }} caractères.",
+            "email_required": "L'email est requis."
+        }
+    },
+    "admin": {
+        "index": {
+            "title": "Administration",
+            "heading": "Page d'administration",
+            "message": "Cette page est utilisée pour l'administration.",
+            "controller_file": "Fichier contrôleur",
+            "template_file": "Fichier template"
+        }
+    },
+    "email": {
+        "upgrade_accepted": {
+            "subject": "LOLA : votre demande de mise à niveau",
+            "html": "<p>La demande de mise à niveau de votre compte LOLA a été acceptée.</p>"
+        },
+        "upgrade_denied": {
+            "subject": "LOLA : votre demande de mise à niveau",
+            "html": "<p>La demande de mise à niveau de votre compte LOLA a été refusée.</p>"
+        },
+        "upgrade_request": {
+            "subject": "LOLA : demande de mise à niveau",
+            "html": "<p>Demande de mise à niveau vers le profil <strong>{profile}</strong> de {firstname} {lastname} ({email}).</p>"
+        }
+    },
+    "login": {
+        "account_not_found": "Le compte n'existe pas.",
+        "account_inactive": "Your account is inactive."
+    }
+}

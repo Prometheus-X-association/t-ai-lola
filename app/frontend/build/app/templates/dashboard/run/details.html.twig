@@ -1,4 +1,7 @@
 {% extends "dashboard/base/layout.html.twig" %}
+{% block title %}
+    {% trans %}dashboard.runs.details.titre{% endtrans %}
+{% endblock %}
 
 {% block content %}
 
@@ -24,7 +27,7 @@
                             {% trans %}dashboard.runs.details.titre{% endtrans %}
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            Status
+                            {% trans %}dashboard.runs.details.status{% endtrans %}
                             {% if run.status == constant('\\App\\Entity\\Run::STATUS_COMPLETED') %}
                             <span id="run_status" class="badge badge-success">
                             {% elseif run.status == constant('\\App\\Entity\\Run::STATUS_ERROR') %}
@@ -46,7 +49,7 @@
                                 <li class="list-group-item"><strong>{% trans %}dashboard.runs.details.hash{% endtrans %}</strong> : <em>{{ run.hash }}</em></li>
                                 <li class="list-group-item">
                                     <strong>{% trans %}dashboard.runs.details.scenario{% endtrans %}</strong> : <em>{{ run.scenario.metascenario.name }}</em>
-                                    <span class="badge badge-primary">{{ run.scenario.metascenario.isPublic ? "Public" : "Privé" }}</span>
+                                    <span class="badge badge-primary">{{ run.scenario.metascenario.isPublic ? 'dashboard.runs.details.public'|trans : 'dashboard.runs.details.private'|trans }}</span>
                                 </li>
                                 <li class="list-group-item"><strong>{% trans %}dashboard.runs.details.tag{% endtrans %}</strong> : <em>{{ run.scenario.tag.name }}</em></li>
                                 <li class="list-group-item"><strong>{% trans %}dashboard.runs.details.dataset{% endtrans %}</strong> : <em>{{ run.scenario.dataset.name }}</em></li>
@@ -153,7 +156,9 @@
                                                             </pre>                    
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                                                {% trans %}dashboard.runs.details.btn_fermer{% endtrans %}
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -214,7 +219,7 @@
                                 }
                                 if(data[0].run_output) {
                                     $("#btn_run_download_results").removeClass("disabled");
-                                    $("#btn_resultat_text").html("{% trans %}dashboard.runs.details.telecharger_resultats{% endtrans %}");
+                                    $("#btn_resultat_text").html("{{ 'dashboard.runs.details.telecharger_resultats'|trans|e('js') }}");
                                 }
                             }
                             // update runlogs table
@@ -275,7 +280,7 @@
                                     txt += `
                                         <td>
                                             <a href="#" data-toggle="modal" data-target="#${modalId}">
-                                                Statistics
+                                                {{ 'dashboard.runs.details.statistiques'|trans|e('js') }}
                                             </a>
                                             <div class="modal" tabindex="-1" role="dialog" id="${modalId}">
                                                 <div class="modal-dialog" role="document">
@@ -292,7 +297,9 @@
                                                             <pre>${statistics}</pre>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                                                {{ 'dashboard.runs.details.btn_fermer'|trans|e('js') }}
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -311,7 +318,7 @@
                                     <tr>
                                         <td colspan="6" class="text-center text-muted py-4">
                                             <i class="fa fa-spinner fa-spin"></i>
-                                            Execution in progress, waiting for logs...
+                                            {{ 'dashboard.runs.details.execution_en_cours'|trans|e('js') }}
                                         </td>
                                     </tr>
                                 `;

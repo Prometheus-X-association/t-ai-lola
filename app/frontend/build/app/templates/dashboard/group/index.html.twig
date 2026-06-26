@@ -1,5 +1,5 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Groupes {% endblock %}
+{% block title %} {% trans %}dashboard.groupe.index.titre_page{% endtrans %} {% endblock %}
 
 {% block content %}
 
@@ -87,11 +87,11 @@
                                         <strong style="color:#0066ff;"><em>{% trans %}dashboard.user.index.th_prenom{% endtrans %}</em></strong> : {{ user.firstname }}  <br><br>
                                         <strong style="color:#0066ff;"><em>{% trans %}dashboard.user.index.th_nom{% endtrans %}</em></strong> : {{ user.lastname }} <br><br>
                                         <strong style="color:#0066ff;"><em>{% trans %}dashboard.user.index.th_email{% endtrans %}</em></strong> : {{ user.email }} <br><br>
-                                        <strong style="color:#0066ff;"><em>Hash</em></strong> : {{ user.hash }}
+                                        <strong style="color:#0066ff;"><em>{% trans %}dashboard.groupe.index.hash{% endtrans %}</em></strong>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.index.modal_btn_fermer{% endtrans %}</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.groupe.index.btn_fermer{% endtrans %}</button>
                                 </div>
                             </div>
                         </div>
@@ -101,7 +101,7 @@
 
                 {% else %}
                     <tr>
-                        <td colspan="4"><em>Aucun groupe</em></td>
+                        <td colspan="6"><em>{% trans %}dashboard.groupe.index.aucun_groupe{% endtrans %}</em></td>
                     </tr>
                 {% endfor %}
             </tbody>

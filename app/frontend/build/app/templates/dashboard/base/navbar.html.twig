@@ -54,7 +54,7 @@
                    data-container="body" 
                    data-toggle="popover" 
                    data-placement="bottom" 
-                   title="<strong>Lolapy configuration</strong>" 
+                   title="<strong>{{ 'dashboard.navbar.lolapy_configuration'|trans }}</strong>"
                    data-content="<strong>IP</strong> : {{ lolapyParameters["LOLAPY_API_ADRESS"] }} <br /> <strong>Port</strong> : {{ lolapyParameters["LOLAPY_API_PORT"] }} <br /> <strong>Fake</strong> : {{ lolapyParameters["LOLAPY_API_FAKE"] }} <br /> ">
                     {{ lolapy.isLolapyReady() ? "<span class='text-success font-weight-bold'> Lolapy <i class='fas fa-power-off'> </i></span>" : "<span class=''> Lolapy <i class='fas fa-power-off'> </i></span>"}}
                 </a>
@@ -120,13 +120,19 @@
 
         <div class="topbar-divider d-none d-sm-block"></div>
 #}
+        <li class="nav-item d-flex align-items-center">
+            {{ include('_language_switcher.html.twig') }}
+        </li>
+
+        <div class="topbar-divider d-none d-sm-block"></div>
+
         <li class="nav-item">
-            <a class="nav-link text-primary btn btn-sm font-weight-light" title="Lola (site public)" target="_blank" href="{{ path('homepage') }}">
+            <a class="nav-link text-primary btn btn-sm font-weight-light" title="{% trans %}dashboard.navbar.lola_public_site{% endtrans %}" target="_blank" href="{{ path('homepage') }}">
                 <b>Lola <i class="fas fa-external-link-alt"></i></b>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-danger btn btn-sm" title="Se déconnecter" href="{{ path('app_logout') }}">
+            <a class="nav-link text-danger btn btn-sm" title="{% trans %}dashboard.navbar.deconnexion{% endtrans %}" href="{{ path('app_logout') }}">
                 <b>{% trans %}dashboard.navbar.deconnexion{% endtrans %} <i class="red fas fa-sign-out-alt"> </i></b>
             </a>
         </li>

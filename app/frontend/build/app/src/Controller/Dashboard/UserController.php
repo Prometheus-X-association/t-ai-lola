@@ -33,7 +33,7 @@ class UserController extends LolaController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->flush();
 
-            $this->addFlash("success", "L'utilisateur a bien été modifié");
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.user.controller.flash_user_modifie'));
             return $this->redirectToRoute('dashboard_user_index');
         }
 
@@ -51,15 +51,14 @@ class UserController extends LolaController {
             $user->addRole($user->getUpgradeRequest());
             $user->setUpgradeRequest(null);
             $this->getEm()->flush();
-            $this->addFlash('success', 'La mise à jour du compte à bien été effectuée. L\'utilisateur a été notifié par email.');
-
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.user.controller.flash_upgrade_validation_success'));
             try {
                 $mailer->upgradeAccepted($user);
             } catch (TransportException) {
-                $this->addFlash('warning', "L'envoi de la notification par email a échoué.");
+                $this->addFlash('warning', $this->getTranslator()->trans('dashboard.user.controller.flash_upgrade_email_error'));
             }
         } else {
-            $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour du compte.');
+            $this->addFlash('error', $this->getTranslator()->trans('dashboard.user.controller.flash_upgrade_error'));
         }
         return $this->redirectToRoute('dashboard_user_index');
     }
@@ -70,16 +69,15 @@ class UserController extends LolaController {
         if (User::isUserProfil($user->getUpgradeRequest())) {
             $user->setUpgradeRequest(null);
             $this->getEm()->flush();
-            $this->addFlash('success', 'La demande de mise à niveau à bien été refusée. L\'utilisateur a été notifié par email.');
-
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.user.controller.flash_upgrade_deny_success'));
             try {
                 $mailer->upgradeDenied($user);
             } catch (TransportException) {
-                $this->addFlash('warning', "L'envoi de la notification par email a échoué.");
+                $this->addFlash('warning', $this->getTranslator()->trans('dashboard.user.controller.flash_upgrade_email_error'));
             }
 
         } else {
-            $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour du compte.');
+            $this->addFlash('error', $this->getTranslator()->trans('dashboard.user.controller.flash_upgrade_error'));
         }
         return $this->redirectToRoute('dashboard_user_index');
     }

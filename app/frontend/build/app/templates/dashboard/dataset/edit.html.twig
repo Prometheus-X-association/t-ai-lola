@@ -16,7 +16,7 @@
 
     <div class="row">
         <div class="col-8">
-            {{ include('dashboard/dataset/_form.html.twig', {'button_label': 'dashboard.dataset.edit.btn_modifier'|trans}) }}
+            {{ include('dashboard/dataset/_form.html.twig', {'button_label': 'dashboard.dataset.edit.btn_modifier'}) }}
         </div>
         <div class="col-4">
             <div class="card">
@@ -24,7 +24,7 @@
                     <i class="fas fa-info-circle"></i> {% trans %}dashboard.dataset.edit.aide_titre{% endtrans %}
                 </div>
                 <div class="card-body">
-                    {% trans %}dashboard.dataset.edit.aide{% endtrans %}
+                    {{ 'dashboard.dataset.edit.aide'|trans|raw }}
                 </div>
             </div>            
         </div>

@@ -1,5 +1,5 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Runs {% endblock %}
+{% block title %} {% trans %}dashboard.runs.index.titre_page{% endtrans %} {% endblock %}
 
 {% block content %}
 
@@ -17,7 +17,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-bordered dt-basic" id="table_algorithms" width="98%" cellspacing="0">
+        <table class="table table-bordered dt-basic" id="table_runs" width="98%" cellspacing="0">
             <thead>
                 <tr>
                     <th scope="col">{% trans %}dashboard.runs.index.th_date_creation{% endtrans %}</th>
@@ -34,7 +34,7 @@
                         {% if run.createdBy is not null and run.createdAt is not null%}
                             <td data-sort="{{ run.createdAt|date('U') }}">{{ run.createdAt | date('d-m-Y H:i:s') }}</td>
                         {% else %}
-                            <td><i>non défini</i></td>
+                            <td><i>{% trans %}dashboard.runs.index.non_defini{% endtrans %}</i></td>
                         {% endif %}
                         <!-- colonne Status -->
                         <td>
@@ -102,7 +102,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.scenario.index.modal_btn_fermer{% endtrans %}</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.runs.index.btn_fermer{% endtrans %}</button>
                                 </div>
                             </div>
                         </div>
@@ -163,7 +163,9 @@
 
                 {% else %}
                     <tr>
-                        <td colspan="4"><em>{% trans %}dashboard.runs.index.th_acun_run{% endtrans %}</em></td>
+                        <td colspan="5">
+                            <em>{% trans %}dashboard.runs.index.th_aucun_run{% endtrans %}</em>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

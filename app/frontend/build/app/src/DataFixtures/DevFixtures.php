@@ -8,7 +8,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use App\Entity\User;
 use App\Entity\Group;
-use App\Entity\Output;
 use App\Entity\MetaScenario;
 use App\Entity\TermsOfUse;
 
@@ -154,30 +153,6 @@ class DevFixtures extends Fixture implements FixtureGroupInterface {
         $terms->setDescription("Terms of use");
 
         $manager->persist($terms);
-        $manager->flush();
-
-        // ---
-
-        $output = new Output();
-        $output->setName("Indicateur A1");
-        $output->setIsActive(true);
-        $manager->persist($output);
-
-        $output2 = new Output();
-        $output2->setName("Indicateur A2");
-        $output2->setIsActive(true);
-        $manager->persist($output2);
-
-        $output3 = new Output();
-        $output3->setName("Indicateur B");
-        $output3->setIsActive(true);
-        $manager->persist($output3);
-
-        $output4 = new Output();
-        $output4->setName("Indicateur CC");
-        $output4->setIsActive(false);
-        $manager->persist($output4);
-
         $manager->flush();
 
     }

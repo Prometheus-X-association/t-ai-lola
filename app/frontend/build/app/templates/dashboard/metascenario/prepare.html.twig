@@ -71,7 +71,10 @@
                                                     </h5>
                                                     <div class="card-body">
                                                         <ul class="list-group list-group-flush ">
-                                                            <li class="list-group-item p-1"><strong>Date</strong> : <em>{{ dataset.createdAt | date('d/m/Y') }}</em></li>
+                                                            <li class="list-group-item p-1">
+                                                                <strong>{% trans %}dashboard.scenario.creation_etape1.date{% endtrans %}</strong> :
+                                                                <em>{{ dataset.createdAt | date('d/m/Y') }}</em>
+                                                            </li>
                                                             <li class="list-group-item p-1"><strong>{% trans %}dashboard.scenario.creation_etape1.cree_par{% endtrans %} </strong> : <em>{{ dataset.createdBy }}</em></li>
                                                         </ul>
                                                         <hr />
@@ -115,7 +118,8 @@
                                                                 <div class="col-6">
                                                                     <ul class="list-group">
                                                                         <a href="#" class="list-group-item list-group-item-action">
-                                                                            <strong>Date de création</strong> : {{ dataset.createdAt | date('d-m-Y') }}
+                                                                            <strong>{% trans %}dashboard.scenario.creation_etape1.date_creation{% endtrans %}</strong> :
+                                                                            {{ dataset.createdAt | date('d-m-Y') }}
                                                                         </a>
                                                                         <a href="#"
                                                                            id="modal_dataset_detail_totalstatements_{{ dataset.hash }}"

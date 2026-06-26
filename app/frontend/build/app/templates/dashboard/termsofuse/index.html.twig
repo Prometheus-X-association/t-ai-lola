@@ -1,5 +1,7 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Terms of use {% endblock %}
+{% block title %}
+    {% trans %}dashboard.termsofuse.index.titre{% endtrans %}
+{% endblock %}
 
 {% block content %}
 
@@ -35,15 +37,13 @@
                         {% if termsOfUse.createdBy is not null and termsOfUse.createdAt is not null%}
                             <td data-sort="{{ termsOfUse.createdAt|date('U') }}">{{ termsOfUse.createdAt | date('d-m-Y H:i:s') }}</td>
                         {% else %}
-                            <td><i>non défini</i></td>
+                            <td><i>{% trans %}dashboard.termsofuse.index.non_defini{% endtrans %}</i></td>
                         {% endif %}
-                        </td>
                         {% if termsOfUse.updatedBy is not null and termsOfUse.updatedAt is not null%}
                             <td data-sort="{{ termsOfUse.updatedAt|date('U') }}">{{ termsOfUse.updatedAt | date('d-m-Y H:i:s') }}</td>
                         {% else %}
                             <td><i>{% trans %}dashboard.termsofuse.index.non_defini{% endtrans %}</i></td>
                         {% endif %}
-                        </td>                        
                         <td>
                             <a href="#"  class="btn btn-outline-primary btn-sm"
                                 id="button_modal_{{ termsOfUse.id }}" 
@@ -85,7 +85,9 @@
 
             {% else %}
                 <tr>
-                    <td colspan="4"><em>{% trans %}dashboard.termsofuse.index.aucun_termsofuse{% endtrans %}</em></td>
+                    <td colspan="3">
+                        <em>{% trans %}dashboard.termsofuse.index.aucun_termsofuse{% endtrans %}</em>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

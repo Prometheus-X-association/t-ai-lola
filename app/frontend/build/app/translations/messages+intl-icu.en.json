@@ -1,0 +1,736 @@
+{
+    "dashboard": {
+        "accueil": {
+            "titre": "Home",
+            "connexion": "Connection",
+            "inscription": "Register",
+            "btn_dashboard": "Access to the dashboard",
+            "btn_compte": "My account",
+            "btn_connexion": "Login",
+            "btn_deconnexion": "Logout",
+            "btn_lola_site_publique": "Access to the Lola public site",
+            "password": "Password",
+            "email": "Email",
+            "prenom": "First name",
+            "nom": "Last name",
+            "institution": "Institution",
+            "fonction": "Function",
+            "voir_conditions": "See Terms & Conditions",
+            "accepter_conditions": "Accept Terms & Conditions"
+        },
+        "title": {
+            "accueil": "Home"
+        },
+        "navbar": {
+            "groupes": "Groups",
+            "deconnexion": "Logout",
+            "lolapy_inaccessible": "Lolapy service is unavailable.",
+            "lola_public_site": "Lola public site",
+            "lolapy_configuration": "Lolapy configuration"
+        },
+        "left_menu": {
+            "dashboard": "Dashboard",
+            "dataset": "Datasets",
+            "scenario": "Scenarios",
+            "run": "Runs",
+            "algorithme": "Algorithms",
+            "template-scenario": "Template scenarios",
+            "groupes": "Groups",
+            "utilisateurs": "Users",
+            "lolapy_logs": "Lolapy Logs",
+            "demande_nouveau_profil": "Ask for a profile upgrade",
+            "voir_les_profils": "See profiles",
+            "termsofuse": "Terms of use",
+            "hash_objet": "Hash / Object",
+            "admin": "Admin"
+        },
+        "controller": {
+            "flash_upgrade_request_success": "Your request has been taken into account.",
+            "flash_upgrade_email_error": "The email notification could not be sent.",
+            "flash_upgrade_request_error": "An error occurred while processing your request."
+        },
+        "runs": {
+            "index": {
+                "titre_page": "Runs",
+                "titre": "List of runs",
+                "btn_liste_scenario": "List of scenarios",
+                "btn_details": "Details",
+                "btn_resultats": "Results",
+                "btn_fermer": "Close",
+                "th_date_creation": "Creation date",
+                "th_status": "Status",
+                "th_scenario": "Scenario",
+                "th_tag": "Tag",
+                "th_dataset": "Dataset",
+                "th_aucun_run": "No run available",
+                "non_defini": "Undefined"
+            },
+            "details": {
+                "titre": "Details of the run",
+                "btn_retour": "Return to the list of runs",
+                "user": "User",
+                "date": "Date",
+                "hash": "Run hash",
+                "status": "Status",
+                "scenario": "Scenario",
+                "tag": "Tag",
+                "dataset": "Dataset",
+                "parametre": "Parameters",
+                "public": "Public",
+                "private": "Private",
+                "telecharger_resultats": "Download results",
+                "resultats_non_disponible": "Results not available",
+                "maj": "Update",
+                "log_run": "Run logs",
+                "statistiques": "Statistics",
+                "datetime": "Datetime",
+                "type": "Type",
+                "nomProcess": "Process name",
+                "evenement": "Event",
+                "erreur": "Error",
+                "config_lolapy": "Lolapy configuration",
+                "rapport_erreur": "Error report",
+                "btn_fermer": "Close",
+                "execution_en_cours": "Execution in progress, waiting for logs..."
+            }
+        },
+        "algorithm": {
+            "index": {
+                "titre": "Algorithms",
+                "titre_2": "Algorithm administration",
+                "btn_ajout_algorithm": "Add an algorithm",
+                "th_nom": "Name",
+                "th_version": "Version",
+                "th_date_creation": "Creation date",
+                "th_derniere_modification": "Last update",
+                "public": "Public",
+                "private": "Private",
+                "tooltip_processing": "This version is currently being created. Click for more information.",
+                "tooltip_error": "This version has an error. Click for more information.",
+                "tooltip_available": "This version is available.",
+                "non_defini": "not defined",
+                "btn_modifier": "Edit",
+                "btn_ajout_version": "Add version",
+                "btn_make_private": "Make private",
+                "btn_make_public": "Make visible to users",
+                "version_nom": "Version name",
+                "version_help": "Enter the name of the version to create. This can be a Git branch, tag or release name, depending on how the algorithm repository is managed.",
+                "delete_version": "Delete version",
+                "from_algorithm": "from algorithm",
+                "modal_processing_message": "This version is currently being created. You can delete it if the process is blocked or no longer needed.",
+                "btn_cancel": "Cancel",
+                "btn_confirm_delete": "Confirm",
+                "modal_error_message": "This version could not be created correctly. You can delete it and try to add it again after fixing the problem.",
+                "aucun_algorithm": "No algorithm found"
+            },
+            "new": {
+                "titre": "Algorithm - Add",
+                "titre_2": "Create a new algorithm",
+                "btn_retour": "Back to algorithm list",
+                "card_header": "Algorithm",
+                "card_title": "Creating an algorithm",
+                "card_text_1": "This page allows you to add a new algorithm to the platform. You need to provide its title, repository URL, description and visibility.",
+                "card_text_2": "The repository URL should point to the source code of the algorithm. The description should briefly explain what the algorithm does, what it is used for, and any useful information for users who may need to run it or include it in a scenario.",
+                "card_text_3": "If the algorithm is visible to other users, they will be able to see it in the application and use it according to their access rights."
+            },
+            "edit": {
+                "titre": "Algorithm - Edit",
+                "titre_2": "Edit algorithm",
+                "btn_retour": "Back to algorithm list",
+                "card_header": "Algorithm",
+                "card_title": "Editing an algorithm",
+                "card_text_1": "This page allows you to update the main information of an algorithm. You can edit its title, repository URL, description and visibility.",
+                "card_text_2": "The description should briefly explain what the algorithm does, what it is used for, and any useful information for users who may need to run it or include it in a scenario."
+            },
+            "form": {
+                "title": "Title",
+                "repository_url": "Repository URL",
+                "description": "Description",
+                "visibility": "Should this algorithm be visible to other users?",
+                "btn_add": "Add",
+                "btn_update": "Update",
+                "btn_save": "Save"
+            },
+            "controller": {
+                "flash_algorithm_ajoute": "Algorithm added",
+                "flash_algorithm_modifie": "Algorithm modified",
+                "flash_algorithm_supprime": "Algorithm deleted",
+                "flash_version_ajoute": "Algorithm version added",
+                "flash_version_requise": "The algorithm version name is required",
+                "flash_version_supprimee": "Version deleted"
+            }
+        },
+        "apilog": {
+            "index": {
+                "titre": "Lolapy Logs",
+                "titre_2": "Lola API logs consultation (Lolapy)",
+                "btn_api_documentation": "Frontend API Documentation",
+                "th_datetime": "Datetime",
+                "th_type": "Type",
+                "th_message": "Message",
+                "th_details": "Details",
+                "aucun_log": "No log"
+            }
+        },
+        "user": {
+            "index": {
+                "titre_page": "Users",
+                "titre": "User administration",
+                "btn_demande_maj": "See profile update requests",
+                "th_nom": "Last name",
+                "th_prenom": "First name",
+                "th_email": "Email",
+                "th_profile": "Profile",
+                "th_groupe": "Groups",
+                "th_date_creation": "Creation date",
+                "th_date_modification": "Modification date",
+                "th_derniere_connexion": "Last connection",
+                "th_hash": "Hash",
+                "th_details": "Details",
+                "tokens": "Tokens",
+                "upgrade": "Upgrade",
+                "admin": "Admin",
+                "sisr": "SISR",
+                "infos": "Information",
+                "erreur": "Error",
+                "pas_profil_lola": "No Lola profile",
+                "non_defini": "Undefined",
+                "modifier": "Edit",
+                "desactiver": "Disable",
+                "activer": "Enable",
+                "modal_maj_profile_titre": "List of profile update requests",
+                "modal_maj_profile_pas_maj": "No update request",
+                "modal_maj_profile_refuser": "Decline",
+                "modal_maj_profile_accepter": "Authorize",
+                "modal_maj_profile_fermer": "Close"
+            },
+            "edit": {
+                "titre": "Edit",
+                "modifier_utilisateur": "Edit user",
+                "nom": "Last name",
+                "prenom": "First name",
+                "email": "Email",
+                "liste_roles": "List of profiles",
+                "btn_modifier": "Save changes",
+                "btn_retour": "Return to the list of users",
+                "aide_titre": "User modification",
+                "aide": "<p class=\"card-text\">Edit the information of a user.<br>This information can be changed later.<br>Changing a user does not break links with existing permissions, datasets, runs or scenarios.</p>"
+            },
+            "form": {
+                "email_required": "Email is required.",
+                "firstname_required": "First name is required.",
+                "lastname_required": "Last name is required."
+            },
+            "controller": {
+                "flash_user_modifie": "User modified",
+                "flash_upgrade_validation_success": "The account update has been completed. The user has been notified by email.",
+                "flash_upgrade_deny_success": "The profile upgrade request has been declined. The user has been notified by email.",
+                "flash_upgrade_email_error": "The email notification could not be sent.",
+                "flash_upgrade_error": "An error occurred while updating the account."
+            }
+        },
+        "groupe": {
+            "index": {
+                "titre": "Groups administration",
+                "titre_page": "Groups",
+                "btn_ajout_groupe": "Add a group",
+                "btn_modifier": "Edit",
+                "btn_supprimer": "Delete",
+                "th_nom": "Name of the group",
+                "th_description": "Description",
+                "th_utilisateur": "Users",
+                "th_date_creation": "Creation date",
+                "th_date_modification": "Modification date",
+                "non_defini": "Undefined",
+                "hash": "Hash",
+                "aucun_groupe": "No groups",
+                "btn_fermer": "Close"
+            },
+            "new": {
+                "title": "Group creation",
+                "btn_retour": "Return to the list of groups",
+                "btn_ajouter": "Create the group",
+                "aide_titre": "Create a new group",
+                "aide": "<p class=\"card-text\">The group name is required. All Lola users are available in the users list.</p><hr><h5 class=\"card-title\">Information about groups</h5><p class=\"card-text\">Groups make it possible to share datasets with several Lola users.</p>"
+            },
+            "edit": {
+                "title": "Group modification",
+                "modification_group": "Modification of the group",
+                "btn_retour": "Return to the list of group",
+                "btn_modifier": "Validate modification",
+                "aide_titre": "Modification of the group",
+                "aide": "<p class=\"card-text\">The group name is required. All Lola users are available in the users list.</p><hr><h5 class=\"card-title\">Information about groups</h5><p class=\"card-text\">Groups make it possible to share datasets with several Lola users.</p>"
+            },
+            "form": {
+                "nom": "Name of the group",
+                "description": "Description",
+                "liste_utilisateurs": "List of users",
+                "btn_enregistrer": "Save"
+            },
+            "controller": {
+                "flash_groupe_ajoute": "Group added",
+                "flash_groupe_modifie": "Group modified",
+                "flash_groupe_supprime": "Group deleted"
+            }
+        },
+        "upgrade": {
+            "index": {
+                "titre_page": "Profile upgrade",
+                "titre": "Upgrade your profile account",
+                "btn_register": "Request this profile",
+                "demande_en_attente": "You have a profile upgrade request ({profile}) pending.",
+                "profil2": "<div class=\"text-xs font-weight-bold text-primary text-uppercase mb-1\">Datasets and scenarios</div><div class=\"h5 mb-0 font-weight-bold text-gray-800\">Profile 2</div>",
+                "profil2_details": "<li class=\"list-group-item\">Create private datasets</li><li class=\"list-group-item\">View shared datasets</li><li class=\"list-group-item\">View public scenarios</li><li class=\"list-group-item\">Run scenarios</li>",
+                "profil3": "<div class=\"text-xs font-weight-bold text-info text-uppercase mb-1\">Shared datasets</div><div class=\"h5 mb-0 font-weight-bold text-gray-800\">Profile 3</div>",
+                "profil3_details": "<li class=\"list-group-item\"><strong>Profile 2 +</strong></li><li class=\"list-group-item\">Share datasets</li><li class=\"list-group-item\">View dataset usage statistics</li>",
+                "profil4": "<div class=\"text-xs font-weight-bold text-success text-uppercase mb-1\">Scenarios and algorithms</div><div class=\"h5 mb-0 font-weight-bold text-gray-800\">Profile 4</div>",
+                "profil4_details": "<li class=\"list-group-item\"><strong>Profile 3 +</strong></li><li class=\"list-group-item\">Create scenarios</li><li class=\"list-group-item\">View scenarios</li><li class=\"list-group-item\">Create algorithms</li><li class=\"list-group-item\">View algorithms</li>",
+                "profil5": "<div class=\"text-xs font-weight-bold text-warning text-uppercase mb-1\">Template-scenarios</div><div class=\"h5 mb-0 font-weight-bold text-gray-800\">Profile 5</div>",
+                "profil5_details": "<li class=\"list-group-item\"><strong>Profile 4 +</strong></li><li class=\"list-group-item\">Create template-scenarios</li>"
+            }
+        },
+        "metascenario": {
+            "index": {
+                "titre": "Template-scenario administration",
+                "btn_ajout_metascenario": "Add a template-scenario",
+                "btn_visualiser_run": "Show runs",
+                "btn_create_scenario": "Create a scenario",
+                "btn_create_tag": "Create new tag",
+                "btn_public_partage": "Share publicly",
+                "btn_public_partage_supprimer": "Remove public sharing",
+                "btn_modifier": "Edit",
+                "btn_activer": "Enable",
+                "btn_desactiver": "Disable",
+                "btn_confirmer": "Confirm deletion",
+                "btn_annuler": "Cancel",
+                "th_titre": "Title",
+                "th_tags": "Tags",
+                "th_url": "Repository URL",
+                "th_description": "Description",
+                "th_date_creation": "Creation date",
+                "th_date_modification": "Modification date",
+                "non_defini": "Undefined",
+                "aucun_scenario": "No template-scenario available",
+                "tooltip_processing": "The tag is currently being created. Click for more information.",
+                "tooltip_error": "The tag has an error. Click for more information.",
+                "tooltip_available": "The tag is available.",
+                "modal_titre": "Tag creation for the template-scenario",
+                "modal_git_tag": "Git tag",
+                "modal_git_tag_doc": "Git tag on the repository. The platform will clone the git repository with the given tag.",
+                "modal_variant": "Variant",
+                "modal_variant_doc": "TODO",
+                "modal_version": "Version",
+                "modal_version_doc": "Name of the version on the lola platform. Can be the same as the git tag.",
+                "modal_btn_ajouter": "Create this tag",
+                "modal_body_processing": "The tag is being created. Are you sure you want to delete it?",
+                "modal_body_error": "Are you sure you want to delete it?",
+                "modal_title_tag1": "Deletion in progress of the tag",
+                "modal_title_tag2": "from the template-scenario",
+                "public": "Public",
+                "private": "Private"
+            },
+            "new": {
+                "title": "Template-scenario creation",
+                "creation_metascenario": "Template-scenario creation",
+                "btn_retour": "Back to the list of template-scenarios",
+                "btn_ajouter": "Create the template-scenario",
+                "aide_titre": "Create a new template-scenario",
+                "aide": "<p class=\"card-text\">Set a <b>name</b>, a <b>Git repository</b> and a <b>description</b> for the new template-scenario. These details can be edited later.<br><br>If the <b>Git repository</b> is not public, you should use a deploy key or token to allow the platform to download it. See <a href=\"https://docs.github.com/en/developers/overview/managing-deploy-keys\" target=\"_blank\">GitHub deploy keys</a> or <a href=\"https://docs.gitlab.com/ee/user/project/deploy_tokens/\" target=\"_blank\">GitLab deploy tokens</a>.</p>"
+            },
+            "edit": {
+                "title": "Template-scenario modification",
+                "modification_metascenario": "Modification of the template-scenario",
+                "btn_retour": "Back to the list of template-scenarios",
+                "btn_modifier": "Save changes",
+                "aide_titre": "Modify a template-scenario",
+                "aide": "<p class=\"card-text\">Edit the name, repository URL and description of the template-scenario. These details can be changed later.<br>Changing this information does not break links with existing scenarios, runs or datasets.</p>"
+            },
+            "form": {
+                "nom": "Name",
+                "description": "Description",
+                "repo_git": "Git repository URL",
+                "visibility": "Should this template-scenario be visible to other users?",
+                "btn_enregistrer": "Save"
+            },
+            "controller": {
+                "flash_metascenario_ajoute": "Template-scenario added",
+                "flash_metascenario_modifie": "Template-scenario modified",
+                "flash_tag_ajoute": "Tag added",
+                "flash_tag_requis": "The tag name is required",
+                "flash_tag_supprime": "Tag deleted",
+                "flash_prepare_error": "An error occurred while preparing the scenario"
+            }
+        },
+        "scenario": {
+            "index": {
+                "titre": "Scenario administration",
+                "titre_page": "Scenarios",
+                "btn_ajout_scenario": "Add a scenario",
+                "btn_visualiser_run": "Show runs",
+                "btn_executer_scenario": "Run the scenario",
+                "btn_create_tag": "Create new tag",
+                "btn_liste_runs": "Runs list",
+                "btn_execute": "Execute",
+                "btn_parametre": "Parameters",
+                "btn_public_partage": "Share publicly",
+                "btn_public_partage_supprimer": "Remove public sharing",
+                "btn_modifier": "Edit",
+                "btn_activer": "Enable",
+                "btn_desactiver": "Disable",
+                "btn_Detail": "Details",
+                "th_template_scenario": "Template-scenario",
+                "th_titre": "Title",
+                "th_tag": "Tag",
+                "th_dataset": "Dataset",
+                "th_date_creation": "Creation date",
+                "th_date_modification": "Modification date",
+                "aucun_scenario": "No scenario available",
+                "modal_titre": "Tag creation for the scenario",
+                "modal_git_tag": "Git tag",
+                "modal_git_tag_doc": "Git tag on the repository. The platform will clone the Git repository with the given tag.",
+                "modal_variant": "Variant",
+                "modal_variant_doc": "TODO",
+                "modal_version": "Version",
+                "modal_version_doc": "Name of the version on the Lola platform. It can be the same as the Git tag.",
+                "modal_btn_ajouter": "Create this tag",
+                "modal_btn_fermer": "Close",
+                "modal_parametres": "Parameters",
+                "label_scenario": "Scenario",
+                "non_defini": "Undefined"
+            },
+            "creation_etape1": {
+                "titre": "Scenario creation - Step 1",
+                "btn_retour_templatescenario": "Return to the list of template-scenarios",
+                "btn_retour_scenario": "Return to the list of scenarios",
+                "tag_selection": "Select the tag",
+                "dataset_selection": "Select the dataset",
+                "btn_selectionner": "Select",
+                "btn_fermer": "Close",
+                "cree_par": "Created by",
+                "date": "Date",
+                "date_creation": "Creation date",
+                "prive": "Private",
+                "public": "Public",
+                "btn_validation": "Step 2: parameter input"
+            },
+            "creation_etape2": {
+                "titre": "Scenario configuration",
+                "titre_switchable_algorithms": "Scenario configuration - switchable algorithms",
+                "btn_retour_templatescenario": "Return to the list of template-scenarios",
+                "btn_retour_scenario": "Return to the list of scenarios",
+                "parametres": "Parameters",
+                "aucun_parametre": "No parameters",
+                "chargement": "Loading...",
+                "miseajour_scenario": "Update the scenario",
+                "creer_scenario": "Create a new scenario",
+                "algorithms": "Algorithms",
+                "algorithms_parameters": "Algorithm parameters",
+                "aucun_algo": "No algorithm",
+                "select_algorithm": "Select algorithm",
+                "no_algorithm_selected": "No algorithm selected",
+                "readme": "Readme",
+                "btn_fermer": "Close",
+                "error_loading_parameters": "Error loading parameters!",
+                "status": "Status",
+                "click_to_see_response": "Click to see response",
+                "error_loading_switchable_algorithms": "Failed to load switchable algorithms. Please check the console for details.",
+                "switchable_algorithm": "Switchable algorithm"
+            },
+            "controller": {
+                "flash_scenario_cree": "Scenario created",
+                "flash_scenario_modifie": "Scenario modified",
+                "flash_prepare_error": "An error occurred while preparing the scenario"
+            }
+        },
+        "dataset": {
+            "index": {
+                "titre_page": "Datasets",
+                "titre": "Dataset administration",
+                "btn_ajout_dataset": "New Dataset",
+                "btn_aide": "Help",
+                "th_partage": "Share",
+                "th_etat": "Status",
+                "th_titre": "Title",
+                "size": "Size",
+                "th_date_creation": "Date of creation",
+                "th_derniere_modification": "Last modification",
+                "partage_non": "Not shared",
+                "partage_global": "Public shared",
+                "partage_global_message": "Share the dataset with all users",
+                "partage_groupe": "Group shared",
+                "logs": "Logs",
+                "non_defini": "Undefined",
+                "btn_modifier": "Edit",
+                "btn_supprimer": "Delete",
+                "btn_bordereau": "Bordereau",
+                "btn_partage": "Share",
+                "btn_partage_supprimer": "Delete sharing",
+                "btn_partager": "Share",
+                "btn_details": "Details",
+                "btn_recipe": "XAPI Recipe",
+                "message_aucune_action": "Shared dataset, no action available",
+                "btn_fermer": "Close",
+                "option_de_partage": "Share options",
+                "aucun_groupe": "No group",
+                "aucun_dataset": "No dataset",
+                "date_creation": "Date of creation",
+                "details_overview": "Overview",
+                "details_recent_activity": "Recent activity",
+                "details_description_empty": "No description provided.",
+                "details_no_logs": "No processing logs yet",
+                "details_hash": "Dataset hash",
+                "details_type": "Type",
+                "modale_aide_titre": "How to send a dataset to the Lola platform?",
+                "modale_aide": "<div class=\"card mb-2\">\n    <h5 class=\"card-header text-white bg-primary\">Requirements</h5>\n    <div class=\"card-body\">\n        <ul>\n            <li>data_prepare tool to encrypt and send data;</li>\n            <li>an XAPI dataset;</li>\n            <li>a bordereau downloadable on application platform (see part 1).</li>\n        </ul>\n    </div>\n    <h5 class=\"card-header text-white bg-primary\">Data_prepare, the tool to send data on Lola platform</h5>\n    <div class=\"card-body\">\n        Download <a href=\"https://gitlab.inria.fr/lola/data_prepare/-/releases\" target=\"_blank\"><strong>Data_prepare <i class=\"fas fa-external-link-alt\"></i></strong></a>.\n    </div>\n    <h5 class=\"card-header text-white bg-primary\">Step by step:</h5>\n    <div class=\"card-body\">\n        <p><strong><u>1. Register XAPI dataset and download bordereau</u></strong></p>\n        This step must be done on lola application platform. Click on \"Add dataset\" in \"Dataset\" tab. In the new window, you can set the name of the new dataset, its information and access permission. This information can be edited later. After validation, the bordereau is available.\n        <hr />\n        <p><strong><u>2. Download the bordereau</u></strong></p>\n        In the \"Dataset\", click on \"Bordereau\" to download the file.\n        <hr />\n        <p><strong><u>3. Send files with data_prepare tool</u></strong></p>\n        Open data_prepare tool on your system. Set path for bordereau and for the dataset file (XAPI format). You must set the path where to store the compressed/encrypted file in case of transfert failure. Click on \"Encrypt\" to start the compression/encryption. After a successful encryption, click on \"Transfer to Lola-platform\".                         <hr />\n        <p><strong><u>4. Check the status in the Lola application platform</u></strong></p>\n        The status of the dataset will be updated after few minutes in the platform application. Note that it may take some time, depending of the size of the XAPI file and the server occupation.\n    </div>\n</div>\n"
+            },
+            "new": {
+                "title": "New",
+                "creation_dataset": "Dataset creation",
+                "btn_retour": "Return to the list of dataset",
+                "btn_ajouter": "Create the dataset",
+                "aide_titre": "Create a new dataset",
+                "aide": "<p class=\"card-text\">\n    Set a name and a description to the new dataset. <br>These information can be edited later.\n</p>\n"
+            },
+            "edit": {
+                "title": "Modification",
+                "modification_dataset": "Modification of the dataset",
+                "btn_retour": "Return to the list of dataset",
+                "btn_modifier": "Validate modification",
+                "aide_titre": "Modification of the dataset",
+                "aide": "<p class=\"card-text\">\n    Edit name and description of the dataset. <br>These information can be edited later.\n    Edit information of a dataset does not break links to existing run or scenario.\n</p>\n"
+            },
+            "form": {
+                "nom": "Name",
+                "description": "Description",
+                "recipe": "XAPI Recipe",
+                "recipe_link": "XAPI Recipe link",
+                "btn_enregistrer": "Save"
+            },
+            "controller": {
+                "flash_dataset_ajoute": "Dataset added",
+                "flash_dataset_modifie": "Dataset edited",
+                "flash_suppression_erreur": "Internal server error when deleting the dataset. API not available",
+                "flash_suppression_confirmation": "Dataset removed",
+                "flash_partage_erreur": "You do not have permission to perform this action.",
+                "flash_partage_suppression": "The dataset %dataset_name% is no longer shared with the group %group_name%.",
+                "flash_partage_ajout": "The dataset %dataset_name% has been shared with the group %group_name%."
+            }
+        },
+        "termsofuse": {
+            "index": {
+                "titre": "Terms of use",
+                "btn_ajout_termsofuse": "New terms of use",
+                "th_date_creation": "Creation date",
+                "th_derniere_modification": "Last update",
+                "non_defini": "Undefined",
+                "aucun_termsofuse": "No terms of use available",
+                "btn_fermer": "Close",
+                "btn_set_active": "Set as active",
+                "btn_details": "Details"
+            },
+            "new": {
+                "title": "New",
+                "creation_termsofuse": "Terms of use creation",
+                "btn_retour": "Return to the list of terms of use",
+                "btn_ajouter": "Create the terms of use",
+                "aide_titre": "Create new terms of use",
+                "aide": "<p class=\"card-text\">This page allows you to create new terms of use for the platform.<br>The content can be edited later and then set as active from the list.</p>"
+            },
+            "edit": {
+                "title": "Edit",
+                "modification_termsofuse": "Terms of use modification",
+                "btn_retour": "Return to the list of terms of use",
+                "btn_modifier": "Save changes",
+                "aide_titre": "Modify terms of use",
+                "aide": "<p class=\"card-text\">This page allows you to edit the content of the terms of use.<br>Changes can be saved and the version can then be set as active from the list.</p>"
+            },
+            "form": {
+                "description": "Description",
+                "btn_enregistrer": "Save"
+            },
+            "controller": {
+                "flash_termsofuse_ajoute": "The terms of use have been added",
+                "flash_termsofuse_modifie": "The terms of use have been modified",
+                "flash_termsofuse_supprime": "The terms of use have been deleted",
+                "flash_termsofuse_active": "The new terms of use have been set as active"
+            }
+        },
+        "hash_objet": {
+            "index": {
+                "titre": "Hash / Object",
+                "Collapsible_1": "Hash / Dataset",
+                "Collapsible_2": "Hash / Scenario",
+                "Collapsible_3": "Hash / User",
+                "Collapsible_4": "Hash / Tag",
+                "Collapsible_5": "Hash / Run",
+                "Collapsible_6": "Hash / Algorithm",
+                "th_titre": "Title",
+                "th_etat": "Status",
+                "th_hash": "Hash",
+                "th_template_scenario": "Template scenario",
+                "th_tags": "Tag",
+                "th_dataset": "Dataset",
+                "th_nom": "Last name",
+                "th_prenom": "First name",
+                "th_email": "Email",
+                "th_profile": "Profile",
+                "th_sftp_hash": "SFTP hash",
+                "th_version": "Version",
+                "th_algorithm": "Algorithm",
+                "upgrade": "Upgrade"
+            }
+        },
+        "home": {
+            "index": {
+                "titre_page": "Dashboard",
+                "titre": "Dashboard",
+                "last_executions_admin": "Last scenario executions",
+                "last_executions_user": "My last scenario executions",
+                "th_template_scenario": "Template-scenario",
+                "th_dataset": "Dataset",
+                "th_status": "Status",
+                "th_results": "Results",
+                "owner": "Owner",
+                "execution_histogram_admin": "Execution histogram",
+                "execution_histogram_user": "Histogram of my executions",
+                "server_memory": "Server memory",
+                "cpu": "CPU",
+                "datasets_admin": "Datasets",
+                "datasets_user": "My datasets",
+                "total_datasets": "Total datasets",
+                "last_datasets": "Last datasets",
+                "algorithms_admin": "Algorithms",
+                "algorithms_user": "My algorithms",
+                "total_algorithms": "Total algorithms",
+                "last_algorithms": "Last algorithms",
+                "templates_admin": "Templates",
+                "templates_user": "My templates",
+                "total_templates": "Total templates",
+                "last_templates": "Last templates",
+                "status_waiting": "Waiting",
+                "status_processing": "Processing",
+                "status_available": "Available",
+                "status_error": "Error",
+                "status_deleting": "Deleting",
+                "status_completed": "Completed",
+                "status_scheduling_trax_db": "Scheduling Trax DB",
+                "status_waiting_nextflow": "Waiting Nextflow",
+                "status_running_scenario": "Running scenario",
+                "chart_executions_by_status": "Number of executions by status",
+                "chart_memory_used": "Memory used in GB",
+                "chart_memory_available": "Memory available in GB",
+                "chart_cpu_used": "Number of CPU used",
+                "chart_cpu_available": "Number of CPU available"
+            }
+        },
+        "common": {
+            "yes": "Yes",
+            "no": "No"
+        },
+        "language": {
+            "switch": "Language",
+            "english": "English",
+            "french": "Français"
+        }
+    },
+    "public": {
+        "base": {
+            "accueil": "Home"
+        },
+        "layout": {
+            "invalid_csrf": "An error occurred while submitting the form. Please clear your browser cache or use a private browsing tab."
+        },
+        "accessibility": {
+            "skip_to_content": "Skip to main content",
+            "auth_tabs": "Authentication mode",
+            "captcha_help": "Enter the characters shown in the captcha image."
+        },
+        "accueil": {
+            "title": "Home",
+            "connexion": "Login",
+            "inscription": "Register",
+            "btn_dashboard": "Dashboard",
+            "btn_compte": "My account",
+            "btn_deconnexion": "Logout",
+            "btn_connexion": "Login",
+            "btn_lola_site_publique": "Lola public site",
+            "email": "Email",
+            "password": "Password",
+            "prenom": "First name",
+            "nom": "Last name",
+            "captcha": "Captcha",
+            "voir_conditions": "View terms of use",
+            "accepter_conditions": "I accept the terms of use",
+            "terms_modal_title": "Terms of use",
+            "terms_update_warning": "To access the Lola dashboard, please accept the new terms of use.",
+            "btn_accepter": "Accept",
+            "btn_fermer": "Close"
+        },
+        "account": {
+            "title": "Account",
+            "email": "Email",
+            "firstname": "First name",
+            "lastname": "Last name",
+            "password": "Password",
+            "voir_conditions": "View terms of use",
+            "accepter_conditions": "I accept the terms of use",
+            "btn_enregistrer": "Save",
+            "terms_modal_title": "Terms of use",
+            "btn_fermer": "Close"
+        },
+        "register": {
+            "title": "Register",
+            "inscription_service": "Service registration",
+            "email": "Email",
+            "firstname": "First name",
+            "lastname": "Last name",
+            "password": "Password",
+            "voir_conditions": "View",
+            "accepter_conditions": "I accept the terms of use",
+            "btn_register": "Register",
+            "terms_modal_title": "Terms of use",
+            "btn_fermer": "Close"
+        },
+        "form": {
+            "firstname": "First name",
+            "lastname": "Last name",
+            "agree_terms": "Terms of use",
+            "password": "Password",
+            "captcha": "Captcha",
+            "email": "Email",
+            "firstname_required": "First name is required.",
+            "lastname_required": "Last name is required.",
+            "agree_terms_required": "You must accept the terms of use.",
+            "password_required": "Please enter a password.",
+            "password_min_length": "The password must contain at least {{ limit }} characters.",
+            "email_required": "Email is required."
+        }
+    },
+    "admin": {
+        "index": {
+            "title": "Administration",
+            "heading": "Administration page",
+            "message": "This page is used for administration.",
+            "controller_file": "Controller file",
+            "template_file": "Template file"
+        }
+    },
+    "email": {
+        "upgrade_accepted": {
+            "subject": "LOLA: your profile upgrade request",
+            "html": "<p>Your LOLA account profile upgrade request has been accepted.</p>"
+        },
+        "upgrade_denied": {
+            "subject": "LOLA: your profile upgrade request",
+            "html": "<p>Your LOLA account profile upgrade request has been declined.</p>"
+        },
+        "upgrade_request": {
+            "subject": "LOLA: profile upgrade request",
+            "html": "<p>Profile upgrade request to <strong>{profile}</strong> from {firstname} {lastname} ({email}).</p>"
+        }
+    },
+    "login": {
+        "account_not_found": "The account does not exist.",
+        "account_inactive": "Your account is inactive."
+    }
+}

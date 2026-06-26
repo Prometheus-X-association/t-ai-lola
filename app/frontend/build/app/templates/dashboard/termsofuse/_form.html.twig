@@ -1,7 +1,7 @@
 {{ form_start(form) }}
-{{ form_row(form.description, {'label': 'dashboard.termsofuse.form.description'|trans}) }}
+{{ form_row(form.description) }}
 <button class="btn btn-success float-right btn-block">
-    {{ button_label|default('dashboard.termsofuse.form.btn_enregistrer'|trans) }}
+    {{ (button_label|default('dashboard.termsofuse.form.btn_enregistrer'))|trans }}
 </button>
 {{ form_end(form) }}
 

@@ -55,7 +55,7 @@
                 <div class="card-header">
                     <div class="col mr-2">
                         <div class="text-md font-weight-bold text-info text-uppercase mb-1">
-                            Readme
+                            {% trans %}dashboard.scenario.creation_etape2.readme{% endtrans %}
                         </div>
                     </div>
                 </div>
@@ -74,7 +74,9 @@
         </div>
 
     </div>
-    <div id="data-parameters" data-parameters="{{ scenario.parametres|json_encode() }}">    
+    <div id="data-parameters"
+        data-parameters="{{ scenario.parametres|json_encode|e('html_attr') }}">
+    </div>    
 {% endblock %}
 
 {% block javascript %}
@@ -218,7 +220,7 @@
 
                 {# If we have switchable algorithm go to the switchable algorithm configuration page #}
                 if( listParams.switchable_algorithms.length > 0 ) {
-                    txt += `<button type="submit" class="btn btn-primary btn-block">Switchable algorithm</button>`;
+                    txt += `<button type="submit" class="btn btn-primary btn-block">{{ 'dashboard.scenario.creation_etape2.switchable_algorithm'|trans|e('js') }}</button>`;
                 }
                 else {
                     txt += `<button type="submit" class="btn btn-primary btn-block" name="create_button_no_algo" value="create">{% trans %}dashboard.scenario.creation_etape2.creer_scenario{% endtrans %}</button>`;                    

@@ -13,8 +13,11 @@ class DatasetType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
+            ->add('name', null, [
+                'label' => 'dashboard.dataset.form.nom',
+            ])
             ->add('description', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class, [
+                'label' => 'dashboard.dataset.form.description',    
                 'required' => false,
             ])
         ;

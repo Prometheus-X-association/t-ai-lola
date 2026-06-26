@@ -1,0 +1,12 @@
+{
+    "public": {
+        "form": {
+            "firstname_required": "Le prénom est requis.",
+            "lastname_required": "Le nom est requis.",
+            "agree_terms_required": "Vous devez accepter les conditions d'utilisation.",
+            "password_required": "Veuillez saisir un mot de passe.",
+            "password_min_length": "Le mot de passe doit contenir au moins {{ limit }} caractères.",
+            "email_required": "L'email est requis."
+        }
+    }
+}

@@ -1,4 +1,7 @@
 {% extends "dashboard/base/layout.html.twig" %}
+{% block title %}
+    {% trans %}dashboard.home.index.titre_page{% endtrans %}
+{% endblock %}
 
 {% block content %}
 
@@ -10,7 +13,9 @@
 	<div class="container-fluid">
 		<!-- Page Heading -->
 		<div class="d-sm-flex align-items-center justify-content-between mb-4">
-			<h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+			<h1 class="h3 mb-0 text-gray-800">
+				{% trans %}dashboard.home.index.titre{% endtrans %}
+			</h1>
 		</div>
 
 		<div class="row">
@@ -23,9 +28,9 @@
 							<div class="col mr-2">
 								<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
 									{% if is_granted('ROLE_ADMIN_SISR') %}
-										Last executions of the scenarios
+										{% trans %}dashboard.home.index.last_executions_admin{% endtrans %}
 									{% else %}
-										my last executions of the scenarios
+										{% trans %}dashboard.home.index.last_executions_user{% endtrans %}
 									{% endif %}
 								</div><br>
 								<div class="h6 mb-0 font-weight-bold text-gray-800">
@@ -33,10 +38,10 @@
 										<table class="table">
 											<thead>
 												<tr class="font-weight-bold text-gray-800">
-													<th scope="col">Template-scenario</th>
-													<th scope="col">Dataset</th>
-													<th scope="col">Status</th>
-													<th scope="col">Results</th>
+													<th scope="col">{% trans %}dashboard.home.index.th_template_scenario{% endtrans %}</th>
+													<th scope="col">{% trans %}dashboard.home.index.th_dataset{% endtrans %}</th>
+													<th scope="col">{% trans %}dashboard.home.index.th_status{% endtrans %}</th>
+													<th scope="col">{% trans %}dashboard.home.index.th_results{% endtrans %}</th>
 													<th scope="col"></th>
 												</tr>
 											</thead>
@@ -72,7 +77,7 @@
 													</td>
 													<td>
 														{% if run.createdBy.isAdmin %}
-															<span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
+															<span class="badge badge-info badge-pill" style="font-size: 12px;">{% trans %}dashboard.home.index.owner{% endtrans %}</span>
 														{% endif %}
 													</td>
 												</tr>
@@ -105,14 +110,14 @@
 			<div id="runCompleted" data-completed="{{ runStatus['COMPLETED'] }}"></div>
 			<div id="runError" data-error="{{ runStatus['ERROR'] }}"></div>
 
-			<div class="col-xl-3 col-lg-5">
+			<div class="col-xl-4 col-lg-5">
 				<div class="card border-left-primary shadow mb-4">
 					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
 						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
 							{% if is_granted('ROLE_ADMIN_SISR') %}
-								execution histogram
+								{% trans %}dashboard.home.index.execution_histogram_admin{% endtrans %}
 							{% else %}
-								histogram of my executions
+								{% trans %}dashboard.home.index.execution_histogram_user{% endtrans %}
 							{% endif %}
 						</div>
 					</div>
@@ -126,10 +131,10 @@
 			</div>
 
 			<!-- Card for server memory doughnut -->
-			<div class="col-xl-3 col-lg-5">
+			<div class="col-xl-4 col-lg-5">
 				<div class="card border-left-primary shadow mb-4">
 					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">Server Memory</div>
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">{% trans %}dashboard.home.index.server_memory{% endtrans %}</div>
 					</div>
 					<!-- Card Body -->
 					<div class="card-body">
@@ -143,29 +148,12 @@
 			<div id="memoryUsed" data-used="{{ statistics.memory_usage|default(0) }}"></div>
 			<div id="memoryTotal" data-total="{{ statistics.memory_total|default(0) }}"></div>
 
-			<!-- Card for slurm job bar chart -->
-			<div class="col-xl-3 col-lg-5">
-				<div class="card border-left-primary shadow mb-4">
-					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">Slurm Job</div>
-					</div>
-					<!-- Card Body -->
-					<div class="card-body">
-						<div class="chart-pie pt-4 pb-2">
-							<canvas id="slurmJobChart"></canvas>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- Storing values ​​of slurm pending job and slurm running job -->
-			<div id="slurmRunning" data-running="{{ statistics.slurm_running_job|default(0) }}"></div>
-			<div id="slurmPending" data-pending="{{ statistics.slurm_pending_job|default(0) }}"></div>
 
 			<!-- Card for CPU doughnut -->
-			<div class="col-xl-3 col-lg-5">
+			<div class="col-xl-4 col-lg-5">
 				<div class="card border-left-primary shadow mb-4">
 					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">CPU</div>
+						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">{% trans %}dashboard.home.index.cpu{% endtrans %}</div>
 					</div>
 					<!-- Card Body -->
 					<div class="card-body">
@@ -194,7 +182,7 @@
 			<div id="processing" data-processing="{{ datasetStatus['PROCESSING'] }}"></div>
 			<div id="available" data-available="{{ datasetStatus['AVAILABLE'] }}"></div>
 			<div id="error" data-error="{{ datasetStatus['ERROR'] }}"></div>
-			<div id="deletng" data-deleting="{{ datasetStatus['DELETING'] }}"></div>
+			<div id="deleting" data-deleting="{{ datasetStatus['DELETING'] }}"></div>
 			<div id="totalDatasets" data-total="{{ datasets|length }}"></div>
 
 			<div class="col-xl-4 col-lg-5">
@@ -202,9 +190,9 @@
 					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
 						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
 							{% if is_granted('ROLE_ADMIN_SISR') %}
-								datasets
+								{% trans %}dashboard.home.index.datasets_admin{% endtrans %}
 							{% else %}
-								my datasets
+								{% trans %}dashboard.home.index.datasets_user{% endtrans %}
 							{% endif %}
 						</div>
 					</div>
@@ -213,7 +201,7 @@
 						<div class = "row">
 							<div class="col-6">
 								<div class="mt-7 text-center medium font-weight-bold text-primary">
-									Total datasets
+									{% trans %}dashboard.home.index.total_datasets{% endtrans %}
 									<span class="badge badge-info" style="font-size: 15px;">{{ datasets|length }}</span>
 								</div>
 								<div class="chart-pie pt-4 pb-2">
@@ -222,23 +210,23 @@
 								<div class="mt-6 text-center small">
 									<span class="mr-2">
 										<i class="fas fa-circle" style="color: #ff8000;"></i>
-										Waiting
+										{% trans %}dashboard.home.index.status_waiting{% endtrans %}
 									</span>
 									<span class="mr-2">
 										<i class="fas fa-circle" style="color: #ffc107;"></i>
-										Processing 
+										{% trans %}dashboard.home.index.status_processing{% endtrans %} 
 									</span>
 									<span class="mr-2">
 										<i class="fas fa-circle" style="color: #007bff;"></i>
-										Available
+										{% trans %}dashboard.home.index.status_available{% endtrans %}
 									</span>
 									<span class="mr-2">
 										<i class="fas fa-circle" style="color: #dc3545;"></i>
-										Error
+										{% trans %}dashboard.home.index.status_error{% endtrans %}
 									</span>
 									<span class="mr-2">
 										<i class="fas fa-circle" style="color: #6c757d;"></i>
-										Deleting
+										{% trans %}dashboard.home.index.status_deleting{% endtrans %}
 									</span>
 								</div>
 							</div>
@@ -247,7 +235,7 @@
 								<div class="row no-gutters align-items-center">
 									<div class="col mr-2">
 										<div class="h6 mb-0 font-weight-bold text-primary">
-											Last datasets
+											{% trans %}dashboard.home.index.last_datasets{% endtrans %}
 											<!-- Display the last 3 datasets in the dashboard -->
 											{% for dataset in datasets|sort((a, b) => b.createdAt <=> a.createdAt)|slice(0, 4) %}
 												<ul class="list-group list-group-flush mt-3">
@@ -272,7 +260,7 @@
 																{{ dataset.name }}
 															{% endif %}
 															{% if dataset.createdBy.isAdmin %}
-																<span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
+																<span class="badge badge-info badge-pill" style="font-size: 12px;">{% trans %}dashboard.home.index.owner{% endtrans %}</span>
 															{% endif %}
 														</span>
 													</li>
@@ -307,9 +295,9 @@
 					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
 						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
 							{% if is_granted('ROLE_ADMIN_SISR') %}
-								algorithms
+								{% trans %}dashboard.home.index.algorithms_admin{% endtrans %}
 							{% else %}
-								my algorithms
+								{% trans %}dashboard.home.index.algorithms_user{% endtrans %}
 							{% endif %}
 						</div>
 					</div>
@@ -318,7 +306,7 @@
 						<div class = "row">
 							<div class="col-6">
 								<div class="mt-7 text-center medium font-weight-bold text-primary">
-									Total algorithms
+									{% trans %}dashboard.home.index.total_algorithms{% endtrans %}
 									<span class="badge badge-info" style="font-size: 15px;">{{ totalAlgoVersions }}</span>
 								</div>
 								<div class="chart-pie pt-4 pb-2">
@@ -344,13 +332,13 @@
 								<div class="row no-gutters align-items-center">
 									<div class="col mr-2">
 										<div class="h6 mb-0 font-weight-bold text-primary">
-											Last algorithms
+											{% trans %}dashboard.home.index.last_algorithms{% endtrans %}
 											<ul class="list-group list-group-flush mt-3">
 												<!-- Display the last 3 algorithms in the dashboard -->
 												{% for algorithm in algorithms|sort((a, b) => b.createdAt <=> a.createdAt)|slice(0, 3) %}
 													<li class="list-group-item text-gray-800">{{ algorithm.name }}
 														{% if algorithm.createdBy.isAdmin %}
-															<br><span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
+															<br><span class="badge badge-info badge-pill" style="font-size: 12px;">{% trans %}dashboard.home.index.owner{% endtrans %}</span>
 														{% endif %}
 													</li>
 													{% for algorithmVersion in algorithm.algorithmVersions|slice(0, 3) %}
@@ -400,9 +388,9 @@
 					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
 						<div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
 							{% if is_granted('ROLE_ADMIN_SISR') %}
-								templates
+								{% trans %}dashboard.home.index.templates_admin{% endtrans %}
 							{% else %}
-								my templates
+								{% trans %}dashboard.home.index.templates_user{% endtrans %}
 							{% endif %}
 						</div>
 					</div>
@@ -411,7 +399,7 @@
 						<div class="row">
 							<div class="col-6">
 								<div class="mt-7 text-center medium font-weight-bold text-primary">
-									Total templates
+									{% trans %}dashboard.home.index.total_templates{% endtrans %}
 									<span class="badge badge-info" style="font-size: 15px;">{{ totalTags }}</span>
 								</div>
 								<div class="chart-pie pt-4 pb-2">
@@ -437,13 +425,13 @@
 								<div class="row no-gutters align-items-center">
 									<div class="col mr-2">
 										<div class="h6 mb-0 font-weight-bold text-primary">
-											Last templates
+											{% trans %}dashboard.home.index.last_templates{% endtrans %}
 											<ul class="list-group list-group-flush mt-3">
 												<!-- Display the last 3 metascenarios in the dashboard -->
 												{% for metascenario in metascenarios|sort((a, b) => b.createdAt <=> a.createdAt)|slice(0, 3) %}
 													<li class="list-group-item text-gray-800">{{ metascenario.name }}
 														{% if metascenario.createdBy is not null and metascenario.createdBy.isAdmin %}
-															<br><span class="badge badge-info badge-pill" style="font-size: 12px;">owner</span>
+															<br><span class="badge badge-info badge-pill" style="font-size: 12px;">{% trans %}dashboard.home.index.owner{% endtrans %}</span>
 														{% endif %}
 													</li>
 													{% for tag in metascenario.tags|slice(0, 3) %}
@@ -479,7 +467,22 @@
 {% block javascript %}
 
 	<script>
-		
+		const dashboardLabels = {
+			waiting: "{{ 'dashboard.home.index.status_waiting'|trans|e('js') }}",
+			processing: "{{ 'dashboard.home.index.status_processing'|trans|e('js') }}",
+			available: "{{ 'dashboard.home.index.status_available'|trans|e('js') }}",
+			error: "{{ 'dashboard.home.index.status_error'|trans|e('js') }}",
+			deleting: "{{ 'dashboard.home.index.status_deleting'|trans|e('js') }}",
+			completed: "{{ 'dashboard.home.index.status_completed'|trans|e('js') }}",
+			schedulingTraxDb: "{{ 'dashboard.home.index.status_scheduling_trax_db'|trans|e('js') }}",
+			waitingNextflow: "{{ 'dashboard.home.index.status_waiting_nextflow'|trans|e('js') }}",
+			runningScenario: "{{ 'dashboard.home.index.status_running_scenario'|trans|e('js') }}",
+			executionsByStatus: "{{ 'dashboard.home.index.chart_executions_by_status'|trans|e('js') }}",
+			memoryUsed: "{{ 'dashboard.home.index.chart_memory_used'|trans|e('js') }}",
+			memoryAvailable: "{{ 'dashboard.home.index.chart_memory_available'|trans|e('js') }}",
+			cpuUsed: "{{ 'dashboard.home.index.chart_cpu_used'|trans|e('js') }}",
+			cpuAvailable: "{{ 'dashboard.home.index.chart_cpu_available'|trans|e('js') }}"
+		};
 		$(document).ready(function () {
 			// Dataset pie chart
 			let dataCounts = {
@@ -600,17 +603,30 @@
 									return value != 0;
 								});
 			// Array of labels corresponding to the filtered values
-			let filteredLabels = ['Waiting', 'Scheduling_Trax_db', 'Waiting_nextflow', 'Running_scenario', 'Completed', 'Error']
-								.filter(function(value, index) {
-									return [runCounts.Waiting, runCounts.Scheduling_Trax_db, runCounts.Waiting_nextflow, runCounts.Running_scenario, runCounts.Completed, runCounts.Error][index] != 0;
-								});
+			let filteredLabels = [
+				dashboardLabels.waiting,
+				dashboardLabels.schedulingTraxDb,
+				dashboardLabels.waitingNextflow,
+				dashboardLabels.runningScenario,
+				dashboardLabels.completed,
+				dashboardLabels.error
+			].filter(function(value, index) {
+				return [
+					runCounts.Waiting,
+					runCounts.Scheduling_Trax_db,
+					runCounts.Waiting_nextflow,
+					runCounts.Running_scenario,
+					runCounts.Completed,
+					runCounts.Error
+				][index] != 0;
+			});
 			// Creation of the scenario run bar chart
 			let myRunBarChart = new Chart(runBarChart, {
 				type: 'bar',
 				data: {
 					labels: filteredLabels,
 					datasets: [{
-						label: 'Number of executions by status',
+						label: dashboardLabels.executionsByStatus,
 						data: filteredData,
 						backgroundColor: ['#007bff']
 					}]
@@ -635,7 +651,7 @@
 			let myMemoryDounghunt = new Chart(memoryDoughnut, {
 				type: 'doughnut',
 				data: {
-					labels: ['Memory used in GB', 'Memory available in GB'],
+					labels: [dashboardLabels.memoryUsed, dashboardLabels.memoryAvailable],
 					datasets: [{
 						data: [memoryCounts.Memory_usage, memoryAvailable],
 						backgroundColor: ['#007bff','#ffc107']
@@ -659,28 +675,7 @@
 				}
 			});
 
-			// Slurm job bar chart
-			let slurmJobCounts = {
-				Running: $("#slurmRunning").attr("data-running"),
-				Pending: $("#slurmPending").attr("data-pending")
-			};
-			let slurmJobChart = $('#slurmJobChart')[0].getContext('2d');
-			// Creation of the slurm job bar chart
-			let mySlurmJobChart = new Chart(slurmJobChart, {
-				type: 'bar',
-				data: {
-					labels: ['Running', 'Pending'],
-					datasets: [{
-						label: 'Number of slurm job by status',
-						data: [slurmJobCounts.Running, slurmJobCounts.Pending],
-						backgroundColor: ['#007bff']
-					}]
-				},
-				options: {
-					responsive: true,
-					maintainAspectRatio: false	
-				}	
-			});
+			
 
 			// CPU doughnut
 			let cpuCounts = {
@@ -693,7 +688,7 @@
 			let myCPUDounghunt = new Chart(cpuDoughnut, {
 				type: 'doughnut',
 				data: {
-					labels: ['Number of CPU used', 'Number of CPU available'],
+					labels: [dashboardLabels.cpuUsed, dashboardLabels.cpuAvailable],
 					datasets: [{
 						data: [cpuCounts.CPU_usage, cpuAvailable],
 						backgroundColor: ['#007bff','#ffc107']

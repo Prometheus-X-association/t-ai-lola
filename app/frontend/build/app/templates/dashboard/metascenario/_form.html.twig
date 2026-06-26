@@ -1,10 +1,10 @@
 {{ form_start(form) }}
-{{ form_row(form.name, {'label': 'dashboard.scenario.form.nom'|trans}) }}
-{{ form_row(form.urlRepository, {'label': 'dashboard.scenario.form.repo_git'|trans}) }}
-{{ form_row(form.description, {'label': 'dashboard.scenario.form.description'|trans}) }}
-{{ form_row(form.isPublic, {'label': 'Public ?'}) }}
+{{ form_row(form.name) }}
+{{ form_row(form.urlRepository) }}
+{{ form_row(form.description) }}
+{{ form_row(form.isPublic) }}
 <button class="btn btn-success float-right btn-block">
-    {{ button_label|default('dashboard.scenario.form.btn_enregistrer'|trans) }}
+    {{ (button_label|default('dashboard.metascenario.form.btn_enregistrer'))|trans }}
 </button>
 {{ form_end(form) }}
 

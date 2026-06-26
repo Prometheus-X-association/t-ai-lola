@@ -1,106 +1,134 @@
 {% extends "public/base/layout.html.twig" %}
+{% block title %}
+    {% trans %}public.accueil.title{% endtrans %}
+{% endblock %}
 
 {% block content %}
-    <div class="login-wrap" id="login-wrap">
+    {% set registerHasError = formHasError|default('0') == '1' %}
+    <div class="login-wrap{% if app.user %} home-wrap{% endif %}{% if registerHasError %} register-has-error{% endif %}" id="login-wrap">
         <div class="login-html">
             <h2>Lola</h2>
             <blockquote class="smallcaps">Laboratoire Ouvert en Learning Analytics</blockquote>
 
             <div class="hr-sm"></div>
             {% if not app.user %}
-                <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab" id="tab-login">{% trans %}dashboard.accueil.connexion{% endtrans %}</label>
-                <input id="tab-2" type="radio" name="tab" class="for-pwd float-right"><label for="tab-2" class="tab" id="tab-register">{% trans %}dashboard.accueil.inscription{% endtrans %}</label>
+                <div class="auth-tabs" role="tablist" aria-label="{{ 'public.accessibility.auth_tabs'|trans }}">
+                    <input id="tab-1" type="radio" name="tab" class="sign-in" aria-controls="login-panel"{% if not registerHasError %} checked{% endif %}>
+                    <label for="tab-1" class="tab" id="tab-login" role="tab" aria-controls="login-panel" aria-selected="{{ registerHasError ? 'false' : 'true' }}">{% trans %}public.accueil.connexion{% endtrans %}</label>
+                    <input id="tab-2" type="radio" name="tab" class="for-pwd" aria-controls="register-panel"{% if registerHasError %} checked{% endif %}>
+                    <label for="tab-2" class="tab" id="tab-register" role="tab" aria-controls="register-panel" aria-selected="{{ registerHasError ? 'true' : 'false' }}">{% trans %}public.accueil.inscription{% endtrans %}</label>
+                </div>
             {% endif %}
 
             <div class="login-form">
                 {% if app.user %}
-                    <center><i class="fas fa-user-circle"></i> <em>{{ app.user }}</em></center>
+                    <div class="logged-user text-center">
+                        <i class="fas fa-user-circle mr-2" aria-hidden="true"></i>
+                        <em>{{ app.user }}</em>
+                    </div>
                     <div class="hr-sm"></div>
                     <div class="group">
                         {% if app.user.termsOfUse or app.user.isAdmin %}
-                            <a href="{{ path("dashboard_accueil") }}" class="button button-green btn" target="_blank"><i class="fas fa-cogs"> </i> {% trans %}dashboard.accueil.btn_dashboard{% endtrans %}</a>
+                            <a href="{{ path("dashboard_accueil") }}" class="button button-green btn" target="_blank">
+                                <i class="fas fa-cogs mr-2" aria-hidden="true"></i>
+                                <span>{% trans %}public.accueil.btn_dashboard{% endtrans %}</span>
+                            </a>
                         {% else %}
                             <div class="alert alert-warning" role="alert">
-                                Pour acceder au dashboard Lola, veuillez accepter la nouvelle charte du service. <hr />
+                                {% trans %}public.accueil.terms_update_warning{% endtrans %}<hr>
                                 <a href="#" id="link_terms" data-toggle="modal" data-target="#terms_update" class="btn btn-primary btn-sm btn-block">
-                                    {% trans %}dashboard.accueil.voir_conditions{% endtrans %}
+                                    {% trans %}public.accueil.voir_conditions{% endtrans %}
                                 </a>
                             </div>
                         {% endif %}
                     </div>
                     <div class="group">
-                    <a href="{{ path("account") }}" class="button button-blue btn"><i class="fas fa-user-circle"> </i> {% trans %}dashboard.accueil.btn_compte{% endtrans %}</a>
+                        <a href="{{ path("account") }}" class="button button-blue btn">
+                            <i class="fas fa-user-circle mr-2" aria-hidden="true"></i>
+                            <span>{% trans %}public.accueil.btn_compte{% endtrans %}</span>
+                        </a>
                     </div>
                     <div class="hr-sm"></div>
                     <div class="group">
-                        <a href="{{ path("app_logout") }}" class="button button-red btn"><i class="fas fa-sign-out-alt"> </i> {% trans %}dashboard.accueil.btn_deconnexion{% endtrans %}</a>
+                        <a href="{{ path("app_logout") }}" class="button button-red btn">
+                            <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i>
+                            <span>{% trans %}public.accueil.btn_deconnexion{% endtrans %}</span>
+                        </a>
                     </div>
                 {% else %}
-                    <div class="sign-in-htm">
+                    <div class="sign-in-htm" id="login-panel" role="tabpanel" aria-labelledby="tab-login" aria-hidden="{{ registerHasError ? 'true' : 'false' }}">
                         <form method="post" action="{{ path("app_login") }}">
                             <div class="group">
-                                <label for="user" class="label">{% trans %}dashboard.accueil.email{% endtrans %}</label>
-                                <input id="user" class="input" name="email" type="email" placeholder={% trans %}dashboard.accueil.email{% endtrans %} value="{{ last_username ?? "" }}" required>
+                                <label for="user" class="label">{% trans %}public.accueil.email{% endtrans %}</label>
+                                <input id="user" class="input" name="email" type="email" placeholder="{{ 'public.accueil.email'|trans }}" value="{{ last_username ?? "" }}" autocomplete="email" required>
                             </div>
                             <div class="group">
-                                <label for="pass" class="label">{% trans %}dashboard.accueil.password{% endtrans %}</label>
-                                <input id="pass" class="input" data-type="password" name="password" type="password" placeholder={% trans %}dashboard.accueil.password{% endtrans %} required>
+                                <label for="pass" class="label">{% trans %}public.accueil.password{% endtrans %}</label>
+                                <input id="pass" class="input" data-type="password" name="password" type="password" placeholder="{{ 'public.accueil.password'|trans }}" autocomplete="current-password" required>
                             </div>
                             <div class="group">
-                                <input type="submit" class="button button-blue" value={% trans %}dashboard.accueil.btn_connexion{% endtrans %} href="{{ path("homepage") }}" >
+                                <input type="submit" class="button button-blue" value="{{ 'public.accueil.btn_connexion'|trans }}" href="{{ path("homepage") }}" >
                             </div>
                             <div class="hr-sm"></div>
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                         </form>
-                        <center><a href="https://lola.loria.fr" target="_blank" class="text-white">{% trans %}dashboard.accueil.btn_lola_site_publique{% endtrans %}<i class="fas fa-external-link-alt"></i></a></center>
+                        <center>
+                            <a href="https://lola.loria.fr" target="_blank" class="text-white public-site-link">
+                                <span>{% trans %}public.accueil.btn_lola_site_publique{% endtrans %}</span>
+                                <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                            </a>
+                        </center>
                     </div>
-                    <div class="for-pwd-htm">
+                    <div class="for-pwd-htm" id="register-panel" role="tabpanel" aria-labelledby="tab-register" aria-hidden="{{ registerHasError ? 'false' : 'true' }}">
                         {% for flashError in app.flashes('verify_email_error') %}
                             <div class="alert alert-danger" role="alert">{{ flashError }}</div>
                         {% endfor %}
                         {{ form_start(form) }}
 
                         <div class="group">
-                            <label for="email" class="label">{% trans %}dashboard.accueil.email{% endtrans %}</label>
-                            {{ form_widget(form.email, { 'attr': {'class': 'input'} }) }}
+                            {{ form_label(form.email, 'public.accueil.email'|trans, { 'label_attr': {'class': 'label'} }) }}
+                            {{ form_widget(form.email, { 'attr': {'class': 'input', 'autocomplete': 'email'} }) }}
                             <div class="form-error">
                                 {{ form_errors(form.email) }}
                             </div>
                         </div>
                         <div class="group">
-                            <label for="firstname" class="label">{% trans %}dashboard.accueil.prenom{% endtrans %}</label>
-                            {{ form_widget(form.firstname, { 'attr': {'class': 'input'} }) }}
+                            {{ form_label(form.firstname, 'public.accueil.prenom'|trans, { 'label_attr': {'class': 'label'} }) }}
+                            {{ form_widget(form.firstname, { 'attr': {'class': 'input', 'autocomplete': 'given-name'} }) }}
                             <div class="form-error">
                                 {{ form_errors(form.firstname) }}
                             </div>
                         </div>
                         <div class="group">
-                            <label for="lastname" class="label">{% trans %}dashboard.accueil.nom{% endtrans %}</label>
-                            {{ form_widget(form.lastname, { 'attr': {'class': 'input'} }) }}
+                            {{ form_label(form.lastname, 'public.accueil.nom'|trans, { 'label_attr': {'class': 'label'} }) }}
+                            {{ form_widget(form.lastname, { 'attr': {'class': 'input', 'autocomplete': 'family-name'} }) }}
                             <div class="form-error">
                                 {{ form_errors(form.lastname) }}
                             </div>
                         </div>
                         <div class="group">
-                            <label for="password" class="label">{% trans %}dashboard.accueil.password{% endtrans %}</label>
-                            {{ form_widget(form.plainPassword, { 'attr': {'class': 'input'} }) }}
+                            {{ form_label(form.plainPassword, 'public.accueil.password'|trans, { 'label_attr': {'class': 'label'} }) }}
+                            {{ form_widget(form.plainPassword, { 'attr': {'class': 'input', 'autocomplete': 'new-password'} }) }}
                             <div class="form-error">
                                 {{ form_errors(form.plainPassword) }}
                             </div>
                         </div>
 
-                        <div class="row pb-2 pt-2 ml-1 mr-1 group">
-                            <div class="col-md-8">
-                                <a href="#" id="link_terms" class="label" data-toggle="modal" data-target="#terms">{% trans %}dashboard.accueil.voir_conditions{% endtrans %}</a>
-                                <hr>
-                                {{ form_widget(form.agreeTerms, {label: 'dashboard.accueil.accepter_conditions'|trans}) }}
+                        <div class="register-options group">
+                            <div class="register-terms">
+                                <a href="#" id="link_terms" class="label" data-toggle="modal" data-target="#terms">{% trans %}public.accueil.voir_conditions{% endtrans %}</a>
+                                <div class="terms-divider"></div>
+                                {{ form_widget(form.agreeTerms, {
+                                    'label': 'public.accueil.accepter_conditions'
+                                }) }}
                                 <div class="form-error">
                                     {{ form_errors(form.agreeTerms) }}
                                 </div>
                             </div>
-                            <div class="col-md-4 text-right">
-                                <label for="captcha" class="label">Captcha</label>
-                                {{ form_widget(form.captcha, { 'attr': {'class': 'input'} }) }}
+                            <div class="register-captcha">
+                                {{ form_label(form.captcha, 'public.accueil.captcha'|trans, { 'label_attr': {'class': 'label'} }) }}
+                                <span id="captcha-help" class="sr-only">{% trans %}public.accessibility.captcha_help{% endtrans %}</span>
+                                {{ form_widget(form.captcha, { 'attr': {'class': 'input', 'aria-describedby': 'captcha-help', 'autocomplete': 'off'} }) }}
                                 <div class="form-error">
                                     {{ form_errors(form.captcha) }}
                                 </div>
@@ -108,7 +136,7 @@
                         </div>
                         <input type="hidden" id="formHasError" value="{{ formHasError ?? '0' }}">
 
-                        <button type="submit" class="btn btn-outline-success btn-lg btn-block mt-4">{% trans %}dashboard.accueil.inscription{% endtrans %}</button>
+                        <button type="submit" class="btn btn-outline-success btn-lg btn-block mt-4">{% trans %}public.accueil.inscription{% endtrans %}</button>
                         {{ form_end(form) }}
                     </div>
                 {% endif %}
@@ -122,9 +150,9 @@
             <div class="modal-content text-dark font-weight-light">
                 <div class="modal-header">
                     <h4 class="modal-title">
-                        Conditions générales d'utilisation du service
+                        {% trans %}public.accueil.terms_modal_title{% endtrans %}
                     </h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'public.accueil.btn_fermer'|trans }}">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -134,7 +162,9 @@
                 {% endif %}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        {% trans %}public.accueil.btn_fermer{% endtrans %}
+                    </button>
                 </div>
             </div>
         </div>
@@ -145,9 +175,9 @@
             <div class="modal-content text-dark font-weight-light">
                 <div class="modal-header">
                     <h4 class="modal-title">
-                        Conditions générales d'utilisation du service
+                        {% trans %}public.accueil.terms_modal_title{% endtrans %}
                     </h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'public.accueil.btn_fermer'|trans }}">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -155,8 +185,13 @@
                     {{ termsOfUse.description | raw }}
                 </div>
                 <div class="modal-footer">
-                    <a href="{{ path("app_terms_update") }}" type="button" class="btn btn-success">Accepter</a>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                    <a href="{{ path('app_terms_update') }}" type="button" class="btn btn-success">
+                        {% trans %}public.accueil.btn_accepter{% endtrans %}
+                    </a>
+
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        {% trans %}public.accueil.btn_fermer{% endtrans %}
+                    </button>
                 </div>
             </div>
         </div>

@@ -12,9 +12,15 @@ class GroupType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('description')
-            ->add('users')
+            ->add('name', null, [
+                'label' => 'dashboard.groupe.form.nom',
+            ])
+            ->add('description', null, [
+                'label' => 'dashboard.groupe.form.description',
+            ])
+            ->add('users', null, [
+                'label' => 'dashboard.groupe.form.liste_utilisateurs',
+            ])
         ;
     }
 

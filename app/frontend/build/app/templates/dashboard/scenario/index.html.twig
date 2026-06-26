@@ -1,5 +1,5 @@
 {% extends "dashboard/base/layout.html.twig" %}
-{% block title %} Scénarios {% endblock %}
+{% block title %} {% trans %}dashboard.scenario.index.titre_page{% endtrans %} {% endblock %}
 
 {% block content %}
 
@@ -20,7 +20,7 @@
         <table class="table table-bordered dt-basic" id="table_scenarios" width="98%" cellspacing="0">
             <thead>
                 <tr>
-                    <th scope="col">{% trans %}dashboard.scenario.index.th_template_scenario{% endtrans %} <sup><span class="badge badge-info">Tag</span></sup> </th>
+                    <th scope="col">{% trans %}dashboard.scenario.index.th_template_scenario{% endtrans %} <sup><span class="badge badge-info">{% trans %}dashboard.scenario.index.th_tag{% endtrans %}</span></sup> </th>
                     <th scope="col">{% trans %}dashboard.scenario.index.th_dataset{% endtrans %}</th>
                     <th scope="col">{% trans %}dashboard.scenario.index.th_date_creation{% endtrans %}</th>
                     <th scope="col">{% trans %}dashboard.scenario.index.th_date_modification{% endtrans %}</th>
@@ -29,76 +29,77 @@
             </thead>
             <tbody>
                 {% for scenario in scenarios %}
+                <tr>
                     <!-- colonne Template-scenario -->
-                <td>
-                    <a href="#" id="link_modal_user_token" data-toggle="modal" data-target="#modal_metascenario_parametre_{{ scenario.id }}">
-                        {{ scenario.metascenario.name }}
-                        <!-- badge du Tag -->
-                        <span class="badge badge-info">{{ scenario.tag.name }}</span>
-                    </a>
-                </td>
-                <!-- colonne Dataset -->
-                <td>
-                    {% if scenario.dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
-                    <a href="#" id="button_modal_dataset_{{ scenario.dataset.hash }}" data-toggle="modal" data-target="#modal_dataset_detail_{{ scenario.dataset.hash }}" data-hash="{{ scenario.dataset.hash }}">
-                        {{ scenario.dataset.name }}
-                    </a>
-                    {% endif %}
-                    </td>
-                    <!--colonne Creation Date -->
-                    <td data-sort="{{ scenario.createdAt|date('U') }}">
-                        {% if scenario.createdBy is not null and scenario.createdAt is not null%}
-                            {{ scenario.createdAt | date('d-m-Y H:i:s') }}
-                            <br /><i>({{ scenario.createdBy }})</i>
-                        {% else %}
-                            <i>{% trans %}dashboard.scenario.index.non_defini{% endtrans %}</i>
-                        {% endif %}
-                    </td>
-                    <!-- colonne Modification Date -->
                     <td>
-                        {% if scenario.updatedBy is not null and scenario.updatedAt is not null%}
-                            {{ scenario.updatedAt | date('d-m-Y H:i:s') }}
-                            <br /><i>({{ scenario.updatedBy }})</i>
-                        {% else %}
-                            <i>{% trans %}dashboard.scenario.index.non_defini{% endtrans %}</i>
-                        {% endif %}
+                        <a href="#" id="link_modal_user_token" data-toggle="modal" data-target="#modal_metascenario_parametre_{{ scenario.id }}">
+                            {{ scenario.metascenario.name }}
+                            <!-- badge du Tag -->
+                            <span class="badge badge-info">{{ scenario.tag.name }}</span>
+                        </a>
                     </td>
+                    <!-- colonne Dataset -->
                     <td>
-                        <form method="post" class="form" action="{{ path('dashboard_scenario_execute', {'id': scenario.id}) }}">
-                            {% if scenario.isActive %}
-                                <!-- Bouton Runs list -->
-                                <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_run_index_scenario', {'id': scenario.id}) }}">
-                                    <i class="fas fa-list"></i> {% trans %}dashboard.scenario.index.btn_liste_runs{% endtrans %}
-                                </a>
-                                <!-- Bouton Execute -->
-                                <input type="hidden" name="_method" value="POST">
-                                <input type="hidden" name="_token" value="{{ csrf_token('execute' ~ scenario.id) }}">
-                                <button type="submit" class="btn btn-outline-primary btn-sm" href="#">
-                                    <i class="fa fa-cogs"></i> {% trans %}dashboard.scenario.index.btn_execute{% endtrans %}
-                                </button>
-                                <!-- Bouton Parameters -->
-                                <a href="#" id="link_modal_user_token" data-toggle="modal" data-target="#modal_scenario_parametre_{{ scenario.id }}" class="btn btn-outline-primary btn-sm">
-                                    {% trans %}dashboard.scenario.index.btn_parametre{% endtrans %}
-                                </a>
-
-                                <hr />
-
-                                <!-- Bouton Disable -->
-                                <a href="{{ path("dashboard_scenario_toggle_active", {'id': scenario.id}) }}" class="btn btn-outline-danger btn-sm">
-                                    <i class="fas fa-times"></i> {% trans %}dashboard.scenario.index.btn_desactiver{% endtrans %}
-                                </a>
-                                <!-- Bouton Edit -->
-                                <a href="{{ path("dashboard_scenario_edit_prepare", {'id': scenario.id}) }}" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-edit"></i> {% trans %}dashboard.scenario.index.btn_modifier{% endtrans %}
-                                </a>
-
+                        {% if scenario.dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
+                        <a href="#" id="button_modal_dataset_{{ scenario.dataset.hash }}" data-toggle="modal" data-target="#modal_dataset_detail_{{ scenario.dataset.hash }}" data-hash="{{ scenario.dataset.hash }}">
+                            {{ scenario.dataset.name }}
+                        </a>
+                        {% endif %}
+                        </td>
+                        <!--colonne Creation Date -->
+                        <td data-sort="{{ scenario.createdAt|date('U') }}">
+                            {% if scenario.createdBy is not null and scenario.createdAt is not null%}
+                                {{ scenario.createdAt | date('d-m-Y H:i:s') }}
+                                <br /><i>({{ scenario.createdBy }})</i>
                             {% else %}
-                                <a href="{{ path("dashboard_scenario_toggle_active", {'id': scenario.id}) }}" class="btn btn-outline-danger btn-sm">
-                                    <i class="fas fa-check"></i> {% trans %}dashboard.scenario.index.btn_activer{% endtrans %}
-                                </a>
+                                <i>{% trans %}dashboard.scenario.index.non_defini{% endtrans %}</i>
                             {% endif %}
-                        </form>
-                    </td>
+                        </td>
+                        <!-- colonne Modification Date -->
+                        <td>
+                            {% if scenario.updatedBy is not null and scenario.updatedAt is not null%}
+                                {{ scenario.updatedAt | date('d-m-Y H:i:s') }}
+                                <br /><i>({{ scenario.updatedBy }})</i>
+                            {% else %}
+                                <i>{% trans %}dashboard.scenario.index.non_defini{% endtrans %}</i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" class="form" action="{{ path('dashboard_scenario_execute', {'id': scenario.id}) }}">
+                                {% if scenario.isActive %}
+                                    <!-- Bouton Runs list -->
+                                    <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_run_index_scenario', {'id': scenario.id}) }}">
+                                        <i class="fas fa-list"></i> {% trans %}dashboard.scenario.index.btn_liste_runs{% endtrans %}
+                                    </a>
+                                    <!-- Bouton Execute -->
+                                    <input type="hidden" name="_method" value="POST">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('execute' ~ scenario.id) }}">
+                                    <button type="submit" class="btn btn-outline-primary btn-sm" href="#">
+                                        <i class="fa fa-cogs"></i> {% trans %}dashboard.scenario.index.btn_execute{% endtrans %}
+                                    </button>
+                                    <!-- Bouton Parameters -->
+                                    <a href="#" id="link_modal_user_token" data-toggle="modal" data-target="#modal_scenario_parametre_{{ scenario.id }}" class="btn btn-outline-primary btn-sm">
+                                        {% trans %}dashboard.scenario.index.btn_parametre{% endtrans %}
+                                    </a>
+
+                                    <hr />
+
+                                    <!-- Bouton Disable -->
+                                    <a href="{{ path("dashboard_scenario_toggle_active", {'id': scenario.id}) }}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-times"></i> {% trans %}dashboard.scenario.index.btn_desactiver{% endtrans %}
+                                    </a>
+                                    <!-- Bouton Edit -->
+                                    <a href="{{ path("dashboard_scenario_edit_prepare", {'id': scenario.id}) }}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-edit"></i> {% trans %}dashboard.scenario.index.btn_modifier{% endtrans %}
+                                    </a>
+
+                                {% else %}
+                                    <a href="{{ path("dashboard_scenario_toggle_active", {'id': scenario.id}) }}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-check"></i> {% trans %}dashboard.scenario.index.btn_activer{% endtrans %}
+                                    </a>
+                                {% endif %}
+                            </form>
+                        </td>
                     </tr>
 
                     <!-- modal parametre -->
@@ -107,7 +108,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h4 class="modal-title">
-                                        <strong><em>Paramètres</em></strong>
+                                        <strong><em>{% trans %}dashboard.scenario.index.modal_parametres{% endtrans %}</em></strong>
                                         <blockquote class="subtitle"><h6>{{ scenario.metaScenario.name }} - </h6></blockquote>
                                     </h4>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -116,7 +117,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="col-12">
-                                        <strong>Scénario</strong>
+                                        <strong>{% trans %}dashboard.scenario.index.label_scenario{% endtrans %}</strong>
                                         <pre class="format_json">
                                             {{ scenario.parametres| json_encode() }}
                                         </pre>
@@ -221,7 +222,7 @@
 
                     {% else %}
                         <tr>
-                            <td colspan="4"><em>Aucun scenario</em></td>
+                            <td colspan="4"><em>{% trans %}dashboard.scenario.index.aucun_scenario{% endtrans %}</em></td>
                         </tr>
                         {% endfor %}
                             </tbody>
