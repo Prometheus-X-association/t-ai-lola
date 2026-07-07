@@ -6,10 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use FOS\RestBundle\Controller\Annotations\RequestParam;
 use Doctrine\ORM\EntityManagerInterface;
-use OpenApi\Annotations as OA;
-use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use App\Lolapy\LolapyServiceApi;
 use App\Entity\Run;
 use App\Entity\RunLogs;
@@ -19,19 +17,10 @@ class ScenarioController extends AbstractController {
 
     /**
      * Notify when Lolapy start the processing of the Trax db
-     *
-     * @OA\Response(
-     *     response=200,
-     *     description="",
-     * )
-     * @OA\Parameter(
-     *     name="run hash",
-     *     in="query",
-     *     description="The hash of the run",
-     *     @OA\Schema(type="string")
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\Response(response: 200, description: 'Run status updated to SCHEDULING_TRAX_DB.')]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/start/trax/{hash}', methods: ['GET'])]
     public function startTrax(Run $run, EntityManagerInterface $em): Response
     {
@@ -42,19 +31,10 @@ class ScenarioController extends AbstractController {
 
     /**
      * Notify when Lolapy finish the processing of the Trax db and wait for Nextflow
-     *
-     * @OA\Response(
-     *     response=200,
-     *     description="",
-     * )
-     * @OA\Parameter(
-     *     name="run hash",
-     *     in="query",
-     *     description="The hash of the run",
-     *     @OA\Schema(type="string")
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\Response(response: 200, description: 'Run status updated to WAITING_NEXTFLOW.')]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/complete/trax/{hash}', methods: ['GET'])]
     public function completeTrax(Run $run, EntityManagerInterface $em): Response
     {
@@ -65,20 +45,10 @@ class ScenarioController extends AbstractController {
 
     /**
      * Notify when Lolapy start to run the scenario
-     *
-     * @OA\Response(
-     *     response=200,
-     *     description="",
-     * )
-     * @OA\Parameter(
-     *     name="run hash",
-     *     description="Hash of the run",
-     *     in="query",
-     *     description="The hash of the run",
-     *     @OA\Schema(type="string")
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\Response(response: 200, description: 'Run status updated to RUNNING_SCENARIO.')]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/start/nextflow/{hash}', methods: ['GET'])]
     public function startNextflow(Run $run, EntityManagerInterface $em): Response
     {
@@ -89,19 +59,11 @@ class ScenarioController extends AbstractController {
 
     /**
      * Notify when Lolapy finish to run the scenario and send to Lolapy the last algorithme workdir
-     *
-     * @OA\Response(
-     *     response=200,
-     *     description="",
-     * )
-     * @OA\Parameter(
-     *     name="run hash",
-     *     in="query",
-     *     description="The hash of the run",
-     *     @OA\Schema(type="string")
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\Response(response: 200, description: 'Run status updated to COMPLETED and result preparation started when work directories are available.')]
+    #[OA\Response(response: 400, description: 'No run logs found for this run.', content: new OA\JsonContent(type: 'string', example: 'No run logs found for the run'))]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/complete/nextflow/{hash}', methods: ['GET'])]
     public function completeNextflow(Run $run, EntityManagerInterface $em, LolapyServiceApi $lolapy): Response
     {
@@ -130,19 +92,10 @@ class ScenarioController extends AbstractController {
 
     /**
      * Notify when an error occured during the execution of the scenario
-     *
-     * @OA\Response(
-     *     response=200,
-     *     description="",
-     * )
-     * @OA\Parameter(
-     *     name="run hash",
-     *     in="query",
-     *     description="The hash of the run",
-     *     @OA\Schema(type="string")
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\Response(response: 200, description: 'Run status updated to ERROR.')]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/error/{hash}', methods: ['GET'])]
     public function error(Run $run, EntityManagerInterface $em): Response
     {
@@ -153,27 +106,24 @@ class ScenarioController extends AbstractController {
 
     /**
      * Collect Nextflow logs for processes only during scenario execution and put status in Submit.
-     *
-     * @OA\Response(response=200, description=""),
-     * @OA\Response(response=400, description="The hash of the run is invalid"),
-     * @RequestParam(
-     *      name="processName",
-     *      description="The name of the process",
-     * )
-     * @RequestParam(
-     *      name="eventTime",
-     *      description="The time marked for the status change",
-     * )
-     * @RequestParam(
-     *      name="workDir",
-     *      description="The path of the working directory. Used to find output results",
-     * )
-     * @RequestParam(
-     *      name="statistics",
-     *      description="the statistics displayed after the done status",
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\RequestBody(
+        required: true,
+        description: 'Nextflow process submit event.',
+        content: new OA\JsonContent(
+            required: ['processName', 'eventTime', 'workDir'],
+            properties: [
+                new OA\Property(property: 'processName', type: 'string', example: 'extract_features'),
+                new OA\Property(property: 'eventTime', type: 'string', format: 'date-time', example: '2026-06-26T10:15:28+02:00'),
+                new OA\Property(property: 'workDir', type: 'string', example: '/work/ab/cdef1234567890'),
+                new OA\Property(property: 'statistics', type: 'object', nullable: true, example: ['cpus' => 2, 'memory' => '4 GB', 'duration' => '12s']),
+            ],
+        ),
+    )]
+    #[OA\Response(response: 200, description: 'Process log created or updated with SUBMIT status.')]
+    #[OA\Response(response: 400, description: 'Invalid run hash, invalid payload, or workflow already in error.', content: new OA\JsonContent(type: 'string', example: 'Incorrect data'))]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/process/submit/{hash}', methods: ['POST'])]
     public function submitProcess(Request $request, EntityManagerInterface $em, String $hash): Response
     {
@@ -225,27 +175,24 @@ class ScenarioController extends AbstractController {
 
     /**
      * Put status in Run.
-     *
-     * @OA\Response(response=200, description=""),
-     * @OA\Response(response=400, description="The hash of the run is invalid"),
-     * @RequestParam(
-     *      name="processName",
-     *      description="The name of the process",
-     * )
-     * @RequestParam(
-     *      name="eventTime",
-     *      description="The time marked for the status change",
-     * )
-     * @RequestParam(
-     *      name="workDir",
-     *      description=" The path of the working directory. Used to find output results",
-     * )
-     * @RequestParam(
-     *      name="statistics",
-     *      description="the statistics displayed after the done status",
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\RequestBody(
+        required: true,
+        description: 'Nextflow process run event.',
+        content: new OA\JsonContent(
+            required: ['processName', 'eventTime', 'workDir'],
+            properties: [
+                new OA\Property(property: 'processName', type: 'string', example: 'extract_features'),
+                new OA\Property(property: 'eventTime', type: 'string', format: 'date-time', example: '2026-06-26T10:16:01+02:00'),
+                new OA\Property(property: 'workDir', type: 'string', example: '/work/ab/cdef1234567890'),
+                new OA\Property(property: 'statistics', type: 'object', nullable: true, example: ['cpus' => 2, 'memory' => '4 GB', 'duration' => '30s']),
+            ],
+        ),
+    )]
+    #[OA\Response(response: 200, description: 'Process log created or updated with RUN status.')]
+    #[OA\Response(response: 400, description: 'Invalid run hash, invalid payload, or forbidden status transition.', content: new OA\JsonContent(type: 'string', example: 'Hash does not exist'))]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/process/run/{hash}', methods: ['POST'])]
     public function runProcess(Request $request, EntityManagerInterface $em, String $hash): Response
     {
@@ -313,27 +260,24 @@ class ScenarioController extends AbstractController {
     
    /**
      * Put status in Done.
-     *
-     * @OA\Response(response=200, description=""),
-     * @OA\Response(response=400, description="The hash of the run is invalid"),
-     * @RequestParam(
-     *      name="processName",
-     *      description="The name of the process",
-     * )
-     * @RequestParam(
-     *      name="eventTime",
-     *      description="The time marked for the status change",
-     * )
-     * @RequestParam(
-     *      name="workDir",
-     *      description="The path of the working directory. Used to find output results",
-     * )
-     * @RequestParam(
-     *      name="statistics",
-     *      description="the statistics displayed after the done status",
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\RequestBody(
+        required: true,
+        description: 'Nextflow process done event.',
+        content: new OA\JsonContent(
+            required: ['processName', 'eventTime', 'workDir', 'statistics'],
+            properties: [
+                new OA\Property(property: 'processName', type: 'string', example: 'extract_features'),
+                new OA\Property(property: 'eventTime', type: 'string', format: 'date-time', example: '2026-06-26T10:20:44+02:00'),
+                new OA\Property(property: 'workDir', type: 'string', example: '/work/ab/cdef1234567890'),
+                new OA\Property(property: 'statistics', type: 'object', example: ['cpus' => 2, 'memory' => '4 GB', 'duration' => '4m16s', 'exit' => 0]),
+            ],
+        ),
+    )]
+    #[OA\Response(response: 200, description: 'Process log created or updated with DONE status.')]
+    #[OA\Response(response: 400, description: 'Invalid run hash, invalid payload, or workflow already in error.', content: new OA\JsonContent(type: 'string', example: 'Hash or processName does not exist'))]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/process/done/{hash}', methods: ['POST'])]
     public function doneProcess(Request $request, EntityManagerInterface $em, String $hash): Response
     {
@@ -384,27 +328,24 @@ class ScenarioController extends AbstractController {
     
     /**
      * Put status in Error.
-     *
-     * @OA\Response(response=200, description=""),
-     * @OA\Response(response=400, description="The hash of the run is invalid"),
-     * @RequestParam(
-     *      name="processName",
-     *      description="The name of the process",
-     * )
-     * @RequestParam(
-     *      name="eventTime",
-     *      description="The time marked for the status change",
-     * )
-     * @RequestParam(
-     *      name="workDir",
-     *      description="The path of the working directory. Used to find output results",
-     * )
-     * @RequestParam(
-     *      name="statistics",
-     *      description="the statistics displayed after the done status",
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\RequestBody(
+        required: true,
+        description: 'Nextflow process error event.',
+        content: new OA\JsonContent(
+            required: ['processName', 'eventTime', 'workDir'],
+            properties: [
+                new OA\Property(property: 'processName', type: 'string', example: 'extract_features'),
+                new OA\Property(property: 'eventTime', type: 'string', format: 'date-time', example: '2026-06-26T10:21:05+02:00'),
+                new OA\Property(property: 'workDir', type: 'string', example: '/work/ab/cdef1234567890'),
+                new OA\Property(property: 'statistics', type: 'object', nullable: true, example: ['exit' => 1, 'message' => 'Process failed']),
+            ],
+        ),
+    )]
+    #[OA\Response(response: 200, description: 'Process log updated with ERROR status.')]
+    #[OA\Response(response: 400, description: 'Invalid run hash, process name, or request body.', content: new OA\JsonContent(type: 'string', example: 'Incorrect data'))]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/process/error/{hash}', methods: ['POST'])]
     public function errorProcess(Request $request, EntityManagerInterface $em, Run $run): Response
     {
@@ -429,20 +370,10 @@ class ScenarioController extends AbstractController {
 
     /**
      * Notify when Lolapy end the compression of the results of the run
-     *
-     * @OA\Response(
-     *     response=200,
-     *     description="",
-     * )
-     * @OA\Parameter(
-     *     name="run hash",
-     *     description="Hash of the run",
-     *     in="query",
-     *     description="The hash of the run",
-     *     @OA\Schema(type="string")
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\Response(response: 200, description: 'Run marked as having an output archive.')]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/results/complete/{hash}', methods: ['GET'])]
     public function resultComplete(Run $run, EntityManagerInterface $em): Response
     {
@@ -454,17 +385,21 @@ class ScenarioController extends AbstractController {
     
     /**
      * Put the status of Workflow in Run
-     *
-     * @OA\Response(response=201, description=""),
-     * @OA\Response(response=400, description="The hash of the run is invalid"),
-     *
-     * @RequestParam(
-     *      name="eventTime",
-     *      description="The time marked for the status change",
-     * )
-     *
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\RequestBody(
+        required: true,
+        description: 'Nextflow workflow run event.',
+        content: new OA\JsonContent(
+            required: ['eventTime'],
+            properties: [
+                new OA\Property(property: 'eventTime', type: 'string', format: 'date-time', example: '2026-06-26T10:15:28+02:00'),
+            ],
+        ),
+    )]
+    #[OA\Response(response: 200, description: 'Workflow log created with RUN status.')]
+    #[OA\Response(response: 400, description: 'Invalid run hash or request body.', content: new OA\JsonContent(type: 'string', example: 'Hash does not exist'))]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/workflow/run/{hash}', methods: ['POST'])]
     public function workflowRun(Request $request, EntityManagerInterface $em, String $hash): Response
     {
@@ -493,17 +428,21 @@ class ScenarioController extends AbstractController {
 
     /**
      * Put the status of Workflow in Done
-
-     * @OA\Response(response=201, description=""),
-     * @OA\Response(response=400, description="The hash of the run is invalid"),
-     *
-     * @RequestParam(
-     *      name="eventTime",
-     *      description="The time marked for the status change",
-     * )
-     *
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\RequestBody(
+        required: true,
+        description: 'Nextflow workflow done event.',
+        content: new OA\JsonContent(
+            required: ['eventTime'],
+            properties: [
+                new OA\Property(property: 'eventTime', type: 'string', format: 'date-time', example: '2026-06-26T10:24:12+02:00'),
+            ],
+        ),
+    )]
+    #[OA\Response(response: 200, description: 'Workflow log created with DONE status.')]
+    #[OA\Response(response: 400, description: 'Invalid run hash or request body.', content: new OA\JsonContent(type: 'string', example: 'Incorrect data'))]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/workflow/done/{hash}', methods: ['POST'])]
     public function workflowDone(Request $request, EntityManagerInterface $em, String $hash): Response
     {
@@ -531,20 +470,22 @@ class ScenarioController extends AbstractController {
 
     /**
      * Put the status of Workflow in Error
-     *
-     * @OA\Response(response=201, description=""),
-     * @OA\Response(response=400, description="The hash of the run is invalid"),
-     *
-     * @RequestParam(
-     *      name="eventTime",
-     *      description="The time marked for the status change",
-     * )
-     *@RequestParam(
-     *      name="errorReport",
-     *      description="",
-     * )
-     * @OA\Tag(name="Scenario")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Run hash.', schema: new OA\Schema(type: 'string'), example: 'R2f5c54f2d5f745988c2287a70e73213')]
+    #[OA\RequestBody(
+        required: true,
+        description: 'Nextflow workflow error event.',
+        content: new OA\JsonContent(
+            required: ['eventTime', 'errorReport'],
+            properties: [
+                new OA\Property(property: 'eventTime', type: 'string', format: 'date-time', example: '2026-06-26T10:25:01+02:00'),
+                new OA\Property(property: 'errorReport', type: 'string', example: 'Nextflow workflow failed during process extract_features.'),
+            ],
+        ),
+    )]
+    #[OA\Response(response: 200, description: 'Workflow log created with ERROR status.')]
+    #[OA\Response(response: 400, description: 'Invalid run hash or request body.', content: new OA\JsonContent(type: 'string', example: 'Incorrect data'))]
+    #[OA\Tag(name: 'Scenario')]
     #[Route('/workflow/error/{hash}', methods: ['POST'])]
     public function workflowError(Request $request, EntityManagerInterface $em, String $hash): Response
     {
