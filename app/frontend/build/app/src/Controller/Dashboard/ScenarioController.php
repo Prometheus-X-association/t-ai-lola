@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Controller\LolaController;
+use App\Entity\AlgorithmVersion;
 use App\Entity\Scenario;
 use App\Entity\ScenarioAlgorithm;
 use App\Entity\Run;
@@ -109,14 +110,23 @@ class ScenarioController extends LolaController {
         $this->getSession()?->set('edit_scenario', $dataSession);
         $scenario = $this->getScenarioRepository()->find($dataSession["scenario"]->getId());
         $scenarioAlgorithms = $this->getScenarioAlgorithmRepository()->findBy(['scenario' => $scenario->getId()]);
-        $algorithmVersions = $this->getAlgorithmVersionRepository()->findBy(["status" => \App\Entity\AlgorithmVersion::STATUS_AVAILABLE]); 
+        $algorithmVersions = $this->getAlgorithmVersionRepository()->findAvailableForUser($this->getUser()); 
         $tableauAlgosScenario = [];
         // Insertion des algos interchangeables dans un tableau
         foreach ($scenarioAlgorithms as $algorithm) {
+            $algorithmVersion = $this->getAlgorithmVersionRepository()->findOneAvailableForUserByHash(
+                $algorithm->getAlgorithmVersion()->getHash(),
+                $this->getUser()
+            );
+
+            if (!$algorithmVersion) {
+                continue;
+            }
+
             $tableauAlgosScenario[] = [
-                "hash" => $algorithm->getAlgorithmVersion()->getHash(), 
-                "nameAlgo" => $algorithm->getAlgorithmVersion()->getAlgorithm()->getName(),
-                "nameAlgoVersion" => $algorithm->getAlgorithmVersion()->getName(), 
+                "hash" => $algorithmVersion->getHash(), 
+                "nameAlgo" => $algorithmVersion->getAlgorithm()->getName(),
+                "nameAlgoVersion" => $algorithmVersion->getName(), 
                 "nfVariable" => $algorithm->getNfVariable(),
                 "parameters" => $algorithm->getParametres()
             ];
@@ -252,7 +262,7 @@ class ScenarioController extends LolaController {
 
                     $scenarioAlgorithm = new ScenarioAlgorithm();
                     $scenarioAlgorithm->setScenario($scenario);
-                    $scenarioAlgorithm->setAlgorithmVersion($this->getAlgorithmVersionRepository()->findOneBy(["hash" => $algorithmHash]));
+                    $scenarioAlgorithm->setAlgorithmVersion($this->getVisibleAlgorithmVersion($algorithmHash));
                     $scenarioAlgorithm->setNfVariable($nfVariable);
                     $scenarioAlgorithm->setParametres($params);
 
@@ -306,7 +316,7 @@ class ScenarioController extends LolaController {
 
                     $scenarioAlgorithm = new ScenarioAlgorithm();
                     $scenarioAlgorithm->setScenario($scenario);
-                    $scenarioAlgorithm->setAlgorithmVersion($this->getAlgorithmVersionRepository()->findOneBy(["hash" => $algorithmHash]));
+                    $scenarioAlgorithm->setAlgorithmVersion($this->getVisibleAlgorithmVersion($algorithmHash));
                     $scenarioAlgorithm->setNfVariable($nfVariable);
                     $scenarioAlgorithm->setParametres($params);
 
@@ -367,7 +377,7 @@ class ScenarioController extends LolaController {
                                 'nf_variable' => $nfVariable
                             ]);
                             
-                            $valeur->setAlgorithmVersion($this->getAlgorithmVersionRepository()->findOneBy(["hash" => $algorithmHash]));
+                            $valeur->setAlgorithmVersion($this->getVisibleAlgorithmVersion($algorithmHash));
                             $valeur->setNfVariable($nfVariable);
                             $valeur->setParametres($params);
                             $this->getEm()->flush();
@@ -387,6 +397,17 @@ class ScenarioController extends LolaController {
 
          $this->logger->info('Redirecting to scenario index');
         return $this->redirectToRoute("dashboard_scenario_index");
+    }
+
+    private function getVisibleAlgorithmVersion(string $algorithmHash): AlgorithmVersion
+    {
+        $algorithmVersion = $this->getAlgorithmVersionRepository()->findOneAvailableForUserByHash($algorithmHash, $this->getUser());
+
+        if (!$algorithmVersion) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $algorithmVersion;
     }
 
 }   
@@ -415,4 +436,3 @@ class ScenarioController extends LolaController {
 //
 //        return $this->redirectToRoute("dashboard_scenario_index");
      
-

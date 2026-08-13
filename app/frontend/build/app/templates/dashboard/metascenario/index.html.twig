@@ -270,7 +270,9 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button onclick="window.location.href = '{{ path("dashboard_metascenario_tag_delete", {'hash': tag.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_confirmer{% endtrans %}</button>
+                                    {% if app.user.isAdmin or tag.metascenario.createdBy == app.user %}
+                                        <button onclick="window.location.href = '{{ path("dashboard_metascenario_tag_delete", {'hash': tag.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_confirmer{% endtrans %}</button>
+                                    {% endif %}
                                     <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_annuler{% endtrans %}</button>
                                 </div>
                             </div>
@@ -310,7 +312,9 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button onclick="window.location.href = '{{ path("dashboard_metascenario_tag_delete", {'hash': tag.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_confirmer{% endtrans %}</button>
+                                {% if app.user.isAdmin or tag.metascenario.createdBy == app.user %}
+                                    <button onclick="window.location.href = '{{ path("dashboard_metascenario_tag_delete", {'hash': tag.hash}) }}';" type="button" class="btn btn-danger" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_confirmer{% endtrans %}</button>
+                                {% endif %}
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans %}dashboard.metascenario.index.btn_annuler{% endtrans %}</button>
                             </div>
                         </div>

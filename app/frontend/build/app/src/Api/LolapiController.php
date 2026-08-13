@@ -2,43 +2,51 @@
 
 namespace App\Api;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use OpenApi\Annotations as OA;
-use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use App\Entity\ApiLog;
-use FOS\RestBundle\Controller\Annotations\RequestParam;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
-use FOS\RestBundle\Controller\Annotations\Post;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
 
 #[Route('/lolapi')]
 class LolapiController extends AbstractFOSRestController {
 
     /**
      * Insert into database a log record from Lolapy
-     * @OA\Response(response=201, description="Serialized ApiLog object"),
-     * @OA\Response(response=400, description="Data sent"),
-     * @RequestParam(
-     *      name="type",
-     *      description="Type of the log record",
-     *      nullable=true
-     * )
-     * @RequestParam(
-     *      name="message",
-     *      description="Message of the log record",
-     *      nullable=true
-     * )
-     * @RequestParam(
-     *      name="details",
-     *      description="Details (optionnal)",
-     *      nullable=false
-     * )
-     * @OA\Tag(name="Lolapy Logs")
      */
+    #[OA\RequestBody(
+        required: true,
+        description: 'Log payload sent by Lolapy.',
+        content: new OA\JsonContent(
+            required: ['type', 'message'],
+            properties: [
+                new OA\Property(property: 'type', type: 'string', description: 'Log type.', example: 'INFO'),
+                new OA\Property(property: 'message', type: 'string', description: 'Log message.', example: 'Dataset import started.'),
+                new OA\Property(property: 'details', type: 'string', nullable: true, description: 'Optional log details.', example: 'dataset=D6da92778e1794c59f3025010ca8612290cbf1e42'),
+            ],
+        ),
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Serialized ApiLog object.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'id', type: 'integer', example: 42),
+                new OA\Property(property: 'datetime', type: 'string', format: 'date-time', example: '2026-06-26T10:15:28+02:00'),
+                new OA\Property(property: 'type', type: 'string', example: 'INFO'),
+                new OA\Property(property: 'message', type: 'string', example: 'Dataset import started.'),
+                new OA\Property(property: 'details', type: 'string', nullable: true, example: 'dataset=D6da92778e1794c59f3025010ca8612290cbf1e42'),
+            ],
+        ),
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Missing type or message. The submitted payload is returned in the response body.',
+        content: new OA\JsonContent(type: 'object', example: ['details' => 'missing type/message']),
+    )]
+    #[OA\Tag(name: 'Lolapy Logs')]
     #[Route('/log', methods: ['POST'])]
     public function log(Request $request, EntityManagerInterface $em): Response
     {

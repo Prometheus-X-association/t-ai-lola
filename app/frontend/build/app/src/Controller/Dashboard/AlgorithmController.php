@@ -139,11 +139,17 @@ class AlgorithmController extends LolaController {
     #[Route('/ajax/parameters/{hash}', name: 'ajax_parameters', methods: ['GET'])]
     public function ajaxParameters(string $hash, LolapyServiceApi $lolapyService): Response
     {
+        $algorithmVersion = $this->getAlgorithmVersionRepository()->findOneAvailableForUserByHash($hash, $this->getUser());
+
+        if (!$algorithmVersion) {
+            throw $this->createAccessDeniedException();
+        }
+
         if (!$lolapyService->isLolapyReady()) {
             return new Response(json_encode(null));
         }
 
-        return new Response($lolapyService->getAlgorithmParameters($hash));
+        return new Response($lolapyService->getAlgorithmParameters($algorithmVersion->getHash()));
     }    
 
 }

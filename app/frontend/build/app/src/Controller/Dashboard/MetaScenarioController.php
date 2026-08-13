@@ -2,7 +2,6 @@
 
 namespace App\Controller\Dashboard;
 
-use App\Entity\AlgorithmVersion;
 use App\Entity\MetaScenario;
 use App\Entity\Tag;
 use App\Form\MetaScenarioType;
@@ -67,8 +66,12 @@ class MetaScenarioController extends LolaController {
         if (!empty($data["tag_name"])) {
             $tag = new Tag();
 
-            // TODO : controle que l'utilisateur à des droits sur le metascenario
             $metaScenario = $this->getMetaScenarioRepository()->find($data["meta_scenario_id"]);
+
+            if (!$metaScenario || !$this->canManageMetaScenario($metaScenario)) {
+                throw $this->createAccessDeniedException();
+            }
+
             $tag->setMetascenario($metaScenario);
             $tag->setName($data["tag_name"]);
             $tag->setVersion($data["tag_version"]);
@@ -144,6 +147,10 @@ class MetaScenarioController extends LolaController {
     #[Route('/tag/delete/{hash}', name: 'tag_delete', methods: ['GET'])]
     public function tagDelete(Tag $tag, LolapyServiceApi $lolapyService): Response
     {
+        if (!$this->canManageTag($tag)) {
+            throw $this->createAccessDeniedException();
+        }
+
         if (!$lolapyService->isLolapyReady()) {
             return new Response(json_encode(null));
         }
@@ -216,8 +223,24 @@ class MetaScenarioController extends LolaController {
                     'tag' => $dataSession["tag"],
                     'dataset' => $dataSession["dataset"],
                     'metascenario' => $dataSession["metascenario"],
-                    'algorithmVersions' => $this->getAlgorithmVersionRepository()->findBy(["status" => AlgorithmVersion::STATUS_AVAILABLE])
+                    'algorithmVersions' => $this->getAlgorithmVersionRepository()->findAvailableForUser($this->getUser())
         ]);        
+    }
+
+    private function canManageTag(Tag $tag): bool
+    {
+        $metaScenario = $tag->getMetascenario();
+
+        return $metaScenario && $this->canManageMetaScenario($metaScenario);
+    }
+
+    private function canManageMetaScenario(MetaScenario $metaScenario): bool
+    {
+        if ($this->getUser()->isAdmin()) {
+            return true;
+        }
+
+        return $metaScenario->getCreatedBy()?->getId() === $this->getUser()->getId();
     }
 
 }

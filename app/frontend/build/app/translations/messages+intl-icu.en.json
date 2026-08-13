@@ -731,6 +731,7 @@
     },
     "login": {
         "account_not_found": "The account does not exist.",
-        "account_inactive": "Your account is inactive."
+        "account_inactive": "Your account is inactive.",
+        "invalid_credentials": "Invalid email or password."
     }
 }

@@ -14,14 +14,23 @@
 
     <main class="public-main" id="public-content" tabindex="-1">
     {% if error is defined and error is not null %}
-
-        <div class="alert alert-danger">
-            {#TODO : solution temporaire en attendant d'avoir une gestion des erreurs et logs global #}
+        {% set errorMessage %}
             {% if error.messageKey == "Invalid CSRF token." %}
-                {% trans %}public.layout.invalid_csrf{% endtrans %}
+                {{ 'public.layout.invalid_csrf'|trans }}
+            {% elseif error.messageKey in ['login.account_not_found', 'login.account_inactive'] %}
+                {{ error.messageKey|trans(error.messageData) }}
             {% else %}
-                {{ error.messageKey|trans(error.messageData, 'security') }}
+                {{ 'login.invalid_credentials'|trans }}
             {% endif %}
+        {% endset %}
+        <div class="public-alert-layer" aria-live="assertive">
+            <div class="alert alert-danger public-alert" role="alert">
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                <span>{{ errorMessage|trim }}</span>
+                <button type="button" class="public-alert-close" data-public-alert-close aria-label="{{ 'public.accueil.btn_fermer'|trans }}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         </div>
     {% endif %}
     {% block content %}{% endblock %}

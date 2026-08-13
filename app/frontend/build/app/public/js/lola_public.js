@@ -1,6 +1,25 @@
 $(document).ready(function () {
     let loginWrap = $("#login-wrap");
 
+    function closePublicAlert(alertLayer) {
+        alertLayer.addClass("is-hiding");
+        window.setTimeout(function () {
+            alertLayer.remove();
+        }, 220);
+    }
+
+    $(".public-alert-layer").each(function () {
+        let alertLayer = $(this);
+        let dismissTimer = window.setTimeout(function () {
+            closePublicAlert(alertLayer);
+        }, 6000);
+
+        alertLayer.find("[data-public-alert-close]").on("click", function () {
+            window.clearTimeout(dismissTimer);
+            closePublicAlert(alertLayer);
+        });
+    });
+
     function updateAuthTabs() {
         let registerIsActive = $("#tab-2").prop("checked");
 

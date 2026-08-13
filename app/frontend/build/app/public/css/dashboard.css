@@ -147,3 +147,48 @@ html {
     width: 0;
     display: none;
 }
+
+.dashboard-action-column {
+    min-width: 9rem;
+    text-align: center;
+    vertical-align: middle !important;
+}
+
+.dashboard-actions {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin: 0 auto;
+    max-width: 9rem;
+    padding: 0.15rem 0.35rem;
+    width: 100%;
+}
+
+.dashboard-actions .btn {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.4rem;
+    justify-content: center;
+    margin: 0;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.dashboard-actions .btn i {
+    margin: 0;
+}
+
+.dashboard-actions-wrap {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.4rem;
+    justify-content: center;
+    max-width: 13rem;
+}
+
+.dashboard-actions-wrap .btn {
+    min-width: 5.7rem;
+    width: auto;
+}

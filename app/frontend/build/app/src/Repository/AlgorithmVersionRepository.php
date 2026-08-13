@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\AlgorithmVersion;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -43,6 +45,43 @@ class AlgorithmVersionRepository extends ServiceEntityRepository
         if ($flush) {
             $this->_em->flush();
         }
+    }
+
+    /**
+     * @return AlgorithmVersion[]
+     */
+    public function findAvailableForUser(User $user): array
+    {
+        return $this->createAvailableForUserQueryBuilder($user)
+            ->orderBy('algorithm.name', 'ASC')
+            ->addOrderBy('algorithmVersion.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOneAvailableForUserByHash(string $hash, User $user): ?AlgorithmVersion
+    {
+        return $this->createAvailableForUserQueryBuilder($user)
+            ->andWhere('algorithmVersion.hash = :hash')
+            ->setParameter('hash', $hash)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    private function createAvailableForUserQueryBuilder(User $user): QueryBuilder
+    {
+        $queryBuilder = $this->createQueryBuilder('algorithmVersion')
+            ->innerJoin('algorithmVersion.algorithm', 'algorithm')
+            ->andWhere('algorithmVersion.status = :status')
+            ->setParameter('status', AlgorithmVersion::STATUS_AVAILABLE);
+
+        if (!$user->isAdmin()) {
+            $queryBuilder
+                ->andWhere('algorithm.isPublic = true OR algorithm.createdBy = :user')
+                ->setParameter('user', $user);
+        }
+
+        return $queryBuilder;
     }
 
     // /**

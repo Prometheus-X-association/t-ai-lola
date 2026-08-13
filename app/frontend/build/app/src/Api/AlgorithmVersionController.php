@@ -7,10 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
-use OpenApi\Annotations as OA;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\RequestParam;
-use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use App\Entity\AlgorithmVersion;
 
 #[Route('/algorithm')]
@@ -18,19 +15,10 @@ class AlgorithmVersionController extends AbstractController {
 
     /**
      * Notify when a version algorithm is successfully added
-     *
-     * @OA\Response(
-     *     response=200,
-     *     description="",
-     * )
-     * @OA\Parameter(
-     *     name="versionAlgorithm hash",
-     *     in="query",
-     *     description="The hash of the versionAlgorithm",
-     *     @OA\Schema(type="string")
-     * )
-     * @OA\Tag(name="Algorithm")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Algorithm version hash.', schema: new OA\Schema(type: 'string'), example: 'A9f1d4c2b0e34567890123456789abcd')]
+    #[OA\Response(response: 200, description: 'Algorithm version status updated to AVAILABLE.')]
+    #[OA\Tag(name: 'Algorithm')]
     #[Route('/{hash}/complete', methods: ['GET'])]
     public function complete(AlgorithmVersion $algorithmVersion, EntityManagerInterface $em): Response
     {
@@ -41,19 +29,29 @@ class AlgorithmVersionController extends AbstractController {
 
     /**
      * Notify when adding the version algorithm fails
-     *
-     * @OA\Response(response=200, description=""),
-     * @OA\Response(response=400, description="The hash of the algorithm version is invalid"),
-     * @RequestParam(
-     *      name="algorithm_hash",
-     *      description="The hash of the algorithm version",
-     * )
-     * @RequestParam(
-     *      name="error",
-     *      description="The error",
-     * )
-     * @OA\Tag(name="Algorithm")
      */
+    #[OA\RequestBody(
+        required: true,
+        description: 'Failure details returned by Lolapy when an algorithm version cannot be added.',
+        content: new OA\JsonContent(
+            required: ['algorithm_hash', 'error'],
+            properties: [
+                new OA\Property(property: 'algorithm_hash', type: 'string', description: 'Algorithm version hash.', example: 'A9f1d4c2b0e34567890123456789abcd'),
+                new OA\Property(property: 'error', type: 'string', description: 'Error message.', example: 'Unable to copy algorithm archive.'),
+            ],
+        ),
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Algorithm version status updated to ERROR.',
+        content: new OA\JsonContent(type: 'string', example: 'true'),
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Invalid hash or request body.',
+        content: new OA\JsonContent(type: 'string', example: 'Bad hash'),
+    )]
+    #[OA\Tag(name: 'Algorithm')]
     #[Route('/error', methods: ['POST'])]
     public function error(Request $request, EntityManagerInterface $em): Response
     {

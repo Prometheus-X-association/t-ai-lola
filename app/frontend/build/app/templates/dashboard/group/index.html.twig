@@ -51,18 +51,17 @@
                         {% else %}
                             <td><i>{% trans %}dashboard.groupe.index.non_defini{% endtrans %}</i></td>
                         {% endif %}
-                        <td>
-                            <form method="post" class="form-inline" action="{{ path('dashboard_group_delete', {'id': group.id}) }}">
+                        <td class="dashboard-action-column">
+                            <form method="post" class="dashboard-actions" action="{{ path('dashboard_group_delete', {'id': group.id}) }}">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ group.id) }}">
 
                                 <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_group_edit', {'id': group.id}) }}">
                                     <i class="fa fa-edit"></i> {% trans %}dashboard.groupe.index.btn_modifier{% endtrans %} 
                                 </a> 
-                                <button type="submit" class="btn btn-outline-danger btn-sm ml-2">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
                                     <i class="fas fa-times"> </i> {% trans %}dashboard.groupe.index.btn_supprimer{% endtrans %} 
                                 </button>
-                                </a>
                             </form>                                
 
                         </td>

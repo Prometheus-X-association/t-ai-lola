@@ -63,20 +63,17 @@
                             {% else %}
                                 <td><i>{% trans %}dashboard.user.index.non_defini{% endtrans %}</i></td>
                             {% endif %}
-                        </td>
                             {% if user.updatedBy is not null and user.updatedAt is not null%}
                                 <td data-sort="{{ user.updatedAt|date('U') }}">{{ user.updatedAt | date('d-m-Y H:i:s') }}</td>
 {#                                <br /><i>({{ user.updatedBy }})</i>#}
                             {% else %}
                                 <td><i>{% trans %}dashboard.user.index.non_defini{% endtrans %}</i></td>
                             {% endif %}
-                        </td> 
                             {% if user.lastLoginAt is not null %}
                                 <td data-sort="{{ user.lastLoginAt|date('U') }}">{{ user.lastLoginAt | date('d-m-Y H:i:s') }}</td>
                             {% else %}
                                 <td><i>{% trans %}dashboard.user.index.non_defini{% endtrans %}</i></td>
                             {% endif %}
-                        </td>
                         {% if is_granted('ROLE_ADMIN_SISR') %}
                             <td>
                                 <a href="#" id="link_modal_user_token" data-toggle="modal" data-target="#modal_user_detail_{{ user.id }}">
@@ -84,39 +81,40 @@
                                 </a>
                             </td>
                         {% endif %}
-                        <td>
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <a class="btn btn-outline-primary btn-sm" href="{{ path('dashboard_user_edit', {'id': user.id}) }}">
-                                    <i class="fa fa-edit"></i> {% trans %}dashboard.user.index.modifier{% endtrans %}
-                                </a> 
-                                {%  if user.isActive %}
-                                    <a href="{{ path("dashboard_user_disable", {'id': user.id}) }}" class="btn btn-outline-danger btn-sm"><i class="fas fa-user-times"></i> {% trans %}dashboard.user.index.desactiver{% endtrans %}</a>
-                                {% else %}
-                                    <a href="{{ path("dashboard_user_enable", {'id': user.id}) }}" class="btn btn-outline-success btn-sm"><i class="fas fa-user-check"></i>{% trans %}dashboard.user.index.activer{% endtrans %}</a>
-                                {% endif %} 
-                                {%  if user.hasRole('ROLE_ADMIN') %}
-                                    <a href="{{ path("dashboard_user_toggle_admin", {'id': user.id}) }}" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
+                        <td class="dashboard-action-column">
+                            <div class="dashboard-actions dashboard-actions-wrap">
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a class="btn btn-outline-primary btn-sm mr-2 mb-2" href="{{ path('dashboard_user_edit', {'id': user.id}) }}">
+                                        <i class="fa fa-edit"></i> {% trans %}dashboard.user.index.modifier{% endtrans %}
                                     </a>
-                                {% else %}
-                                    <a href="{{ path("dashboard_user_toggle_admin", {'id': user.id}) }}" class="btn btn-outline-warning btn-sm">
-                                        <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
-                                    </a>
-                                {% endif %}                                
-                            {% endif %}
-                            {% if is_granted('ROLE_ADMIN_SISR') %}
-                                {%  if user.hasRole('ROLE_ADMIN_SISR') %}
-                                    <a href="{{ path("dashboard_user_toggle_admin_sisr", {'id': user.id}) }}" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
-                                    </a>
-                                {% else %}
-                                    <a href="{{ path("dashboard_user_toggle_admin_sisr", {'id': user.id}) }}" class="btn btn-outline-warning btn-sm">
-                                        <i class="fas fa-crown"></i> {% trans %}dashboard.user.index.sisr{% endtrans %}
-                                    </a>
-                                {% endif %}                                 
-                            {% endif %}
+                                    {%  if user.isActive %}
+                                        <a href="{{ path("dashboard_user_disable", {'id': user.id}) }}" class="btn btn-outline-danger btn-sm mr-2 mb-2"><i class="fas fa-user-times"></i> {% trans %}dashboard.user.index.desactiver{% endtrans %}</a>
+                                    {% else %}
+                                        <a href="{{ path("dashboard_user_enable", {'id': user.id}) }}" class="btn btn-outline-success btn-sm mr-2 mb-2"><i class="fas fa-user-check"></i>{% trans %}dashboard.user.index.activer{% endtrans %}</a>
+                                    {% endif %}
+                                    {%  if user.hasRole('ROLE_ADMIN') %}
+                                        <a href="{{ path("dashboard_user_toggle_admin", {'id': user.id}) }}" class="btn btn-warning btn-sm mr-2 mb-2">
+                                            <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path("dashboard_user_toggle_admin", {'id': user.id}) }}" class="btn btn-outline-warning btn-sm mr-2 mb-2">
+                                            <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                                {% if is_granted('ROLE_ADMIN_SISR') %}
+                                    {%  if user.hasRole('ROLE_ADMIN_SISR') %}
+                                        <a href="{{ path("dashboard_user_toggle_admin_sisr", {'id': user.id}) }}" class="btn btn-warning btn-sm mr-2 mb-2">
+                                            <i class="fas fa-medal"></i> {% trans %}dashboard.user.index.admin{% endtrans %}
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path("dashboard_user_toggle_admin_sisr", {'id': user.id}) }}" class="btn btn-outline-warning btn-sm mr-2 mb-2">
+                                            <i class="fas fa-crown"></i> {% trans %}dashboard.user.index.sisr{% endtrans %}
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
                         </td>                                   
-                        </td>
                     </tr>
 
                     {% if is_granted('ROLE_ADMIN_SISR') %}

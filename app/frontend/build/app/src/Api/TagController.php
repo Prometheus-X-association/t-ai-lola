@@ -7,10 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
-use OpenApi\Annotations as OA;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\RequestParam;
-use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use App\Entity\Tag;
 
 #[Route('/tag')]
@@ -18,19 +15,10 @@ class TagController extends AbstractController {
 
     /**
      * Notify when a tag is successfully added
-     *
-     * @OA\Response(
-     *     response=200,
-     *     description="",
-     * )
-     * @OA\Parameter(
-     *     name="tag hash",
-     *     in="query",
-     *     description="The hash of the tag",
-     *     @OA\Schema(type="string")
-     * )
-     * @OA\Tag(name="Tag")
      */
+    #[OA\Parameter(name: 'hash', in: 'path', required: true, description: 'Tag hash.', schema: new OA\Schema(type: 'string'), example: 'T8bdf038817f64473abe0e82aa339981e')]
+    #[OA\Response(response: 200, description: 'Tag status updated to AVAILABLE.')]
+    #[OA\Tag(name: 'Tag')]
     #[Route('/{hash}/complete', methods: ['GET'])]
     public function complete(Tag $tag, EntityManagerInterface $em): Response
     {
@@ -41,19 +29,29 @@ class TagController extends AbstractController {
 
     /**
      * Notify when adding the tag fails
-     *
-     * @OA\Response(response=200, description=""),
-     * @OA\Response(response=400, description="The hash of the tag is invalid"),
-     * @RequestParam(
-     *      name="tag",
-     *      description="The hash of the tag",
-     * )
-     * @RequestParam(
-     *      name="error",
-     *      description="The error",
-     * )
-     * @OA\Tag(name="Tag")
      */
+    #[OA\RequestBody(
+        required: true,
+        description: 'Failure details returned by Lolapy when a tag cannot be added.',
+        content: new OA\JsonContent(
+            required: ['tag', 'error'],
+            properties: [
+                new OA\Property(property: 'tag', type: 'string', description: 'Tag hash.', example: 'T8bdf038817f64473abe0e82aa339981e'),
+                new OA\Property(property: 'error', type: 'string', description: 'Error message.', example: 'Tag archive cannot be extracted.'),
+            ],
+        ),
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Tag status updated to ERROR.',
+        content: new OA\JsonContent(type: 'string', example: 'true'),
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Invalid hash or request body.',
+        content: new OA\JsonContent(type: 'string', example: 'Bad hash'),
+    )]
+    #[OA\Tag(name: 'Tag')]
     #[Route('/error', methods: ['POST'])]
     public function error(Request $request, EntityManagerInterface $em): Response
     {
