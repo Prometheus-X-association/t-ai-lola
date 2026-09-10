@@ -52,7 +52,7 @@ class DocFile:
         Returns:
             True if the file is empty. False otherwise.
         """
-        if os.stat(path).st_size == 0:
+        if os.stat(self.module_path).st_size == 0:
             return True
         return False
 
@@ -64,9 +64,9 @@ for path in sorted(Path("lolapy").rglob("*.py")):
     if current_path.is_empty_file():
         # Don't do anything if file is empty
         continue
-    if not current_path.full_doc_path.exists():
+    if not current_path.full_doc_path.parent.exists():
         # If there is no parents path
-        current_path.full_doc_path.mkdir(parents=True)
+        current_path.full_doc_path.parent.mkdir(parents=True, exist_ok=True)
     with open(current_path.full_doc_path, "w") as full_doc:
         print("::: " + current_path.imported_module, file=full_doc)
     all_doc_files.append(current_path)

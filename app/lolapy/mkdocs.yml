@@ -22,7 +22,7 @@ plugins:
             show_if_no_docstring: yes
             show_root_heading: yes
             merge_init_into_class: yes
-          paths: [lolapy]
+          paths: [.]
 markdown_extensions:
     - toc:
         permalink: "#"
