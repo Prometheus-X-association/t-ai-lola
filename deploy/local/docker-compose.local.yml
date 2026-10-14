@@ -38,6 +38,7 @@ services:
       - lolasqlite:/tmp
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ../../app/lolapy/certs/:/tmp/certs:ro
+      - ../../app/lolapy/keys/:/app/keys:ro
       - /tmp/lolauser:/tmp/lolauser
     command: 
       - ./venv/bin/gunicorn
@@ -63,6 +64,7 @@ services:
       - lolasqlite:/tmp
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ../../app/lolapy/certs/:/tmp/certs
+      - ../../app/lolapy/keys/:/app/keys:ro
       - /tmp/lolauser/nf-workdir:/tmp/lolauser/nf-workdir
     command:
       - "venv/bin/huey_consumer"

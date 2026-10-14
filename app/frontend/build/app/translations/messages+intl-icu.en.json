@@ -489,7 +489,7 @@
                 "btn_retour": "Return to the list of dataset",
                 "btn_ajouter": "Create the dataset",
                 "aide_titre": "Create a new dataset",
-                "aide": "<p class=\"card-text\">\n    Set a name and a description to the new dataset. <br>These information can be edited later.\n</p>\n"
+                "aide": "<p class=\"card-text\">\n    Set a name and a description for the new dataset.<br>Provide the <strong>PDC Contract</strong> and <strong>Resource</strong> to automatically import the data through the PDC connector without requiring SFTP.\n</p>\n"
             },
             "edit": {
                 "title": "Modification",
@@ -502,6 +502,10 @@
             "form": {
                 "nom": "Name",
                 "description": "Description",
+                "contract": "Contract",
+                "purpose_id": "Purpose ID",
+                "resource_id": "Resource ID",
+                "resource": "Resource",
                 "recipe": "XAPI Recipe",
                 "recipe_link": "XAPI Recipe link",
                 "btn_enregistrer": "Save"

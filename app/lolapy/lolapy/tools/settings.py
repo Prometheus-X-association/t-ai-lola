@@ -131,6 +131,18 @@ class AppSettings(BaseModel):
     k8s_service_account: str = "default"
     http_proxy: str | None = None
 
+    # PDC (Personal Data Connector) settings
+    pdc_host: str = "https://loria.pdc.visionstrust.com"
+    pdc_service_key: str = ""
+    pdc_secret_key: str = ""
+    pdc_purpose_id: str = "https://api.visionstrust.com/v1/catalog/serviceofferings/65f0809bae4df85cec866a80"
+    pdc_resource_id: str = "https://api.visionstrust.com/v1/catalog/serviceofferings/65f44ef4eaa4d99df777d93d"
+    pdc_pubkey_file: Path = Path("keys/pubkey.pem")
+    pdc_privkey_file: Path = Path("keys/privkey.pem")
+    pdc_receiver_host: str = "http://loria.ovh:8081"
+    pdc_receiver_service_key: str = "azim"
+    pdc_receiver_secret_key: str = "roussanaly"
+
     @validator("http_proxy")
     def validate_http_proxy(cls, value) -> str | None:
         if value:

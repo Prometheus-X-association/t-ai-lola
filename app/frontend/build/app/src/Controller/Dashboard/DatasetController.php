@@ -31,7 +31,7 @@ class DatasetController extends LolaController {
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, LolapyServiceApi $lolapyService): Response
     {
         $dataset = new Dataset();
         $form = $this->createForm(DatasetType::class, $dataset);
@@ -40,6 +40,18 @@ class DatasetController extends LolaController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->persist($dataset);
             $this->getEm()->flush();
+
+            // If contract and resource are specified, trigger PDC fetch via Lolapy
+            if ($dataset->getContract() && $dataset->getResource()) {
+                $lolapyService->createDataset(
+                    $dataset->getHash(),
+                    $this->getUser()->getHash(),
+                    $dataset->getContract(),
+                    $dataset->getResource(),
+                    $dataset->getPurposeId(),
+                    $dataset->getResourceId()
+                );
+            }
 
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_dataset_ajoute'));
             return $this->redirectToRoute('dashboard_dataset_index');

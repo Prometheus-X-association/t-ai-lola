@@ -49,6 +49,13 @@ class LolapyServiceApi {
     private $resourceDatasetGet;
 
     /**
+     * Resource url for Lolapy to create and fetch a dataset via PDC
+     *
+     * @var string $resourceDatasetCreate
+     */
+    private $resourceDatasetCreate;
+
+    /**
      * Resource url for Lolapy to delete a dataset
      *
      * @var string $resourceDatasetDelete
@@ -139,6 +146,7 @@ class LolapyServiceApi {
         $this->resourcePing = $_ENV["LOLAPY_RESOURCE_PING"];
 
         $this->resourceDatasetGet = $_ENV["LOLAPY_RESOURCE_DATASET_GET"];
+        $this->resourceDatasetCreate = $_ENV["LOLAPY_RESOURCE_DATASET_CREATE"] ?? '/dataset/create';
         $this->resourceDatasetDelete = $_ENV["LOLAPY_RESOURCE_DATASET_DELETE"];
         $this->resourceScenarioTagAdd = $_ENV["LOLAPY_RESOURCE_SCENARIO_TAG_ADD"];
         $this->resourceScenarioTagRemove = $_ENV["LOLAPY_RESOURCE_SCENARIO_TAG_REMOVE"];
@@ -218,6 +226,40 @@ class LolapyServiceApi {
         $content = curl_exec($curl);
         curl_close($curl);
         return $content;
+    }
+
+    /**
+     * Create and fetch dataset via PDC
+     *
+     * @param string $datasetHash
+     * @param string $userHash
+     * @param string|null $contract
+     * @param string|null $resource
+     * @param string|null $purposeId
+     * @param string|null $resourceId
+     *
+     * @return string|json
+     */
+    public function createDataset(
+        string $datasetHash,
+        string $userHash,
+        ?string $contract = null,
+        ?string $resource = null,
+        ?string $purposeId = null,
+        ?string $resourceId = null
+    ) {
+        if ($_ENV["LOLAPY_API_FAKE"] === "false") {
+            return $this->executeCurlRequestPost($this->resourceDatasetCreate, [
+                "dataset" => $datasetHash,
+                "user" => $userHash,
+                "contract" => $contract,
+                "resource" => $resource,
+                "purpose_id" => $purposeId,
+                "resource_id" => $resourceId
+            ]);
+        } else {
+            return false;
+        }
     }
 
     /**

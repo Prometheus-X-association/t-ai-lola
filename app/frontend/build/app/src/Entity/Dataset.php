@@ -83,6 +83,30 @@ class Dataset extends AbstractLolaEntity {
     #[ORM\Column(type: 'string', length: 50)]
     private $type = 'file';
 
+    /**
+     * PDC Contract URI
+     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private $contract;
+
+    /**
+     * PDC Resource Path / Identifier
+     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private $resource;
+
+    /**
+     * PDC Purpose ID URI
+     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private $purposeId;
+
+    /**
+     * PDC Resource ID URI
+     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private $resourceId;
+
     public function __construct()
     {
         $this->isShared = false;
@@ -354,6 +378,54 @@ class Dataset extends AbstractLolaEntity {
     public function setType(string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getContract(): ?string
+    {
+        return $this->contract;
+    }
+
+    public function setContract(?string $contract): self
+    {
+        $this->contract = $contract;
+
+        return $this;
+    }
+
+    public function getResource(): ?string
+    {
+        return $this->resource;
+    }
+
+    public function setResource(?string $resource): self
+    {
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    public function getPurposeId(): ?string
+    {
+        return $this->purposeId;
+    }
+
+    public function setPurposeId(?string $purposeId): self
+    {
+        $this->purposeId = $purposeId;
+
+        return $this;
+    }
+
+    public function getResourceId(): ?string
+    {
+        return $this->resourceId;
+    }
+
+    public function setResourceId(?string $resourceId): self
+    {
+        $this->resourceId = $resourceId;
 
         return $this;
     }

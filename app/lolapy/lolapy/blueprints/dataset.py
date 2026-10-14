@@ -17,29 +17,55 @@ from flask import request
 import logging
 
 
+class CreateDatasetJSON(BaseModel):
+    dataset: str
+    user: str
+    contract: str
+    resource: str
+    purpose_id: str | None = None
+    resource_id: str | None = None
+
+
+@dataset_blueprint.route("/create", methods=["POST"])
+@validate_json(CreateDatasetJSON)
+def create_dataset():
+    """Create and fetch a dataset from PDC."""
+    data: CreateDatasetJSON = g.request_data
+    async_tasks.fetch_and_import_dataset_pdc(
+        dataset_hash=data.dataset,
+        user_hash=data.user,
+        contract=data.contract,
+        resource=data.resource,
+        purpose_id=data.purpose_id,
+        resource_id=data.resource_id,
+    )
+    return Response(status=200)
+
+
 class ImportDatasetJSON(BaseModel):
-    dataset: Path
+    dataset: str
+    user: str | None = None
+    contract: str | None = None
+    resource: str | None = None
+    purpose_id: str | None = None
+    resource_id: str | None = None
 
 @dataset_blueprint.route("/import", methods=["POST"])
 @validate_json(ImportDatasetJSON)
 def import_dataset():
-    """Import a dataset stored in an encrypted acrchive
-    This request should come from the same server
-
-    The function import an crypted and compressed file into a specifi directory.
-    The archive contains a bordereau (json file with information on user/database) and a dataset file
-    1. decrypt dataset
-    2. extract archive
-    3. read bordereau
-    4. validate bordereau with frontend
-    5. copy dataset to lolapy_dataset_path/<dataset_hash>
-    6. send progress update to frontend
-    During all steps, the function must send information to the frontend to give the import status to the user
-    """
-    # retrieve data from the request
+    """Import a dataset either via PDC or local archive."""
     data: ImportDatasetJSON = g.request_data
-
-    async_tasks.import_dataset(data.dataset)
+    if data.contract and data.resource and data.user:
+        async_tasks.fetch_and_import_dataset_pdc(
+            dataset_hash=data.dataset,
+            user_hash=data.user,
+            contract=data.contract,
+            resource=data.resource,
+            purpose_id=data.purpose_id,
+            resource_id=data.resource_id,
+        )
+    else:
+        async_tasks.import_dataset(Path(data.dataset))
     return Response(status=200)
 
 
