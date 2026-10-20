@@ -27,7 +27,6 @@ from flask_wtf.csrf import CSRFProtect
 flask_app = Flask(__name__)
 csrf = CSRFProtect()
 csrf.init_app(flask_app)
-flask_app.config["WTF_CSRF_CHECK_DEFAULT"] = False
 csrf_guard.install(flask_app)
 
 flask_app.config["SWAGGER"] = {

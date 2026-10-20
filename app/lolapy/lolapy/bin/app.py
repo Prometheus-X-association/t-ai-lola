@@ -29,7 +29,6 @@ from setup import lolapy_version
 flask_app = Flask(__name__)
 csrf = CSRFProtect()
 csrf.init_app(flask_app)
-flask_app.config["WTF_CSRF_CHECK_DEFAULT"] = False
 csrf_guard.install(flask_app)
 APP_VERSION = lolapy_version
 
