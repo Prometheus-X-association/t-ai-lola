@@ -7,6 +7,7 @@ Used for development purpose.
 from __future__ import annotations
 from datetime import datetime, timedelta
 import logging
+import tempfile
 from pathlib import Path
 
 from lolapy.nextflow import nextflow_logs
@@ -215,7 +216,7 @@ class FakeNextflowLog:
         "runHash": "Rf53ce97606fd82c13a3b87e205f3577724191474",
         "processName": "First-process",
         "eventTime": "1970-01-01T00:01:02Z",
-        "workDir": "/tmp/wdir",
+        "workDir": str(Path(tempfile.gettempdir()) / "wdir"),
         "statistics": {
             "cpu": 90.5,
             "memory": 10.0,
@@ -230,7 +231,7 @@ class FakeNextflowLog:
         "runHash": "Rf53ce97606fd82c13a3b87e205f3577724191474",
         "processName": "First-process",
         "eventTime": "1970-01-01T00:01:02Z",
-        "workDir": "/tmp/wdir",
+        "workDir": str(Path(tempfile.gettempdir()) / "wdir"),
         "statistics": None,
     }
     _process_run: nextflow_logs.NextflowLogProcess = {
@@ -239,7 +240,7 @@ class FakeNextflowLog:
         "runHash": "Rf53ce97606fd82c13a3b87e205f3577724191474",
         "processName": "First-process",
         "eventTime": "1970-01-01T00:01:02Z",
-        "workDir": "/tmp/wdir",
+        "workDir": str(Path(tempfile.gettempdir()) / "wdir"),
         "statistics": None,
     }
     _process_error: nextflow_logs.NextflowLogProcess = {
@@ -248,7 +249,7 @@ class FakeNextflowLog:
         "runHash": "Rf53ce97606fd82c13a3b87e205f3577724191474",
         "processName": "First-process",
         "eventTime": "1970-01-01T00:01:02Z",
-        "workDir": "/tmp/wdir",
+        "workDir": str(Path(tempfile.gettempdir()) / "wdir"),
         "statistics": None,
     }
     local_datetime = None

@@ -3,6 +3,10 @@ import os
 import re
 import sys
 
+# Must match the /tmp/lolauser bind mounts in docker-compose.local.yml.
+# Overridable through LOLA_LOCAL_HOME.
+LOLA_LOCAL_HOME = os.environ.get("LOLA_LOCAL_HOME", os.path.join(os.sep, "tmp", "lolauser"))
+
 def parse_yaml(file_path):
     vars_dict = {}
     if not os.path.exists(file_path):
@@ -36,19 +40,19 @@ def update_env_file(sample_path, target_path, updates):
             matched = False
             for key, val in updates.items():
                 if line.startswith(f"{key}="):
-                    val_str = str(val).replace('/home/lolauser', '/tmp/lolauser')
+                    val_str = str(val).replace('/home/lolauser', LOLA_LOCAL_HOME)
                     lines.append(f"{key}={val_str}\n")
                     updated_keys.add(key)
                     matched = True
                     break
             if not matched:
-                line_str = line.replace('/home/lolauser', '/tmp/lolauser')
+                line_str = line.replace('/home/lolauser', LOLA_LOCAL_HOME)
                 lines.append(line_str)
                 
     # Append any updates that weren't in the sample file
     for key, val in updates.items():
         if key not in updated_keys:
-            val_str = str(val).replace('/home/lolauser', '/tmp/lolauser')
+            val_str = str(val).replace('/home/lolauser', LOLA_LOCAL_HOME)
             lines.append(f"{key}={val_str}\n")
             
     with open(target_path, 'w') as f:
@@ -148,7 +152,7 @@ def main():
         sys.exit(1)
 
     # 6. Create directories
-    home_dir = '/tmp/lolauser'
+    home_dir = LOLA_LOCAL_HOME
     datasets_dir = os.path.join(home_dir, 'nf-workdir', 'datasets')
     os.makedirs(datasets_dir, exist_ok=True)
     print(f"Ensured datasets directory exists: {datasets_dir}")

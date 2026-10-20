@@ -10,7 +10,9 @@ RUN apk update && \
     binutils \
     git
 
-COPY . /src
+COPY src/ /src/src/
+COPY img/ /src/img/
+COPY main.spec requirements.txt /src/
 
 RUN pip install -r /src/requirements.txt && \
     pip install pyinstaller
