@@ -130,7 +130,7 @@ class Algorithm extends AbstractLolaEntity {
         if (strpos( $this->urlRepository, "@" ) !== false) {
             // Et si l'url commence par http ou https, on supprime tout ce qui se trouve entre / et @
             if (strpos( $this->urlRepository, "http:" ) === 0) {
-                return "http://" . substr($this->urlRepository, strpos($this->urlRepository, "@") + 1, strlen($this->urlRepository));
+                return "https://" . substr($this->urlRepository, strpos($this->urlRepository, "@") + 1, strlen($this->urlRepository));
             } elseif (strpos( $this->urlRepository, "https:" ) === 0) {
                 return "https://" . substr($this->urlRepository, strpos($this->urlRepository, "@") + 1, strlen($this->urlRepository));
             // Sinon on supprime du début jusqu'au @

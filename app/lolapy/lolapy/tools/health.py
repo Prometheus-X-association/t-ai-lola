@@ -83,15 +83,8 @@ class Health:
         # TODO: Rework this method to check status of huey
         # It can fail if huey is really busy
         async_is_running = async_tasks.huey_work()
-        attempt = 0
-        while attempt < 5:
-            attempt += 1
-            time.sleep(1)  # Sleep to avoid race condition
-            if not async_is_running.get():
-                return False
-            else:
-                return True
-        return False
+        time.sleep(1)  # Sleep to avoid race condition
+        return bool(async_is_running.get())
 
     @staticmethod
     def check_status() -> dict:

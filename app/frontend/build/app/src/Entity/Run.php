@@ -42,7 +42,7 @@ class Run extends AbstractLolaEntity {
 
     public function __construct()
     {
-        $this->hash = "R" . sha1(random_bytes(255));
+        $this->hash = "R" . bin2hex(random_bytes(20));
         $this->setStatus(self::STATUS_WAITING);
         $this->runLogs = new ArrayCollection();
         $this->hasOutput = false;

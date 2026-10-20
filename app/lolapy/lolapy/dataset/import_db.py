@@ -242,9 +242,9 @@ class ExtractArchive:
 
     def __init__(self, path_encrypted_file: Path):
         self.encrypted_file = path_encrypted_file
-        self.decrypt_dir = Path(tempfile.mktemp())
+        self.decrypt_dir = Path(tempfile.mkdtemp())
         self.decrypted_output_file = self.decrypt_dir / "decrypted_file.zip"
-        self.extract_dir = Path(tempfile.mktemp())
+        self.extract_dir = Path(tempfile.mkdtemp())
 
     def decrypt_archive(self):
         self.mkdir(self.decrypt_dir)
@@ -320,7 +320,7 @@ class UploadProgress:
                 progress = max(0.0, min(progress, 1.0))
 
                 # send update every 1%
-                if progress - last_reported >= 0.01 or progress == 1.0:
+                if progress - last_reported >= 0.01 or progress >= 1.0:
                     FrontendRequest.get(
                         f"/api/dataset/{dataset_hash}/progress/{progress}"
                     )

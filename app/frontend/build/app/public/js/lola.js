@@ -88,7 +88,7 @@ $(document).ready(function () {
     // selection of the dataset before the execution of a scenario
     // and check if the button to next step must be activated
     $(".btn-scenario-execute-dataset").on('click', function () {
-        selectedDataset = $(this);
+        const selectedDataset = $(this);
         $(".btn-scenario-execute-dataset").each(function () {
             $(this).addClass("btn-outline-success");
             $(this).removeClass("btn-success");

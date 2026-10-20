@@ -80,7 +80,7 @@ class User extends AbstractLolaEntity implements UserInterface, PasswordAuthenti
         $this->createdAt = new \DateTime();
         // user is authenticated after registration
         $this->lastLoginAt = new \DateTime();
-        $this->hash = "U" . sha1(random_bytes(255));
+        $this->hash = "U" . bin2hex(random_bytes(20));
         $this->groups = new ArrayCollection();
     }
 

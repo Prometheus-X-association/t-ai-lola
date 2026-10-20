@@ -34,7 +34,7 @@ class AlgorithmVersion
     
     public function __construct()
     {
-        $this->hash = "A" . sha1(random_bytes(255));
+        $this->hash = "A" . bin2hex(random_bytes(20));
     }    
     
     public function getId(): ?int

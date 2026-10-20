@@ -2,8 +2,6 @@
 import os
 import re
 import sys
-import hashlib
-import base64
 
 def parse_yaml(file_path):
     vars_dict = {}
@@ -145,13 +143,10 @@ def main():
             f.write(bcrypt_line + '\n')
         print(f"Generated bcrypt registry htpasswd file: {htpasswd_path}")
     except Exception as e:
-        # Fallback to SHA-1 if Docker is not available
-        sha1_hash = hashlib.sha1(password.encode('utf-8')).digest()
-        sha1_b64 = base64.b64encode(sha1_hash).decode('utf-8')
-        with open(htpasswd_path, 'w') as f:
-            f.write(f"backend:{{SHA}}{sha1_b64}\n")
-        print(f"Generated registry htpasswd file (fallback to SHA-1): {htpasswd_path}")
-    
+        # SHA-1 is not an acceptable fallback; the registry requires bcrypt.
+        print(f"Error: could not generate bcrypt htpasswd file (is Docker running?): {e}")
+        sys.exit(1)
+
     # 6. Create directories
     home_dir = '/tmp/lolauser'
     datasets_dir = os.path.join(home_dir, 'nf-workdir', 'datasets')

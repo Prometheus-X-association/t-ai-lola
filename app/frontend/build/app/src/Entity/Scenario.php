@@ -52,7 +52,7 @@ class Scenario extends AbstractLolaEntity {
 
     public function __construct()
     {
-        $this->hash = "S" . sha1(random_bytes(255));
+        $this->hash = "S" . bin2hex(random_bytes(20));
         $this->isActive = true;
         $this->runs = new ArrayCollection();
         $this->scenarioAlgorithms = new ArrayCollection();
