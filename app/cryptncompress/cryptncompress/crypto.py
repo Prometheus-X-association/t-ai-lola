@@ -63,14 +63,17 @@ from pathlib import Path
 from cryptncompress import errors
 
 from cryptography import x509
+from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey, RSAPublicKey
 
 
 CHUNK_SIZE = 2**25  # Easy to fit in memory
+FINAL_CHUNK = b"\x01"  # Authenticated flag of the last chunk (detect truncation)
+MORE_CHUNKS = b"\x00"
 
 
 def fix_binary_data_length(binary_data: bytes):
@@ -236,31 +239,44 @@ class DataFile:
 
 
 class SymmetricKey:
+    """
+    AES-256-GCM key used to encrypt/decrypt the data chunk by chunk.
+
+    Every chunk is encrypted with a unique nonce (random 4 bytes prefix shared through the
+    RSA encrypted header + 8 bytes chunk counter) and authenticated (GCM tag appended to the chunk).
+    """
 
     key_size = 32  # in bytes
-    iv_size = 16  # in bytes
+    nonce_prefix_size = 4  # in bytes. Random part of the nonce, different for each file
+    counter_size = 8  # in bytes. Chunk counter part of the nonce
+    tag_size = 16  # in bytes. GCM authentication tag appended to every encrypted chunk
 
-    def __init__(self, key: bytes, iv: bytes = None):
+    def __init__(self, key: bytes, nonce_prefix: bytes):
         """
         Create a SymmetricKey object.
-        **Note**: You should use the method gen_key() instead of this constructor
+        **Note**: You should use the method gen_aes_key() instead of this constructor
 
         :param key: Binary Key. The size have to match SymmetricKey.key_size
         :type key: bytes
-        :param iv: Binary key to use as IV (mode). The size have to match SymmetricKey.iv_size
+        :param nonce_prefix: Random prefix of the nonces. The size have to match SymmetricKey.nonce_prefix_size
+        :type nonce_prefix: bytes
         :return: SymmetricKey structure
         :rtype: SymmetricKey
         """
+        if len(key) != SymmetricKey.key_size or len(nonce_prefix) != SymmetricKey.nonce_prefix_size:
+            raise errors.DecryptSymmetricKeyError(
+                f"Wrong key material size. Expected {SymmetricKey.key_size}+{SymmetricKey.nonce_prefix_size} bytes."
+            )
         self.key = key
-        self.iv = iv
-        self.cipher = Cipher(algorithms.AES(self.key), modes.CBC(self.iv))
+        self.nonce_prefix = nonce_prefix
+        self.aead = AESGCM(self.key)
 
     @staticmethod
     def from_binary_data(
         encrypted_keys: bytes, private_key: "AsymmetricPrivateKey"
     ) -> "SymmetricKey":
         """
-        Decrypt symetric keys (key + iv) from binary data.
+        Decrypt symetric keys (key + nonce prefix) from binary data.
         """
         if len(encrypted_keys) != AsymmetricPublicKey.key_size:
             raise errors.DecryptSymmetricKeyError(
@@ -268,31 +284,36 @@ class SymmetricKey:
             )
         decrypted_keys = private_key.decrypt(encrypted_keys)
         key = decrypted_keys[0:SymmetricKey.key_size]
-        iv = decrypted_keys[SymmetricKey.key_size:]
-        return SymmetricKey(key=key, iv=iv)
+        nonce_prefix = decrypted_keys[SymmetricKey.key_size:]
+        return SymmetricKey(key=key, nonce_prefix=nonce_prefix)
 
     @staticmethod
     def gen_aes_key() -> "SymmetricKey":
         """
-        Generate a Cipher AES
+        Generate a random AES-256-GCM key
 
-        :return: A  structure
-        :rtype: cryptography.hazmat.primitives.ciphers.Cipher
+        :return: A SymmetricKey structure
+        :rtype: SymmetricKey
         """
         aes_key = os.urandom(SymmetricKey.key_size)
-        iv_key = os.urandom(SymmetricKey.iv_size)
-        return SymmetricKey(key=aes_key, iv=iv_key)
+        nonce_prefix = os.urandom(SymmetricKey.nonce_prefix_size)
+        return SymmetricKey(key=aes_key, nonce_prefix=nonce_prefix)
 
-    def encrypt(self, binary_txt: bytes) -> bytes:
-        encryptor = self.cipher.encryptor()
-        data, _ = fix_binary_data_length(binary_txt)
-        cipher_text = encryptor.update(data) + encryptor.finalize()
-        return cipher_text
+    def _nonce(self, chunk_index: int) -> bytes:
+        return self.nonce_prefix + chunk_index.to_bytes(SymmetricKey.counter_size, "big")
 
-    def decrypt(self, binary_txt: bytes) -> bytes:
-        decryptor = self.cipher.decryptor()
-        data = decryptor.update(binary_txt)
-        return data
+    def encrypt(self, binary_txt: bytes, chunk_index: int, associated_data: bytes = b"") -> bytes:
+        """Encrypt and authenticate one chunk. Output is len(binary_txt) + tag_size bytes."""
+        return self.aead.encrypt(self._nonce(chunk_index), binary_txt, associated_data)
+
+    def decrypt(self, binary_txt: bytes, chunk_index: int, associated_data: bytes = b"") -> bytes:
+        """Verify and decrypt one chunk. Raise errors.DecryptChunkError if the chunk was tampered."""
+        try:
+            return self.aead.decrypt(self._nonce(chunk_index), binary_txt, associated_data)
+        except InvalidTag as e:
+            raise errors.DecryptChunkError(
+                f"Authentication failed for chunk {chunk_index}: corrupted or tampered file"
+            ) from e
 
 
 class AsymmetricPublicKey:
@@ -325,7 +346,7 @@ class AsymmetricPublicKey:
             return AsymmetricPublicKey(x509_key.public_key())
 
     def encrypt_symmetric_keys(self, symmetric_key: "SymmetricKey"):
-        data = symmetric_key.key + symmetric_key.iv
+        data = symmetric_key.key + symmetric_key.nonce_prefix
         return self.encrypt(data)
 
     def encrypt(self, binary_txt: bytes):
@@ -417,16 +438,23 @@ class Encrypt:
             encrypted_keys = public_key.encrypt_symmetric_keys(symmetric_key)
             # Write file type, symmetric key and size of the file in output file
             buffer_output_file.write(binary_filetype + encrypted_keys + binary_file_size)
+            # The header is authenticated with every chunk
+            header = binary_filetype + binary_file_size
+            file_size = DataFile.bin_to_int(binary_file_size)
 
-            # Read input file by chunk, crypt every chunk and write them in output file
+            # Read input file by chunk, encrypt every chunk and write them in output file
             with open(input_file, "rb") as i_file:
-                while chunk := i_file.read(CHUNK_SIZE):
-                    if len(chunk) != CHUNK_SIZE:
-                        # Fix length of the last chunk by adding \'0
-                        chunk, _ = fix_binary_data_length(chunk)
-                        # Encrypt chunk and write it directly
-                    encrypted_txt = symmetric_key.encrypt(chunk)
-                    buffer_output_file.write(encrypted_txt)
+                chunk_index = 0
+                bytes_read = 0
+                while True:
+                    chunk = i_file.read(CHUNK_SIZE)
+                    bytes_read += len(chunk)
+                    is_final = bytes_read >= file_size
+                    aad = header + (FINAL_CHUNK if is_final else MORE_CHUNKS)
+                    buffer_output_file.write(symmetric_key.encrypt(chunk, chunk_index, aad))
+                    chunk_index += 1
+                    if is_final:
+                        break
         finally:
             buffer_output_file.close()
 
@@ -457,8 +485,8 @@ class Decrypt:
             # Load Asymmetric private key
             private_key = AsymmetricPrivateKey.load_from_file(self.path_private_key)
             # Read 8 first bytes for the FileType
-            file_type = buffer_input_file.read(FileType.int_size)
-            file_type = FileType.bin_to_str(file_type)
+            binary_file_type_header = buffer_input_file.read(FileType.int_size)
+            file_type = FileType.bin_to_str(binary_file_type_header)
             # Decrypt Symmetric key
             encrypted_symmetric_keys = buffer_input_file.read(AsymmetricPublicKey.key_size)
             symmetric_key = SymmetricKey.from_binary_data(encrypted_symmetric_keys, private_key)
@@ -466,17 +494,20 @@ class Decrypt:
             binary_file_size = buffer_input_file.read(8)
             file_size = DataFile.bin_to_int(binary_file_size)
 
-            # Read input file by chunk, crypt every chunk and write them in output file
-            while chunk := buffer_input_file.read(CHUNK_SIZE):
-                # Save chunk size here. After decryption, chunk variable is empty
-                chunk_size = len(chunk)
-                # Decrypt chunk
-                decrypted_txt = symmetric_key.decrypt(chunk)
-                if chunk_size != CHUNK_SIZE:
-                    # remove trailing \'0 in the last chunk
-                    decrypted_txt = sanitize_binary_data(decrypted_txt, file_size)
-                    # Write chunk in file
-                buffer_output_file.write(decrypted_txt)
+            header = binary_file_type_header + binary_file_size
+
+            # Read input file by chunk, decrypt every chunk and write them in output file
+            encrypted_chunk_size = CHUNK_SIZE + SymmetricKey.tag_size
+            chunk_index = 0
+            chunk = buffer_input_file.read(encrypted_chunk_size)
+            while True:
+                next_chunk = buffer_input_file.read(encrypted_chunk_size) if len(chunk) == encrypted_chunk_size else b""
+                is_final = not next_chunk
+                aad = header + (FINAL_CHUNK if is_final else MORE_CHUNKS)
+                buffer_output_file.write(symmetric_key.decrypt(chunk, chunk_index, aad))
+                if is_final:
+                    break
+                chunk, chunk_index = next_chunk, chunk_index + 1
 
             return file_type
         finally:

@@ -17,5 +17,5 @@ threadpoolctl==3.6.0
 tifffile==2025.5.10
 tqdm==4.67.3
 requests==2.34.2
-cryptncompress==2.0.0
+cryptncompress==3.0.0
 # ../cryptncompress

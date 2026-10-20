@@ -20,9 +20,15 @@ from lolapy.dataset import dataset_information, import_db
 from lolapy.nextflow.nextflow_logs import NextflowLogProcess, NextflowLogWorkflow
 from lolapy.tools import settings, fixtures
 from lolapy.tools.frontend_api import FrontendRequest
+from lolapy.tools import csrf_guard
 from lolapy.tools.health import Health
+from flask_wtf.csrf import CSRFProtect
 
 flask_app = Flask(__name__)
+csrf = CSRFProtect()
+csrf.init_app(flask_app)
+flask_app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+csrf_guard.install(flask_app)
 
 flask_app.config["SWAGGER"] = {
     "title": "Lolapy API",

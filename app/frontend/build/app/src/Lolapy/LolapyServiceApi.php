@@ -534,7 +534,7 @@ class LolapyServiceApi {
     {
         if ($_ENV["LOLAPY_API_FAKE"] === "false") {
             // Build the URL
-            $url = "http://" . $this->url . ":" . $this->port . $this->resourceServerUsage;
+            $url = ($_ENV["LOLAPY_URL_SCHEME"] ?? "https") . "://" . $this->url . ":" . $this->port . $this->resourceServerUsage;
 
             // Initiate cURL
             $curl = curl_init();

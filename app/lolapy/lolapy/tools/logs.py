@@ -20,6 +20,7 @@ To use logging, in a module, import logging and use just with `logging.info("bla
 import asyncio
 import json
 import logging, logging.handlers, logging.config
+from lolapy.tools.urls import with_scheme
 from pathlib import Path
 from queue import Queue
 import uuid
@@ -138,15 +139,14 @@ class LolapyLogs:
     def _gen_frontend_url(self) -> str:
         """Generate frontend api log URL based on env vars.
 
-        Add http:// at the beginning of the url if not present.
+        Add scheme at the beginning of the url if not present.
         Concatenate host_server, port and url of the log
 
-        :return: str: url of the frontend log in the format http://<server>:<port>/<url>
+        :return: str: url of the frontend log in the format https://<server>:<port>/<url>
         """
         app_settings = settings.get()
         frontend_host: str = app_settings.frontend_api_ip
-        if not frontend_host.startswith("http"):
-            frontend_host = f"http://{frontend_host}"
+        frontend_host = with_scheme(frontend_host)
         frontend_port: int = app_settings.frontend_api_port
         frontend_url: str = app_settings.frontend_api_log_url
         if not frontend_url.startswith("/"):
