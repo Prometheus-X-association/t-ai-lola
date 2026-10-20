@@ -86,6 +86,6 @@ RUN python${PYTHON_VERSION} -m venv /app/venv \
     && /app/venv/bin/pip install --no-cache-dir --no-deps cryptncompress==2.0.0
 
 # Copy the rest of the application code
-COPY --chown=lolauser:lolauser setup.py Readme.md LICENSE ./
-COPY --chown=lolauser:lolauser lolapy/ lolapy/
-COPY --chown=lolauser:lolauser docs/swagger.yaml docs/swagger.yaml
+COPY setup.py Readme.md LICENSE ./
+COPY lolapy/ lolapy/
+COPY docs/swagger.yaml docs/swagger.yaml
