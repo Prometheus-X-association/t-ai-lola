@@ -14,6 +14,6 @@ ijson==3.3.0
 pytest==9.0.3
 pytest-cov==3.0.0
 pydantic==2.13.4
-Werkzeug==3.1.8
+Werkzeug>=3.1.9
 # cryptncompress==3.0.0 (installed with --no-deps in Dockerfile due to PyPI metadata pin on cryptography==48.0.0)
 # ../cryptncompress
