@@ -7,13 +7,12 @@ following the logic of the data-import project.
 """
 
 import base64
+import binascii
 import gzip
 import json
 import logging
-import os
 from pathlib import Path
 import shutil
-import traceback
 from urllib.parse import quote
 
 import requests
@@ -23,21 +22,21 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from lolapy.tools import settings
 
 
-def encode_uri(s) -> str:
+def encode_uri(s: str | bytes | None) -> str:
     """Encode `s` like the `@uri` filter of jq (RFC 3986 percent-encoding)."""
     if s is None:
         return ""
     if isinstance(s, bytes):
         try:
             s = s.decode("utf-8")
-        except Exception:
-            return "".join("%%%02X" % b for b in s)
+        except UnicodeDecodeError:
+            return "".join(f"%{b:02X}" for b in s)
     if not isinstance(s, str):
         s = str(s)
     return quote(s, safe="-._~")
 
 
-def b64_flexible_decode(s, prefer_urlsafe=False) -> bytes | None:
+def b64_flexible_decode(s: str | bytes | None, prefer_urlsafe: bool = False) -> bytes | None:
     """Decode base64/base64url with flexible padding."""
     if s is None:
         return None
@@ -53,12 +52,12 @@ def b64_flexible_decode(s, prefer_urlsafe=False) -> bytes | None:
         if prefer_urlsafe:
             return base64.urlsafe_b64decode(ss)
         return base64.b64decode(ss)
-    except Exception:
+    except (binascii.Error, ValueError, UnicodeDecodeError):
         try:
             if prefer_urlsafe:
                 return base64.b64decode(s_bytes)
             return base64.urlsafe_b64decode(s_bytes)
-        except Exception:
+        except (binascii.Error, ValueError):
             return None
 
 
@@ -74,7 +73,7 @@ def decode_jwt_payload(token_str: str) -> dict | None:
         return None
     try:
         return json.loads(payload_bytes.decode("utf-8"))
-    except Exception as e:
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
         logging.warning(f"Could not decode JWT payload as JSON: {e}")
         return None
 
@@ -250,7 +249,7 @@ class PdcImporter:
         self.data_jwt = resp.text.strip()
         return self.data_jwt
 
-    def download_data(self, target_file: Path, progress_callback=None, decrypt_if_needed: bool = False) -> int:
+    def download_data(self, target_file: Path, progress_callback=None) -> int:
         """
         Download dataset from the resolved URL in Data JWT and save to target_file.
         Returns total bytes written.
@@ -298,7 +297,7 @@ class PdcImporter:
                 with gzip.open(target_file, "rb") as gz_in:
                     with open(decompressed_path, "wb") as f_out:
                         shutil.copyfileobj(gz_in, f_out)
-            except Exception as e:
+            except (gzip.BadGzipFile, OSError) as e:
                 logging.warning(f"Could not decompress gzip file {target_file}: {e}")
 
         return downloaded

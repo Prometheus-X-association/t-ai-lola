@@ -4,9 +4,10 @@ namespace App\Form;
 
 use App\Entity\Dataset;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 class DatasetType extends AbstractType
 {
@@ -16,32 +17,32 @@ class DatasetType extends AbstractType
             ->add('name', null, [
                 'label' => 'dashboard.dataset.form.nom',
             ])
-            ->add('description', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class, [
+            ->add('description', TextareaType::class, [
                 'label' => 'dashboard.dataset.form.description',    
                 'required' => false,
             ])
-            ->add('contract', \Symfony\Component\Form\Extension\Core\Type\TextType::class, [
+            ->add('contract', TextType::class, [
                 'label' => 'dashboard.dataset.form.contract',
                 'required' => false,
                 'attr' => [
                     'placeholder' => 'https://contract.visionstrust.com/contracts/...',
                 ],
             ])
-            ->add('purposeId', \Symfony\Component\Form\Extension\Core\Type\TextType::class, [
+            ->add('purposeId', TextType::class, [
                 'label' => 'dashboard.dataset.form.purpose_id',
                 'required' => false,
                 'attr' => [
                     'placeholder' => 'https://api.visionstrust.com/v1/catalog/serviceofferings/...',
                 ],
             ])
-            ->add('resourceId', \Symfony\Component\Form\Extension\Core\Type\TextType::class, [
+            ->add('resourceId', TextType::class, [
                 'label' => 'dashboard.dataset.form.resource_id',
                 'required' => false,
                 'attr' => [
                     'placeholder' => 'https://api.visionstrust.com/v1/catalog/serviceofferings/...',
                 ],
             ])
-            ->add('resource', \Symfony\Component\Form\Extension\Core\Type\TextType::class, [
+            ->add('resource', TextType::class, [
                 'label' => 'dashboard.dataset.form.resource',
                 'required' => false,
                 'attr' => [

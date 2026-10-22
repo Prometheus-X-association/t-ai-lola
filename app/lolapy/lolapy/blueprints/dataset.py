@@ -13,8 +13,6 @@ from lolapy.blueprints.request_validation import validate_json
 from lolapy.dataset import dataset_information
 from lolapy.bin import async_tasks
 
-from flask import request
-import logging
 
 
 class CreateDatasetJSON(BaseModel):
