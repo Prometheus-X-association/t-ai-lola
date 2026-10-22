@@ -11,7 +11,7 @@ Projet : step2
 import json
 
 JSON_FILE = "../dataJson/oulad-data.json"
-URL = "http://loria.ovh:8081/post"
+URL = "https://loria.ovh/post"
 TOKEN ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXJ2aWNlX2tleSI6ImF6aW0ifQ._CMXo2uhqxXnvzrQF6QC_7BCkfa3jknxBPjd7_jN5do"
 import requests
 
