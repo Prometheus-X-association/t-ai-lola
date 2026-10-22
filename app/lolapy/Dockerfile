@@ -83,7 +83,9 @@ COPY --chown=lolauser:lolauser requirements.txt requirements.txt
 RUN python${PYTHON_VERSION} -m venv /app/venv \
     && /app/venv/bin/pip install --no-cache-dir wheel "setuptools>=78.1.1" \
     && /app/venv/bin/pip install --no-cache-dir -r requirements.txt \
-    && /app/venv/bin/pip install --no-cache-dir --no-deps cryptncompress==2.0.0
+    && /app/venv/bin/pip install --no-cache-dir --no-deps cryptncompress==3.0.0
 
 # Copy the rest of the application code
-COPY --chown=lolauser:lolauser . .
+COPY setup.py Readme.md LICENSE ./
+COPY lolapy/ lolapy/
+COPY docs/swagger.yaml docs/swagger.yaml

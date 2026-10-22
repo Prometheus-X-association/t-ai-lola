@@ -110,7 +110,7 @@ class Dataset extends AbstractLolaEntity {
     public function __construct()
     {
         $this->isShared = false;
-        $this->hash = "D" . sha1(random_bytes(255));
+        $this->hash = "D" . bin2hex(random_bytes(20));
         $this->status = self::STATUS_WAITING;
         $this->groups = new ArrayCollection();
         $this->datasetLogs = new ArrayCollection();

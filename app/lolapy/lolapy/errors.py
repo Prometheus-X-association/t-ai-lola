@@ -38,10 +38,7 @@ class LolapyGlobalError(Exception):
 
     def __ensure_attributes(self):
         """Ensure all attributes are set."""
-        try:
-            assert self.message
-            assert self.public_message
-        except AssertionError:
+        if not (self.message and self.public_message):
             logging.error(
                 f"Missing 'message' or 'public_message' attribute(s) in {tools.object_fullname(self)}"
             )

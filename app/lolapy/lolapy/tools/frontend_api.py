@@ -8,6 +8,7 @@ Can be used to search information on the frontend such user permissions on datas
 """
 
 from __future__ import annotations
+from lolapy.tools.urls import with_scheme
 from enum import Enum
 import json
 import logging
@@ -63,16 +64,13 @@ class _FrontendApi:
         Don't use it directly. Use FrontedRequest instead.
 
         Args:
-            adress: url of the server. For exemple http://0.0.0.0 or http://localhost. Should
-                start with `http(s)://` but this constructor will add it if missing.
+            adress: url of the server. For example https://127.0.0.1 or https://localhost. Should
+                start with `https://` but this constructor will add it if missing.
             port: port of the server
             fake_request: If set to True, no request will be send to the frontend. Every request
                 `will return` 200
         """
-        if not adress.startswith("http"):
-            self.adress = f"http://{adress}"
-        else:
-            self.adress = adress
+        self.adress = with_scheme(adress)
         self.port = int(port)
         self.fake_request = fake_request
 
@@ -100,7 +98,7 @@ class _FrontendApi:
         Args:
             fct: Callable function. Actually supported: [requests.get] and [requests.post]
                 Request to execute.
-            url: URL to target. For example: `/api/user/{user-id}`(not http://localhost/api/lolapi/log)
+            url: URL to target. For example: `/api/user/{user-id}` (not https://localhost/api/lolapi/log)
             data: Data to send. If Json data, it must be formatted before. Default to `None`
             file: Postfile to send. Default to `None`
         Returns:

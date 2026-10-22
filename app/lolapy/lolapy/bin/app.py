@@ -3,6 +3,7 @@
 import json
 import logging
 import logging.config
+import os
 import traceback
 import sys
 
@@ -20,10 +21,15 @@ from lolapy.dataset import errors as dataset_error
 from lolapy.algorithm import errors as algorithm_error
 from lolapy.scenario import errors as scenario_errors
 from lolapy.tools.check_startup import CheckInstallation
+from flask_wtf.csrf import CSRFProtect
+from lolapy.tools import csrf_guard
 
 from setup import lolapy_version
 
 flask_app = Flask(__name__)
+csrf = CSRFProtect()
+csrf.init_app(flask_app)
+csrf_guard.install(flask_app)
 APP_VERSION = lolapy_version
 
 # Manage cache system
@@ -37,7 +43,6 @@ from lolapy.blueprints import algorithm_blueprint, scenario_blueprint, dataset_b
 flask_app.register_blueprint(algorithm_blueprint)
 flask_app.register_blueprint(scenario_blueprint)
 flask_app.register_blueprint(dataset_blueprint)
-flask_app.register_blueprint
 
 # Config swagger routes
 flask_app.config["SWAGGER"] = {
@@ -138,7 +143,7 @@ if __name__ == "__main__":
     logs.LolapyLogs.configure_logs()
     app_settings.print()
     logging.info(f"API READY FOR DEBUG ON PORT {app_port}")
-    flask_app.run(host='0.0.0.0', debug=None, port=app_port)
+    flask_app.run(host=os.environ.get('LOLAPY_BIND_HOST', '127.0.0.1'), debug=None, port=app_port)
 
 if __name__ != "__main__":
     app_settings = settings.get()  # First initialisation of the env

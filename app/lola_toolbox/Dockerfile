@@ -10,9 +10,14 @@ RUN apk update && \
     binutils \
     git
 
-COPY . /src
+COPY src/ /src/src/
+COPY img/ /src/img/
+COPY main.spec requirements.txt /src/
 
 RUN pip install -r /src/requirements.txt && \
     pip install pyinstaller
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
 ENTRYPOINT ["pyinstaller", "/src/main.spec", "--distpath", "/tmp/dist", "--workpath", "/tmp/build"]

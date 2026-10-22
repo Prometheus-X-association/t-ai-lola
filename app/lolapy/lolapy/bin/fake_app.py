@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import queue
+import tempfile
 import threading
 import time
 import zipfile
@@ -19,9 +20,14 @@ from lolapy.dataset import dataset_information, import_db
 from lolapy.nextflow.nextflow_logs import NextflowLogProcess, NextflowLogWorkflow
 from lolapy.tools import settings, fixtures
 from lolapy.tools.frontend_api import FrontendRequest
+from lolapy.tools import csrf_guard
 from lolapy.tools.health import Health
+from flask_wtf.csrf import CSRFProtect
 
 flask_app = Flask(__name__)
+csrf = CSRFProtect()
+csrf.init_app(flask_app)
+csrf_guard.install(flask_app)
 
 flask_app.config["SWAGGER"] = {
     "title": "Lolapy API",
@@ -524,12 +530,12 @@ def scenario_get_archive():
         return Response("Bad request error", status=400)
 
     def gen_fake_archive() -> Path:
-        fake_result = Path("/tmp/result.txt")
-        fake_archve = Path("/tmp/result.zip")
+        tmp_dir = Path(tempfile.mkdtemp())
+        fake_result = tmp_dir / "result.txt"
+        fake_archve = tmp_dir / "result.zip"
         fake_result.write_text("This is a result!")
         with zipfile.ZipFile(fake_archve, "w", zipfile.ZIP_DEFLATED) as zf:
-            filename_in_archive = str(fake_result).replace("/tmp", "")
-            zf.write(fake_result, filename_in_archive)
+            zf.write(fake_result, "/result.txt")
         return fake_archve
 
     fake_archive = gen_fake_archive()
