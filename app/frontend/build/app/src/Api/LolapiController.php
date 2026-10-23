@@ -52,7 +52,7 @@ class LolapiController extends AbstractFOSRestController {
     {
         $serializer = $this->container->get('serializer');
         $data = json_decode($request->getContent());
-        
+
         if (isset($data->type) && !empty($data->type) && isset($data->message) && !empty($data->message)) {
             $apiLog = new ApiLog();
             $apiLog->setDatetime(new \DateTime());

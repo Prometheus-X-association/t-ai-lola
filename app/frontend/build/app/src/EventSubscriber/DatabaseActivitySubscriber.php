@@ -43,7 +43,7 @@ class DatabaseActivitySubscriber implements EventSubscriberInterface {
     private function logActivity(string $action, LifecycleEventArgs $args): void
     {
         $entity = $args->getObject();
-        // TODO : log 
+        // TODO : log
     }
 
 }

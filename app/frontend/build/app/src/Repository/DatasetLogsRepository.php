@@ -19,22 +19,6 @@ class DatasetLogsRepository extends ServiceEntityRepository
         parent::__construct($registry, DatasetLogs::class);
     }
 
-    // /**
-    //  * @return DatasetLogs[] Returns an array of DatasetLogs objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('d.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 
     /*
     public function findOneBySomeField($value): ?DatasetLogs

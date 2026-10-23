@@ -10,7 +10,7 @@ use App\Entity\AbstractLolaEntity;
 
 // Atenttion: changement of the LOLA data provider logic
 // Now, datasets can be different types: "csv", 'json', "xapi", etc.
-// The old logic is remained. To use old logic, just set type = "xapi" in ..... 
+// The old logic is remained. To use old logic, just set type = "xapi" in .....
 // TODO
 
 #[ORM\Entity(repositoryClass: DatasetRepository::class)]
@@ -78,7 +78,7 @@ class Dataset extends AbstractLolaEntity {
     private $storagePath;
 
     /**
-     * type dataset "file" 
+     * type dataset "file"
      */
     #[ORM\Column(type: 'string', length: 50)]
     private $type = 'file';
@@ -118,7 +118,7 @@ class Dataset extends AbstractLolaEntity {
     }
 
     private function formatSize(): string
-    {        
+    {
         if ($this->size === null) {
             return "N/A";
         }
@@ -297,42 +297,12 @@ class Dataset extends AbstractLolaEntity {
 
     public function removeDatasetLog(datasetLogs $datasetLog): self
     {
-        if ($this->datasetLogs->removeElement($datasetLog)) {
-            // set the owning side to null (unless already changed)
-            if ($datasetLog->getDataset() === $this) {
-                $datasetLog->setDataset(null);
-            }
+        if ($this->datasetLogs->removeElement($datasetLog) && $datasetLog->getDataset() === $this) {
+            $datasetLog->setDataset(null);
         }
 
         return $this;
     }
-
-    // [OLD] - removed november 2025 (because of removing of obligation to use xapi datasets)
-
-    
-    // public function getRecipe(): ?string
-    // {
-    //     return $this->recipe;
-    // }
-
-    // public function setRecipe(?string $recipe): self
-    // {
-    //     $this->recipe = $recipe;
-
-    //     return $this;
-    // }
-
-    // public function getRecipeLink(): ?string
-    // {
-    //     return $this->recipeLink;
-    // }
-
-    // public function setRecipeLink(?string $recipeLink): self
-    // {
-    //     $this->recipeLink = $recipeLink;
-
-    //     return $this;
-    // }
 
     public function getPourcentageProgress(): ?float
     {

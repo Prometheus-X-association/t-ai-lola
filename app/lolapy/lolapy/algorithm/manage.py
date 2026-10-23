@@ -50,7 +50,7 @@ class InstallAlgorithm:
         # Validate the algorithm
         new_algo: Algorithm = Algorithm.from_hash(self.algo_hash)
         # Download docker dependencies
-        docker_image_url = docker.SanitizeDockerUrl(
+        docker.SanitizeDockerUrl(
             new_algo.get_recipe().harbor_url
         ).sanitize()
 

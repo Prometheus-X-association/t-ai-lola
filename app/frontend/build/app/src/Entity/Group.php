@@ -87,12 +87,12 @@ class Group extends AbstractLolaEntity
 
         return $this;
     }
-    
+
     public function hasUser(User $user): bool
     {
         return $this->users->contains($user);
     }
-    
+
     /**
      * @return Collection|Dataset[]
      */
@@ -116,10 +116,10 @@ class Group extends AbstractLolaEntity
 
         return $this;
     }
-    
+
     public function hasDataset(Dataset $dataset): bool
     {
         return $this->datasets->contains($dataset);
     }
-    
+
 }

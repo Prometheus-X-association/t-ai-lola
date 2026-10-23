@@ -29,7 +29,7 @@ class Run extends AbstractLolaEntity {
     private $status;
 
     #[ORM\Column(type: 'boolean')]
-    private $hasOutput;  
+    private $hasOutput;
 
     /**
      * @var Scenario
@@ -109,11 +109,8 @@ class Run extends AbstractLolaEntity {
 
     public function removeRunLog(RunLogs $runLog): self
     {
-        if ($this->runLogs->removeElement($runLog)) {
-            // set the owning side to null (unless already changed)
-            if ($runLog->getRun() === $this) {
-                $runLog->setRun(null);
-            }
+        if ($this->runLogs->removeElement($runLog) && $runLog->getRun() === $this) {
+            $runLog->setRun(null);
         }
 
         return $this;

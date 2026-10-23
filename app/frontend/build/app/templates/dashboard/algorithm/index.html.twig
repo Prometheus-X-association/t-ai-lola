@@ -17,7 +17,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-bordered dt-basic" id="table_algorithms" width="98%" cellspacing="0">
+        <table class="table table-bordered dt-basic" id="table_algorithms" width="98%">
             <thead>
                 <tr>
                     <th scope="col">{% trans %}dashboard.algorithm.index.th_nom{% endtrans %}</th>
@@ -52,10 +52,10 @@
                                         {{ algorithmVersion.name }}
                                     </a>
                                 {% elseif algorithmVersion.status == constant('\\App\\Entity\\AlgorithmVersion::STATUS_AVAILABLE') %}
-                                    <a class="text-success" role="button" data-toggle="tooltip" data-placement="right" title="{% trans %}dashboard.algorithm.index.tooltip_available{% endtrans %}">
+                                    <span class="text-success" data-toggle="tooltip" data-placement="right" title="{% trans %}dashboard.algorithm.index.tooltip_available{% endtrans %}">
                                         <i class="fas fa-info-circle"> </i>
                                         {{ algorithmVersion.name }}
-                                    </a>
+                                    </span>
                                 {% endif %}
                                 <br />
                             {% endfor %}

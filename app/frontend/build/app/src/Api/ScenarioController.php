@@ -133,36 +133,36 @@ class ScenarioController extends AbstractController {
         $event = "ERROR";
 
         if (isset($data->processName) && isset($data->eventTime) && isset($data->workDir)) {
-            $run = $em->getRepository(Run::class)->findOneBy(["hash" => $hash]); 
-            $runLogs = $em->getRepository(RunLogs::class)->findOneBy(["nomProcess" => $data->processName, "run" => $run]); 
+            $run = $em->getRepository(Run::class)->findOneBy(["hash" => $hash]);
+            $runLogs = $em->getRepository(RunLogs::class)->findOneBy(["nomProcess" => $data->processName, "run" => $run]);
             $workflow = $em->getRepository(RunLogs::class)->findOneBy(["type" => $type, "event" => $event, "run" => $run ]);
-            if ($workflow) { 
+            if ($workflow) {
                 return new Response(json_encode("The workflow is in error"), Response::HTTP_BAD_REQUEST);
             } else {
                     // Si l'objet Process existe, ça veut dire qu'il est soit en 'RUN', soit en 'DONE'
-                    if($runLogs) { 
+                    if($runLogs) {
                         return new Response(json_encode("Unable to return to submit event"), Response::HTTP_BAD_REQUEST);
                     } else {
-                    // S'il n'exite pas, on crée l'objet Process avec les infos envoyés en paramètres de la requête        
+                    // S'il n'exite pas, on crée l'objet Process avec les infos envoyés en paramètres de la requête
                             if ($run) {
                                 $nvRunLogs = new RunLogs();
                                 $nvRunLogs->setRun($run);
-                                $nvRunLogs->setType(RunLogs::TYPE_PROCESS);  
+                                $nvRunLogs->setType(RunLogs::TYPE_PROCESS);
                                 $nvRunLogs->setTime(new \Datetime($data->eventTime));
                                 $nvRunLogs->setWorkdir($data->workDir ?? null);
                                 $nvRunLogs->setStatistic(json_decode(json_encode($data->statistics), true) ?? null);
                                 $nvRunLogs->setNomProcess($data->processName);
                                     // Si le scénario est à 'COMPLETED', on fait passer le process directement à 'DONE'
-                                    if ($run->getStatus() == "COMPLETED") { 
+                                    if ($run->getStatus() == "COMPLETED") {
                                         $nvRunLogs->setEvent(RunLogs::EVENT_DONE);
                                     // Sinon, il est en 'SUBMIT'
-                                    } else { 
+                                    } else {
                                         $nvRunLogs->setEvent(RunLogs::EVENT_SUBMIT);
                                     }
                                 $em->persist($nvRunLogs);
                                 $em->flush();
                                 return new Response(null, Response::HTTP_OK);
-                            } else {   
+                            } else {
                                 return new Response(json_encode("Hash does not exist"), Response::HTTP_BAD_REQUEST);
                             }
                 }
@@ -200,7 +200,7 @@ class ScenarioController extends AbstractController {
         $data = json_decode($request->getContent());
         $type = "WORKFLOW";
         $event = "ERROR";
-        
+
         if (isset($data->processName) && isset($data->eventTime) && isset($data->workDir)) {
             $run = $em->getRepository(Run::class)->findOneBy(["hash" => $hash]);
             $runLogs = $em->getRepository(RunLogs::class)->findOneBy(["nomProcess" => $data->processName, "run" => $run]);
@@ -209,55 +209,55 @@ class ScenarioController extends AbstractController {
                 return new Response(json_encode("The workflow is in error"), Response::HTTP_BAD_REQUEST);
             } else {
                     // Si on a un process en 'SUBMIT'
-                    if ($run && $runLogs && $runLogs->getEvent() != "DONE") { 
+                    if ($run && $runLogs && $runLogs->getEvent() != "DONE") {
                         // et le scénario n'est pas à 'COMPLETED'
                         if ($run->getStatus() != "COMPLETED") {
-                            // le process passe à 'RUN' 
-                            $runLogs->setEvent(RunLogs::EVENT_RUN); 
+                            // le process passe à 'RUN'
+                            $runLogs->setEvent(RunLogs::EVENT_RUN);
                         } else {
                             // sinon le process passe directement à 'DONE'
-                            $runLogs->setEvent(RunLogs::EVENT_DONE); 
+                            $runLogs->setEvent(RunLogs::EVENT_DONE);
                         }
                         $em->persist($runLogs);
                         $em->flush();
                         return new Response(null, Response::HTTP_OK);
 
                     // Si le process est déjà en 'DONE'
-                    } elseif ($run && $runLogs && $runLogs->getEvent() == "DONE") { 
+                    } elseif ($run && $runLogs && $runLogs->getEvent() == "DONE") {
                         return new Response(json_encode("Unable to return to run event !!"), Response::HTTP_BAD_REQUEST);
 
                     } else {
                             // Si l'objet 'runLogs n'existe pas, on crée l'objet Process avec les infos envoyés en paramètres de la requête
-                            if ($run) { 
+                            if ($run) {
                                 $nvRunLogs = new RunLogs();
                                 $nvRunLogs->setRun($run);
-                                $nvRunLogs->setType(RunLogs::TYPE_PROCESS);  
+                                $nvRunLogs->setType(RunLogs::TYPE_PROCESS);
                                 $nvRunLogs->setTime(new \Datetime($data->eventTime));
                                 $nvRunLogs->setWorkdir($data->workDir ?? null);
                                 $nvRunLogs->setStatistic(json_decode(json_encode($data->statistics), true) ?? null);
                                 $nvRunLogs->setNomProcess($data->processName);
                                     // Si le scénario est à 'COMPLETED', on fait passer le process directement à 'DONE'
-                                    if ($run->getStatus() == "COMPLETED") { 
+                                    if ($run->getStatus() == "COMPLETED") {
                                         $nvRunLogs->setEvent(RunLogs::EVENT_DONE);
                                     // Sinon, il est en 'RUN'
-                                    }else { 
+                                    }else {
                                         $nvRunLogs->setEvent(RunLogs::EVENT_RUN);
                                     }
                                 $em->persist($nvRunLogs);
                                 $em->flush();
                                 return new Response(null, Response::HTTP_OK);
 
-                            } else {   
+                            } else {
                                 return new Response(json_encode("Hash does not exist"), Response::HTTP_BAD_REQUEST);
                             }
-                } 
+                }
             }
         } else {
             return new Response(json_encode("Incorrect data"), Response::HTTP_BAD_REQUEST);
         }
     }
 
-    
+
    /**
      * Put status in Done.
      */
@@ -284,7 +284,7 @@ class ScenarioController extends AbstractController {
         $data = json_decode($request->getContent());
         $type = "WORKFLOW";
         $event = "ERROR";
-        
+
         if (isset($data->processName) && isset($data->eventTime) && isset($data->workDir) && isset($data->statistics)) {
             $run = $em->getRepository(Run::class)->findOneBy(["hash" => $hash]);
             $runLogs = $em->getRepository(RunLogs::class)->findOneBy(["nomProcess" => $data->processName, "run" => $run]);
@@ -294,7 +294,7 @@ class ScenarioController extends AbstractController {
             } else {
                     // Si le process existe déjà
                     if ($runLogs) {
-                        // On passe son statut à 'DONE' 
+                        // On passe son statut à 'DONE'
                         $runLogs->setEvent(RunLogs::EVENT_DONE);
                         // Mettre à jour les statistiques
                         $runLogs->setStatistic(json_decode(json_encode($data->statistics), true) ?? null);
@@ -304,9 +304,9 @@ class ScenarioController extends AbstractController {
                     } else {
                             if ($run) {
                                 // Création d'un nouveau objet RunLogs avec un statut en 'DONE'
-                                $nv_runLogs = new RunLogs(); 
+                                $nv_runLogs = new RunLogs();
                                 $nv_runLogs->setRun($run);
-                                $nv_runLogs->setType(RunLogs::TYPE_PROCESS); 
+                                $nv_runLogs->setType(RunLogs::TYPE_PROCESS);
                                 $nv_runLogs->setEvent(RunLogs::EVENT_DONE);
                                 $nv_runLogs->setTime(new \Datetime($data->eventTime));
                                 $nv_runLogs->setWorkdir($data->workDir ?? null);
@@ -318,14 +318,14 @@ class ScenarioController extends AbstractController {
                             } else {
                                 return new Response(json_encode("Hash or processName does not exist"), Response::HTTP_BAD_REQUEST);
                             }
-                    } 
+                    }
             }
         } else {
             return new Response(json_encode("Incorrect data"), Response::HTTP_BAD_REQUEST);
         }
     }
 
-    
+
     /**
      * Put status in Error.
      */
@@ -382,7 +382,7 @@ class ScenarioController extends AbstractController {
         return new Response(null, Response::HTTP_OK);
     }
 
-    
+
     /**
      * Put the status of Workflow in Run
      */
@@ -408,7 +408,7 @@ class ScenarioController extends AbstractController {
             $run = $em->getRepository(Run::class)->findOneBy(["hash" => $hash]);
             if ($run) {
                 // Création d'un workflow Run
-                $runLogs = new RunLogs(); 
+                $runLogs = new RunLogs();
                 $runLogs->setRun($run);
                 $runLogs->setType(RunLogs::TYPE_WORKFLOW);
                 $runLogs->setEvent(RunLogs::EVENT_RUN);
@@ -451,7 +451,7 @@ class ScenarioController extends AbstractController {
             $run = $em->getRepository(Run::class)->findOneBy(["hash" => $hash]);
             if ($run) {
                 // Création d'un workflow Run
-                $runLogs = new RunLogs(); 
+                $runLogs = new RunLogs();
                 $runLogs->setRun($run);
                 $runLogs->setType(RunLogs::TYPE_WORKFLOW);
                 $runLogs->setEvent(RunLogs::EVENT_DONE);
@@ -466,7 +466,7 @@ class ScenarioController extends AbstractController {
         } else {
             return new Response(json_encode("Incorrect data"), Response::HTTP_BAD_REQUEST);
         }
-    } 
+    }
 
     /**
      * Put the status of Workflow in Error
@@ -495,7 +495,7 @@ class ScenarioController extends AbstractController {
             $run = $em->getRepository(Run::class)->findOneBy(["hash" => $hash]);
             if ($run) {
                 // Création d'un workflow Run
-                $runLogs = new RunLogs(); 
+                $runLogs = new RunLogs();
                 $runLogs->setRun($run);
                 $runLogs->setType(RunLogs::TYPE_WORKFLOW);
                 $runLogs->setEvent(RunLogs::EVENT_ERROR);
@@ -511,7 +511,7 @@ class ScenarioController extends AbstractController {
         } else {
             return new Response(json_encode("Incorrect data"), Response::HTTP_BAD_REQUEST);
         }
-    } 
+    }
 
-    
+
 }

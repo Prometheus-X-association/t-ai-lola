@@ -11,7 +11,6 @@ from tqdm import tqdm
 from src import crypto
 from src import archive
 from src import connection
-# from src import lib
 
 class DownloadProgressBar(tqdm):
     def update_to(self, current, total):

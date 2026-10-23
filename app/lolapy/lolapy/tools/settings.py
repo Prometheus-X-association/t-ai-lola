@@ -107,13 +107,6 @@ class AppSettings(BaseModel):
     lolapy_dataset_decrypt_key: Path
     lolapy_dataset_path: Path
     lolapy_disable_frontend_logs: bool
-    # trax_check_images: bool
-    # trax_image_client: str
-    # trax_image_admin: str
-    # sql_host_ip: str
-    # sql_host_port: int
-    # sql_root_user: str
-    # sql_root_password: str
     nextflow_executable: Path
     nextflow_log_listener_host: str
     nextflow_workdir: Path
@@ -309,13 +302,6 @@ class AppSettingsBuilder:
             lolapy_dataset_decrypt_key = Path(""),
             lolapy_dataset_path = Path(""),
             lolapy_disable_frontend_logs = False,
-            # trax_check_images=False,
-            # trax_image_client="trax_client",
-            # trax_image_admin="trax_admin",
-            # sql_host_ip = "",
-            # sql_host_port = 0,
-            # sql_root_user = "",
-            # sql_root_password = "",
             nextflow_executable = Path(""),
             nextflow_log_listener_host = "",
             nextflow_workdir = Path(""),

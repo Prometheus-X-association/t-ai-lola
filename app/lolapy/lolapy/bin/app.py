@@ -131,7 +131,7 @@ def parse_nextflow_logs():
     return Response(status=200)
 
 
-@flask_app.route("/site-map")
+@flask_app.route("/site-map", methods=["GET"])
 def site_map():
     print(flask_app.url_map)
     return Response(status=200)
@@ -151,6 +151,6 @@ if __name__ != "__main__":
         logs.LolapyLogs.configure_logs()
         CheckInstallation.check()
     except LolapyGlobalError as error:
-        logging.error(error.message)
+        logging.exception("Installation check failed: %s", error.message)
         sys.exit(1)
     logging.info("API READY FOR PRODUCTION")

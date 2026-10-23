@@ -105,11 +105,8 @@ class Algorithm extends AbstractLolaEntity {
     }
 
     public function removeAlgorithmVersion(AlgorithmVersion $algorithmVersion): self {
-        if ($this->algorithmVersions->removeElement($algorithmVersion)) {
-            // set the owning side to null (unless already changed)
-            if ($algorithmVersion->getAlgorithm() === $this) {
-                $algorithmVersion->setAlgorithm(null);
-            }
+        if ($this->algorithmVersions->removeElement($algorithmVersion) && $algorithmVersion->getAlgorithm() === $this) {
+            $algorithmVersion->setAlgorithm(null);
         }
 
         return $this;
@@ -126,7 +123,7 @@ class Algorithm extends AbstractLolaEntity {
     }
 
     public function getUrlRepositoryNoToken(): ?string {
-        // Si l'url contient un @ 
+        // Si l'url contient un @
         if (strpos( $this->urlRepository, "@" ) !== false) {
             // Et si l'url commence par http ou https, on supprime tout ce qui se trouve entre / et @
             if (strpos( $this->urlRepository, "http:" ) === 0) {
@@ -137,10 +134,10 @@ class Algorithm extends AbstractLolaEntity {
             } else {
                 return substr($this->urlRepository, strpos($this->urlRepository, "@") + 1, strlen($this->urlRepository));
             }
-            
+
         } else {
             return $this->urlRepository;
-        }   
+        }
     }
 
 }

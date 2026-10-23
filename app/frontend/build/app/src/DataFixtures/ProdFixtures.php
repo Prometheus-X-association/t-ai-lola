@@ -38,14 +38,14 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface {
         ));
         $manager->persist($user);
         $manager->flush();
-        
-                
+
+
         $terms = new TermsOfUse();
         $terms->setCreatedAt(new \DateTime());
         $terms->setCreatedBy($user);
         $terms->setActive();
         $terms->setDescription("Terms of use");
-                                
+
         $manager->persist($terms);
         $manager->flush();
     }

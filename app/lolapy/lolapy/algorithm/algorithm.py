@@ -15,10 +15,13 @@ from lolapy.algorithm import errors
 from lolapy.tools import settings
 
 
-class CONST_ALGORITHM:
+class ConstAlgorithm:
     """Store constante information on algorithm"""
 
     algo_recipe_file = "algo_recipe.json"
+
+
+CONST_ALGORITHM = ConstAlgorithm
 
 
 class ParameterAvailableTypes(Enum):
@@ -174,7 +177,7 @@ class AlgorithmParameter(BaseModel):
 
         # Check that the choices field is validated if type is choices
         if value == "choices":
-            if not "choices" in values or values["choices"] == None:
+            if "choices" not in values or values["choices"] is None:
                 raise errors.AlgorithmParameterFieldWrongFormat(
                     field="choices",
                     value=value,

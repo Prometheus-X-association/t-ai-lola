@@ -28,7 +28,7 @@ import json
 
 from jinja2 import Template, StrictUndefined
 import jinja2
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from lolapy.algorithm.algorithm import AlgorithmRecipe, InputValue, OutputValue
 from lolapy.algorithm.errors import (
@@ -108,7 +108,7 @@ class CreateNFscript(BaseModel):
 
     algo_recipe_data: AlgorithmRecipe
     scenario_template: ScenarioTemplate
-    algorithm_parameters: dict = None or {}
+    algorithm_parameters: dict = Field(default_factory=dict)
     output_template: Path
 
     model_config = ConfigDict(arbitrary_types_allowed=True)  # required to validate ScenarioTemplate
@@ -127,8 +127,6 @@ class CreateNFscript(BaseModel):
                     self.algorithm_parameters[
                         param.variable_name
                     ] = param.type.get_value()
-                case _:
-                    pass
         # Expand self.algorithm_params with docker url for template
         self.algorithm_parameters["docker_image"] = self.algo_recipe_data.harbor_url
 

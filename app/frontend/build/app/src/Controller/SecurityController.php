@@ -49,7 +49,7 @@ class SecurityController extends AbstractController {
         $user = $this->getUser();
         $user->setTermsOfUse(true);
         $entityManager->flush();
-        
+
         return $this->redirectToRoute("dashboard_accueil");
     }
 

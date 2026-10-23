@@ -18,5 +18,4 @@ def usage():
     logging.info("Compute usage of the cluster. Not cached")
 
     server_usage = ClusterUsage.get()
-    # return json.dumps(server_usage)
     return server_usage.json()

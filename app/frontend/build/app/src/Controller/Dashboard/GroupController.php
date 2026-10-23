@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Controller\LolaController;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/dashboard/group', name: 'dashboard_group_')]
 #[IsGranted('ROLE_ADMIN')]
@@ -25,7 +24,7 @@ class GroupController extends LolaController {
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, TranslatorInterface $translator): Response
+    public function new(Request $request): Response
     {
         $group = new Group();
         $form = $this->createForm(GroupType::class, $group);
@@ -35,7 +34,7 @@ class GroupController extends LolaController {
             $this->getEm()->persist($group);
             $this->getEm()->flush();
 
-            $this->addFlash('success', $translator->trans('dashboard.groupe.controller.flash_groupe_ajoute'));
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.groupe.controller.flash_groupe_ajoute'));
             return $this->redirectToRoute('dashboard_group_index');
         }
 
@@ -46,7 +45,7 @@ class GroupController extends LolaController {
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Group $group, TranslatorInterface $translator): Response
+    public function edit(Request $request, Group $group): Response
     {
         $form = $this->createForm(GroupType::class, $group);
         $form->handleRequest($request);
@@ -54,7 +53,7 @@ class GroupController extends LolaController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->flush();
 
-            $this->addFlash('success', $translator->trans('dashboard.groupe.controller.flash_groupe_modifie'));
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.groupe.controller.flash_groupe_modifie'));
             return $this->redirectToRoute('dashboard_group_index');
         }
 
@@ -65,13 +64,13 @@ class GroupController extends LolaController {
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(Request $request, Group $group, TranslatorInterface $translator): Response
+    public function delete(Request $request, Group $group): Response
     {
         if ($this->isCsrfTokenValid('delete' . $group->getId(), $request->request->get('_token'))) {
             $this->getEm()->remove($group);
             $this->getEm()->flush();
 
-            $this->addFlash('success',$translator->trans('dashboard.groupe.controller.flash_groupe_supprime'));
+            $this->addFlash('success', $this->getTranslator()->trans('dashboard.groupe.controller.flash_groupe_supprime'));
         }
 
         return $this->redirectToRoute('dashboard_group_index');

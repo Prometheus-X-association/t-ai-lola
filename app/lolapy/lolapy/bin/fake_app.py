@@ -142,8 +142,8 @@ def get_dataset_info():
     All data are fake and statics
     """
     json_data = request.get_json()
-    dataset_hash = json_data["dataset"]  # don't check type here
-    user_hash = json_data["user"]  # don't check type here
+    _ = json_data["dataset"]  # don't check type here
+    _ = json_data["user"]  # don't check type here
 
     # Generate fake data for a dataset
     fake_dataset: dataset_information.DataStatements = {
@@ -209,12 +209,12 @@ def scenario_execute():
     """
     json_data = request.get_json()
     try:
-        tag_hash = json_data["tag_hash"]
+        _ = json_data["tag_hash"]
         run_hash = json_data["run_hash"]
         user_hash = json_data["user_hash"]
         dataset_hash = json_data["dataset_hash"]
-        parameters = json_data["parameters"]
-        algorithms = json_data["algorithms"]
+        _ = json_data["parameters"]
+        _ = json_data["algorithms"]
     except (TypeError, KeyError):
         ## Missing fields in the JSON
         message = f"Wrong request (?) in '{request.full_path}'"
@@ -227,83 +227,83 @@ def scenario_execute():
             lambda: FrontendRequest.get(f"/api/scenario/start/nextflow/{run_hash}")
         )
         _put_nf_log_into_queue(
-            bg_tasks, fixtures.FakeNextflowLog.workflow_run().runHash(run_hash).log
+            bg_tasks, fixtures.FakeNextflowLog.workflow_run().run_hash(run_hash).log
         )
         _put_nf_log_into_queue(
-            bg_tasks, fixtures.FakeNextflowLog.process_submit().runHash(run_hash).log
+            bg_tasks, fixtures.FakeNextflowLog.process_submit().run_hash(run_hash).log
         )
         _put_nf_log_into_queue(
-            bg_tasks, fixtures.FakeNextflowLog.process_run().runHash(run_hash).log
+            bg_tasks, fixtures.FakeNextflowLog.process_run().run_hash(run_hash).log
         )
 
     def workflow_success(bg_tasks: QueueFakeAsync, run_hash):
         _put_nf_log_into_queue(
-            bg_tasks, fixtures.FakeNextflowLog.process_done().runHash(run_hash).log
+            bg_tasks, fixtures.FakeNextflowLog.process_done().run_hash(run_hash).log
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_submit()
-            .processName("Second-Process")
-            .runHash(run_hash)
+            .process_name("Second-Process")
+            .run_hash(run_hash)
             .log,
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_run()
-            .processName("Second-Process")
-            .runHash(run_hash)
+            .process_name("Second-Process")
+            .run_hash(run_hash)
             .log,
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_done()
-            .processName("Second-Process")
-            .runHash(run_hash)
+            .process_name("Second-Process")
+            .run_hash(run_hash)
             .log,
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_submit()
-            .processName("third-Process")
-            .runHash(run_hash)
+            .process_name("third-Process")
+            .run_hash(run_hash)
             .log,
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_submit()
-            .processName("fourth-Process")
-            .runHash(run_hash)
+            .process_name("fourth-Process")
+            .run_hash(run_hash)
             .log,
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_run()
-            .processName("fourth-Process")
-            .runHash(run_hash)
+            .process_name("fourth-Process")
+            .run_hash(run_hash)
             .log,
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_run()
-            .processName("third-Process")
-            .runHash(run_hash)
+            .process_name("third-Process")
+            .run_hash(run_hash)
             .log,
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_done()
-            .processName("fourth-Process")
-            .runHash(run_hash)
+            .process_name("fourth-Process")
+            .run_hash(run_hash)
             .log,
         )
         _put_nf_log_into_queue(
-            bg_tasks, fixtures.FakeNextflowLog.workflow_done().runHash(run_hash).log
+            bg_tasks, fixtures.FakeNextflowLog.workflow_done().run_hash(run_hash).log
         )
         _put_nf_log_into_queue(
             bg_tasks,
             fixtures.FakeNextflowLog.process_done()
-            .processName("third-Process")
-            .runHash(run_hash)
+            .process_name("third-Process")
+            .run_hash(run_hash)
             .log,
         )
         # Informs frontend that scenario complete without errors
@@ -313,19 +313,6 @@ def scenario_execute():
             )
         )
 
-    def workflow_error(bg_tasks: QueueFakeAsync, run_hash):
-        ## Failure
-        _put_nf_log_into_queue(
-            bg_tasks, fixtures.FakeNextflowLog.process_error().runHash(run_hash).log
-        )
-        _put_nf_log_into_queue(
-            bg_tasks, fixtures.FakeNextflowLog.workflow_error().runHash(run_hash).log
-        )
-        # Inform frontend that scenario is in error state
-        bg_tasks.push(
-            lambda: FrontendRequest.get(url=f"/api/scenario/error/{run_hash}")
-        )
-
     bg_tasks = QueueFakeAsync()
     ###### START Async part
     # Check permission of the user on the dataset
@@ -333,7 +320,6 @@ def scenario_execute():
     # Comment or uncomment function calls below to change behavior
     workflow_run(bg_tasks, run_hash)
     workflow_success(bg_tasks, run_hash)
-    # workflow_error(bg_tasks, run_hash)
     ##### END Async part
     bg_tasks.start()
     return Response(status=200)
@@ -351,7 +337,7 @@ def scenario_parameters():
     """
     json_data = request.get_json()
     try:
-        tag_hash = json_data["tag_hash"]  # hash unique of the tag
+        _ = json_data["tag_hash"]  # hash unique of the tag
     except (TypeError, KeyError):
         ## Missing fields in the JSON
         message = f"Wrong request (?) in '{request.full_path}'"
@@ -412,7 +398,7 @@ def remove_scenario():
     """
     json_data = request.get_json()
     try:
-        algorithm_hash = json_data["tag_hash"]  # hash unique of the tag
+        _ = json_data["tag_hash"]  # hash unique of the tag
     except (TypeError, KeyError):
         ## Missing fields in the JSON
         message = f"Wrong request (?) in '{request.full_path}'"
@@ -429,8 +415,8 @@ def algorithme_add():
     json_data = request.get_json()
     try:
         algorithm_hash = json_data["algorithm_hash"]  # hash unique of the tag
-        algorithm_url_repository = json_data["algorithm_url_repository"]
-        git_version = json_data["git_version"]
+        _ = json_data["algorithm_url_repository"]
+        _ = json_data["git_version"]
     except (TypeError, KeyError):
         ## Missing fields in the JSON
         message = f"Wrong request (?) in '{request.full_path}'"
@@ -461,7 +447,7 @@ def algorithme_add():
 def algorithm_remove():
     json_data = request.get_json()
     try:
-        algorithm_hash = json_data["algorithm_hash"]  # hash unique of the tag
+        _ = json_data["algorithm_hash"]  # hash unique of the tag
     except (TypeError, KeyError):
         ## Missing fields in the JSON
         message = f"Wrong request (?) in '{request.full_path}'"
@@ -475,7 +461,7 @@ def algorithm_parameters():
     """Return the parameters of an algorithm."""
     json_data = request.get_json()
     try:
-        tag_hash = json_data["algorithm_hash"]  # hash unique of the tag
+        _ = json_data["algorithm_hash"]  # hash unique of the tag
     except (TypeError, KeyError):
         ## Missing fields in the JSON
         message = f"Wrong request (?) in '{request.full_path}'"
@@ -504,7 +490,7 @@ def scenario_prepare_results():
         _ = json_data["tag_hash"]
         _ = json_data["workdir"]
     except (TypeError, KeyError) as e:
-        logging.error(e)
+        logging.exception("Bad request payload: %s", e)
         # Wrong formatted request
         return Response("Bad request error", status=400)
 
@@ -523,10 +509,10 @@ def scenario_get_archive():
 
     json_data = request.get_json()
     try:
-        run_hash = json_data["run_hash"]
+        _ = json_data["run_hash"]
     except (TypeError, KeyError) as e:
         # Wrong formatted request
-        logging.error(str(e))
+        logging.exception("Bad request payload: %s", e)
         return Response("Bad request error", status=400)
 
     def gen_fake_archive() -> Path:
@@ -596,42 +582,5 @@ def import_dataset():
             data={"size": 123},
         )
     )
-    # Failure
-    # bg_tasks.push(lambda: FrontendRequest.get(url=f"/api/dataset/{installation.dataset_hash}/error/{installation.import_id}"))
     bg_tasks.start()
-    #########
     return Response(status=200)
-
-
-# @flask_app.route("/server/usage", methods=["GET"])
-# def server_usage():
-#     """Return the usage of the server"""
-#     from lolapy.slurm.usage import ClusterUsage
-#     import random
-#     # usage/total
-#     cpu_possibility = [(2, 4), (10, 1000), (0, 50), (None, None)]
-#     # running/pending
-#     slurm_possibility = [(0, 50), (4, 1), (None, None), (1, 1000)]
-#     # usage/total in MB
-#     memory_possibility = [(25_000, 100_000), (None, None), (0, 100)]
-
-#     memory = random.choice(memory_possibility)
-#     slurm = random.choice(slurm_possibility)
-#     cpu = random.choice(cpu_possibility)
-
-#     return ClusterUsage(
-#             slurm_running_job=slurm[0],
-#             slurm_pending_job=slurm[1],
-#             cpu_usage=cpu[0],
-#             cpu_total=cpu[1],
-#             memory_usage=memory[0],
-#             memory_total=memory[1],
-#     ).json()
-
-
-# if __name__ == "__main__":
-#     app_settings = settings.get()
-#     app_settings.print()
-#     app_port = app_settings.lolapy_host_port
-#     logging.info(f"API READY FOR DEBUG ON PORT {app_port}")
-#     flask_app.run(host=app_settings.lolapy_host_ip, debug=True, port=app_port)

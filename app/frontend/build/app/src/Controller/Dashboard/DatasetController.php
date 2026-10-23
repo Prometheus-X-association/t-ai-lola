@@ -71,7 +71,7 @@ class DatasetController extends LolaController {
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->flush();
-                        
+
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_dataset_modifie'));
             return $this->redirectToRoute('dashboard_dataset_index');
         }
@@ -122,7 +122,6 @@ class DatasetController extends LolaController {
             $group->addDataset($dataset);
             $this->getEm()->flush();
 
-//            $this->addFlash("success", "Le dataset " . $dataset->getName() . " a été partagé avec le groupe " . $group->getName());
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_partage_ajout', [
                 '%dataset_name%' => $dataset->getName(),
                 '%group_name%' => $group->getName(),
@@ -155,7 +154,7 @@ class DatasetController extends LolaController {
     }
 
     /**
-     * Return the file to be sent with the dataset. 
+     * Return the file to be sent with the dataset.
      * It contains the sftp_hash string to identify the user and the dataset id.
      */
     #[Route('/download/{hash}', name: 'download')]

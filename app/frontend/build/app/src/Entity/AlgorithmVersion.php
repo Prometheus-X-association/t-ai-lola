@@ -27,16 +27,16 @@ class AlgorithmVersion
     private $status;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $log;    
+    private $log;
 
     #[ORM\ManyToOne(targetEntity: Algorithm::class, inversedBy: 'algorithmVersions')]
-    public $algorithm;    
-    
+    public $algorithm;
+
     public function __construct()
     {
         $this->hash = "A" . bin2hex(random_bytes(20));
-    }    
-    
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -65,7 +65,7 @@ class AlgorithmVersion
 
         return $this;
     }
-    
+
     public function getLog(): ?string
     {
         return $this->log;

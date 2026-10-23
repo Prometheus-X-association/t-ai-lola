@@ -380,6 +380,7 @@ class AsymmetricPrivateKey:
             )
         self.private_key = private_key
 
+    @staticmethod
     def load_from_file(path_priv_key: Path) -> "AsymmetricPrivateKey":
         with open(path_priv_key, "rb") as buffer_priv_key:
             private_key = buffer_priv_key.read()

@@ -247,9 +247,9 @@ class CustomHttpHandler(logging.Handler):
         It recieves a record, formats it and sends it to the url
         :param record: a log record from logging
         """
-        logEntry = self.format(record)
+        log_entry = self.format(record)
         try:
-            self.session.post(self.url, data=logEntry)
+            self.session.post(self.url, data=log_entry)
         except requests.exceptions.ConnectionError as e:
             # handle exception when frontend is not available
             with DisableCustomHttphandler() as _:

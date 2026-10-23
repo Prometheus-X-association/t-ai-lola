@@ -39,7 +39,7 @@ class Tag extends AbstractLolaEntity {
     private $log;
 
     #[ORM\ManyToOne(targetEntity: MetaScenario::class, inversedBy: 'tags')]
-    public $metascenario;    
+    public $metascenario;
 
     public function __construct()
     {

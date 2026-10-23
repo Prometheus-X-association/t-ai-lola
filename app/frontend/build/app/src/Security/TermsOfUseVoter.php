@@ -10,7 +10,7 @@ class TermsOfUseVoter extends Voter {
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        // check with voter only the authorization to access to the dashboard 
+        // check with voter only the authorization to access to the dashboard
         return $attribute === "IS_AUTHENTICATED_FULLY";
     }
 
@@ -18,7 +18,7 @@ class TermsOfUseVoter extends Voter {
     {
         /* @var $user \App\Entity\User */
         $user = $token->getUser();
-        
+
         if (!$user instanceof \App\Entity\User) {
             return false;
         }

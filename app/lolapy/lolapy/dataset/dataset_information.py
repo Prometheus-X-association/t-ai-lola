@@ -8,7 +8,6 @@ from pathlib import Path
 from lolapy.tools.frontend_api import FrontendRequest
 from lolapy.tools import settings
 from lolapy.dataset import errors as dataset_error
-# from lolapy.dataset import mysql_connect
 import shutil
 
 class DatasetFileInfo(TypedDict):

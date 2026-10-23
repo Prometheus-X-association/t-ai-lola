@@ -17,11 +17,11 @@ class AlgorithmType extends AbstractType
                 'label' => 'dashboard.algorithm.form.title',
             ])
             ->add('description', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class, [
-                'label' => 'dashboard.algorithm.form.description',    
+                'label' => 'dashboard.algorithm.form.description',
                 'required' => false,
             ])
             ->add('urlRepository', \Symfony\Component\Form\Extension\Core\Type\TextType::class, [
-                'label' => 'dashboard.algorithm.form.repository_url',    
+                'label' => 'dashboard.algorithm.form.repository_url',
                 'required' => true,
             ])
             ->add('isPublic', ChoiceType::class, [

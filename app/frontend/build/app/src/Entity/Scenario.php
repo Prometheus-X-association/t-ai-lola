@@ -30,7 +30,7 @@ class Scenario extends AbstractLolaEntity {
     public $tag;
 
     #[ORM\Column(type: 'boolean')]
-    private $isActive;    
+    private $isActive;
 
     /**
      * @var Dataset
@@ -45,7 +45,7 @@ class Scenario extends AbstractLolaEntity {
     public $metascenario;
 
     #[ORM\OneToMany(targetEntity: ScenarioAlgorithm::class, mappedBy: 'scenario')]
-    private $scenarioAlgorithms;    
+    private $scenarioAlgorithms;
 
     #[ORM\OneToMany(targetEntity: Run::class, mappedBy: 'scenario')]
     public $runs;
@@ -64,8 +64,8 @@ class Scenario extends AbstractLolaEntity {
     public function toggleActive(): void
     {
         $this->isActive = !$this->isActive;
-    }    
-    
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -139,11 +139,8 @@ class Scenario extends AbstractLolaEntity {
 
     public function removeRun(Run $run): self
     {
-        if ($this->runs->removeElement($run)) {
-            // set the owning side to null (unless already changed)
-            if ($run->getScenario() === $this) {
-                $run->setScenario(null);
-            }
+        if ($this->runs->removeElement($run) && $run->getScenario() === $this) {
+            $run->setScenario(null);
         }
 
         return $this;
@@ -193,11 +190,8 @@ class Scenario extends AbstractLolaEntity {
 
     public function removeScenarioAlgorithm(scenarioAlgorithm $scenarioAlgorithm): self
     {
-        if ($this->scenarioAlgorithms->removeElement($scenarioAlgorithm)) {
-            // set the owning side to null (unless already changed)
-            if ($scenarioAlgorithm->getScenario() === $this) {
-                $scenarioAlgorithm->setScenario(null);
-            }
+        if ($this->scenarioAlgorithms->removeElement($scenarioAlgorithm) && $scenarioAlgorithm->getScenario() === $this) {
+            $scenarioAlgorithm->setScenario(null);
         }
 
         return $this;

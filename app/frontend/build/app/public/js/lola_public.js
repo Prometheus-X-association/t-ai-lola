@@ -1,12 +1,21 @@
+function closePublicAlert(alertLayer) {
+    alertLayer.addClass("is-hiding");
+    window.setTimeout(function () {
+        alertLayer.remove();
+    }, 220);
+}
+
+function updateAuthTabs() {
+    let registerIsActive = $("#tab-2").prop("checked");
+
+    $("#tab-login").attr("aria-selected", registerIsActive ? "false" : "true");
+    $("#tab-register").attr("aria-selected", registerIsActive ? "true" : "false");
+    $("#login-panel").attr("aria-hidden", registerIsActive ? "true" : "false");
+    $("#register-panel").attr("aria-hidden", registerIsActive ? "false" : "true");
+}
+
 $(document).ready(function () {
     let loginWrap = $("#login-wrap");
-
-    function closePublicAlert(alertLayer) {
-        alertLayer.addClass("is-hiding");
-        window.setTimeout(function () {
-            alertLayer.remove();
-        }, 220);
-    }
 
     $(".public-alert-layer").each(function () {
         let alertLayer = $(this);
@@ -19,15 +28,6 @@ $(document).ready(function () {
             closePublicAlert(alertLayer);
         });
     });
-
-    function updateAuthTabs() {
-        let registerIsActive = $("#tab-2").prop("checked");
-
-        $("#tab-login").attr("aria-selected", registerIsActive ? "false" : "true");
-        $("#tab-register").attr("aria-selected", registerIsActive ? "true" : "false");
-        $("#login-panel").attr("aria-hidden", registerIsActive ? "true" : "false");
-        $("#register-panel").attr("aria-hidden", registerIsActive ? "false" : "true");
-    }
 
     if ($("#formHasError").val() === "1") {
         loginWrap.addClass("register-has-error");

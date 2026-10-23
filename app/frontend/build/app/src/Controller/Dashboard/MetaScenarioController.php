@@ -75,7 +75,6 @@ class MetaScenarioController extends LolaController {
             $tag->setMetascenario($metaScenario);
             $tag->setName($data["tag_name"]);
             $tag->setVersion($data["tag_version"]);
-//            $tag->setVariant($data["tag_variant"]);
             $tag->setVariant("");
 
             $this->getEm()->persist($tag);
@@ -218,13 +217,13 @@ class MetaScenarioController extends LolaController {
         $dataSession = $this->getSession()?->get('create_scenario', []);
         $dataSession["parameters"] = serialize($parameters);
         $this->getSession()?->set('create_scenario', $dataSession);
-        
+
         return $this->render('dashboard/metascenario/prepare_algorithm.html.twig', [
                     'tag' => $dataSession["tag"],
                     'dataset' => $dataSession["dataset"],
                     'metascenario' => $dataSession["metascenario"],
                     'algorithmVersions' => $this->getAlgorithmVersionRepository()->findAvailableForUser($this->getUser())
-        ]);        
+        ]);
     }
 
     private function canManageTag(Tag $tag): bool

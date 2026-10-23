@@ -23,7 +23,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-bordered dt-basic" id="table_scenarios" width="98%" cellspacing="0">
+        <table class="table table-bordered dt-basic" id="table_scenarios" width="98%">
             <thead>
                 <tr>
                     <th scope="col">{% trans %}dashboard.metascenario.index.th_titre{% endtrans %}</th>
@@ -58,10 +58,10 @@
                                         {{ tag.name }}
                                     </a>
                                 {% elseif tag.status == constant('\\App\\Entity\\Tag::STATUS_AVAILABLE') %}
-                                    <a class="text-success" role="button" data-toggle="tooltip" data-placement="right" title="{% trans %}dashboard.metascenario.index.tooltip_available{% endtrans %}">
+                                    <span class="text-success" data-toggle="tooltip" data-placement="right" title="{% trans %}dashboard.metascenario.index.tooltip_available{% endtrans %}">
                                         <i class="fas fa-info-circle"> </i>
                                         {{ tag.name }}
-                                    </a>
+                                    </span>
                                 {% endif %}
                                 <br />
                             {% endfor %}

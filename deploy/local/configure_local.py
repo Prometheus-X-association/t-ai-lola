@@ -67,20 +67,21 @@ def main():
     lolapy_sample = os.path.join(project_root, 'app', 'lolapy', '.env.sample')
     lolapy_target = os.path.join(project_root, 'app', 'lolapy', '.env')
     
+    dev_default_pwd = os.environ.get('LOCAL_DEV_PASSWORD', 'password')
     lolapy_updates = {
         'FRONTEND_API_IP': 'app',
         'FRONTEND_API_PORT': '80',
         'LOLAPY_HOST_IP': 'backend',
         'HARBOR_HOST': 'localhost:5001',
         'HARBOR_USER': 'backend',
-        'HARBOR_PASSWORD': 'password',
+        'HARBOR_PASSWORD': dev_default_pwd,
         'CLUSTER_TYPE': 'local',
         'SFTP_USER': 'lola',
         'SFTP_PASSWORD': 'lola',
         'MYSQL_ROOT_PASSWORD': 'lolapassword',
         'DATABASE_NAME': 'loladb',
         'MYSQL_USER': 'lola',
-        'MYSQL_PASSWORD': 'password',
+        'MYSQL_PASSWORD': dev_default_pwd,
     }
     update_env_file(lolapy_sample, lolapy_target, lolapy_updates)
     
@@ -98,7 +99,7 @@ def main():
         'DATABASE_NAME': 'loladb',
         'MYSQL_ROOT_PASSWORD': 'lolapassword',
         'MYSQL_USER': 'lola',
-        'MYSQL_PASSWORD': 'password',
+        'MYSQL_PASSWORD': dev_default_pwd,
         'SFTP_USER': 'lola',
         'SFTP_PASSWORD': 'lola',
         'SFTP_PORT': '2222',  # Non-conflicting local port for DMZ SFTP

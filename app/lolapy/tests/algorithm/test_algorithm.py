@@ -86,7 +86,7 @@ def test_Algorithm_from_hash_no_recipe(fixture_algo_hash, fixture_NEXTFLOW_ALGO_
         # Don't check if files exists (they are not)
         my_algo = algorithm.Algorithm.from_hash(fixture_algo_hash, check_exists=False)
         # Validate that a missing Readme returns the correct string
-        assert "Missing Readme in the Algorithm", my_algo.get_readme()
+        assert "Readme" in Readme.search(my_algo.algo_path).read()
 
         settings.get().nextflow_algorithm_dir = fixture_NEXTFLOW_ALGO_DIR
 

@@ -72,7 +72,7 @@ class SlurmJob:
         if cmd_result.exit_code != 0:
             self.stop()
             raise ScenarioRunError(stdout=cmd_result.stdout, stderr=cmd_result.stderr)
-        logging.info(f"Job sumbitted", extra={"request_id": self.job_name})
+        logging.info("Job sumbitted", extra={"request_id": self.job_name})
 
     def stop(self):
         """Stop a slurm Job by cancelling the job"""
@@ -88,7 +88,7 @@ class SlurmJob:
                 extra={"request_id": self.job_name},
             )
             return cmd_result.stderr
-        logging.info(f"Job stopped", extra={"request_id": self.job_name})
+        logging.info("Job stopped", extra={"request_id": self.job_name})
 
     def is_pending(self) -> bool:
         """Check if the job is pending by slurm controller.

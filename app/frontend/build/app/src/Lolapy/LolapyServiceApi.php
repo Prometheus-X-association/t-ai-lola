@@ -8,14 +8,14 @@ class LolapyServiceApi {
 
     /**
      * Logger service
-     * 
+     *
      * @var LoggerInterface
      */
     private $logger;  // Add this property
 
     /**
      * Security service for User logged data
-     * 
+     *
      * @var \Symfony\Bundle\SecurityBundle\Security
      */
     private $security;
@@ -197,11 +197,7 @@ class LolapyServiceApi {
             return true;
         }
 
-        if ($this->executeCurlRequestPost($this->resourcePing, [], false)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (bool) $this->executeCurlRequestPost($this->resourcePing, [], false);
     }
 
     /**
@@ -481,7 +477,7 @@ class LolapyServiceApi {
             $tabAlgorithm["nf_variable"] = $scenarioAlgorithm->getNfVariable();
             $tabAlgorithm["parameters"] = $scenarioAlgorithm->getParametres();
             $tabAlgorithms[] = $tabAlgorithm;
-            
+
             $this->logger->debug('Algorithm added to execution', [
                 'algorithm_hash' => $tabAlgorithm["algorithm_hash"],
                 'nf_variable' => $tabAlgorithm["nf_variable"]
@@ -495,7 +491,6 @@ class LolapyServiceApi {
             $this->logger->info('Executing real API call to Lolapy');
             $result = $this->executeCurlRequestPost($this->resourceScenarioExecute, $dataExecution);
             $this->logger->info('API call completed', ['result' => $result]);
-            # return $result;
         } else {
             $this->logger->warning('FAKE mode - dumping data instead of API call', ['data' => $dataExecution]);
             dump($dataExecution);
@@ -546,7 +541,7 @@ class LolapyServiceApi {
 
     /**
      * Add a version for an algorithm
-     * 
+     *
      * @param $algorithmUrlRepository
      * @param $versionName
      * @param $versionHash
@@ -584,23 +579,23 @@ class LolapyServiceApi {
             // Set cURL options
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            
+
             // Execute the cURL request
             $response = curl_exec($curl);
-            
+
             // Check for errors
             if (curl_errno($curl)) {
                 $error_message = curl_error($curl);
                 curl_close($curl);
                 return "Curl error: " . $error_message;
             }
-            
+
             // Close the cURL session
             curl_close($curl);
-            
-            // Decode the JSON 
+
+            // Decode the JSON
             $json = json_decode($response, true);
-            
+
             return $json;
         } else {
                 return false;

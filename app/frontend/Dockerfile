@@ -63,7 +63,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     && rm -rf /var/lib/apt/lists/*
 
 # Configure Apache & Enable necessary modules
-RUN a2enmod rewrite
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
+    && a2enmod rewrite
 
 # Enhance Apache Security
 RUN echo "ServerTokens Prod" >> /etc/apache2/conf-available/security-custom.conf \
@@ -93,7 +94,6 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 80 443
 
-USER www-data
-
 # Start Apache in the foreground
 CMD ["apache2ctl", "-D", "FOREGROUND"]
+

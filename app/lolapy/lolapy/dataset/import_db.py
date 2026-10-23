@@ -20,12 +20,8 @@ import jsonschema
 from lolapy.dataset.dataset_information import DatasetInformation
 
 import lolapy.dataset.errors as dataset_error
-# from lolapy.slurm.errors import SbatchImportDataset
 from lolapy.tools.frontend_api import FrontendRequest
-# from lolapy.slurm import slurm_job
-# from lolapy.slurm import sbatch
 from lolapy.tools import settings
-# from lolapy.dataset import mysql_connect
 
 
 class InstallDataset:

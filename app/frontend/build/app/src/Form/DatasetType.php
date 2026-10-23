@@ -18,7 +18,7 @@ class DatasetType extends AbstractType
                 'label' => 'dashboard.dataset.form.nom',
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'dashboard.dataset.form.description',    
+                'label' => 'dashboard.dataset.form.description',
                 'required' => false,
             ])
             ->add('contract', TextType::class, [

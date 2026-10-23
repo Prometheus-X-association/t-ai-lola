@@ -127,7 +127,6 @@ class _FrontendApi:
                 log_request = "POST"
                 result: requests.Response = request_fct(final_url, data, files)
             case _:
-                log_request = f"UNKNOW REQUEST: {request_fct}"
                 raise NotImplementedError(f"Unimplement request type {request_fct}")
 
         log_message = f"Send '{log_request}' with data '{result.request.body}' to '{final_url}'. Got response: '{result.content.decode('UTF-8')}'"

@@ -19,22 +19,6 @@ class MetaScenarioRepository extends ServiceEntityRepository
         parent::__construct($registry, MetaScenario::class);
     }
 
-    // /**
-    //  * @return MetaScenario[] Returns an array of Scenario objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 
     /*
     public function findOneBySomeField($value): ?MetaScenario

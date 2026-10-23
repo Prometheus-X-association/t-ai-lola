@@ -91,14 +91,8 @@ class GenMarkdownList:
                     print("here")
                     current_pos[ii] = docfile
                     break
-                if not ii in current_pos:
+                if ii not in current_pos:
                     current_pos[ii] = {}
                 current_pos = current_pos[ii]
             current_pos = hierarchical_sort
         return hierarchical_sort
-
-
-# print(GenMarkdownList(all_doc_files)._sort_hierarchically())
-# markdown_index_template = Path("docs/index.md")
-# with open(markdown_index_template) as f:
-#    rendered = jinja2.Template(f.read()).render(**self.parameters)

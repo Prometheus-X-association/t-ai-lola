@@ -21,12 +21,6 @@ Examples:
 import logging
 import time
 
-from lolapy.dataset import errors as dataset_error
-# from lolapy.slurm import job_info
-from lolapy.bin import async_tasks
-from lolapy.tools import settings
-
-
 class Health:
     def __init__(self):
         """Constructor of Health structure.
@@ -34,15 +28,11 @@ class Health:
         By default, all values are True and will be set to False if the service does not work
         """
         self.async_controller = True
-        # self.sql_controller = True
-        # self.slurm_controller = True
 
     def to_dict(self) -> dict:
         """Serialize the structure into dictionnary"""
         return {
             "async_controller": self.async_controller,
-            # "sql_controller": self.sql_controller,
-            # "slurm_controller": self.slurm_controller,
         }
 
     def _check_database(self) -> bool:
@@ -57,20 +47,9 @@ class Health:
             test_file.write_text("ok")
             test_file.unlink()
         except Exception as e:
-            logging.warning("Dataset storage healthcheck failed: {e}")
+            logging.warning("Dataset storage healthcheck failed: %s", e)
             return False
         return True
-
-    # def _check_slurm_controller(self) -> bool:
-    #     """Test connection of the slurm controller, if slurm is available"""
-    #     try:
-    #         if not job_info.SlurmControllerInfo.is_idle():
-    #             return False
-    #     except FileNotFoundError as e:
-    #         # handle 'sinfo command not found'
-    #         logging.warning(f"Command to check slurm status not available: {str(e)}")
-    #         return False
-    #     return True
 
     def _check_async_controller(self) -> bool:
         """Test async controller.

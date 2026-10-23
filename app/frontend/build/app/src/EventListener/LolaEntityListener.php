@@ -16,8 +16,8 @@ class LolaEntityListener {
     public function __construct(Security $security)
     {
        $this->security = $security;
-    }    
-    
+    }
+
     public function preUpdate(AbstractLolaEntity $lolaEntity, LifecycleEventArgs $event): void
     {
         $lolaEntity->setUpdatedAt(new \DateTime());

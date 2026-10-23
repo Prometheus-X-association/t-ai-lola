@@ -123,7 +123,7 @@ class NextflowCheckEnv():
             for docker_image in docker_images_list:
                 docker_config += f"""\n params.{docker_image.name} = '{docker_image.url}'"""
         except Exception as e:
-            logging.error(f"Error generating docker config: {e}")
+            logging.exception("Error generating docker config: %s", e)
             raise nextflow_errors.NextflowConfigError(f"Error generating docker config: {e}") 
         try:
             hash_file = hashlib.sha256(

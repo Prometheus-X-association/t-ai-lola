@@ -175,7 +175,7 @@ class User extends AbstractLolaEntity implements UserInterface, PasswordAuthenti
 
     /**
      * Check if a profil is an existing profil for Lola's users (must not be an ADMIN profil)
-     * 
+     *
      * @param string $profil
      * @return bool
      */
@@ -194,7 +194,7 @@ class User extends AbstractLolaEntity implements UserInterface, PasswordAuthenti
     /**
      * Return the formatted user profil of the current user (no admin or admin-sisr)
      * If more than 1 profil found, the first is returned (it is not normal to have more than 1 profil)
-     * 
+     *
      * @param bool $formatted if true, return the string of profil, if false return the ROLE_PROFIL_X
      * @return string The profil formatted or the role corresponding
      */
@@ -211,7 +211,7 @@ class User extends AbstractLolaEntity implements UserInterface, PasswordAuthenti
     }
 
     /**
-     * 
+     *
      */
     public static function getProfilFromRole(string $role): ?string
     {

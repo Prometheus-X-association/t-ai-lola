@@ -60,11 +60,10 @@ class Extract:
             raise IOError(f"'{archive}' file is not a zipfile")
 
         zip_archive = zipfile.ZipFile(archive)
-        if file_number:
-            if len(zip_archive.namelist()) != file_number:
-                raise IOError(
-                    f"'{archive}' archive have more or less than {file_number} file(s)"
-                )
+        if file_number and len(zip_archive.namelist()) != file_number:
+            raise IOError(
+                f"'{archive}' archive have more or less than {file_number} file(s)"
+            )
 
         return archive
 
