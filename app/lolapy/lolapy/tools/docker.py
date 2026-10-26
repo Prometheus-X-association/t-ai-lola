@@ -92,7 +92,6 @@ class PullDockerImages:
         """
 
         app_parameters = settings.get()
-        cluster_name = app_parameters.cluster_host
         docker_host = app_parameters.harbor_host
         docker_user = app_parameters.harbor_user
         docker_password = app_parameters.harbor_password
@@ -109,12 +108,8 @@ class PullDockerImages:
         login_command = f"{login_command} -u {docker_user}  -p {docker_password}" 
         cmd_result = shell_command.ShellCommand.from_env(
             command=login_command,
-            # environment={
-            #     "DOCKER_USER": docker_user,
-            #     "DOCKER_PASSWORD": docker_password,
-            # },
         ).run()
-        if cmd_result.stderr and not "login succeeded" in str(cmd_result.stdout).lower():
+        if cmd_result.stderr and "login succeeded" not in str(cmd_result.stdout).lower():
             raise tools_errors.DockerLoginError(cmd=login_command, stderr=str(cmd_result.stderr))
         logging.info(f"Connection successful to '{docker_host}'")
 
@@ -131,7 +126,7 @@ class PullDockerImages:
             if cmd_result.stderr:
                 raise tools_errors.DockerPullError(pull_command=pull_command, stderr=cmd_result.stderr)
             else:
-                logging.info(f"Images pulled")
+                logging.info("Images pulled")
             # Tag image if image.name is not None
             if image.name:
                 retag_command = f"docker tag {image.url} {image.name}"
@@ -181,7 +176,7 @@ class SanitizeDockerUrl:
         :return: str: url with good host
         """
         app_settings = settings.get()
-        docker_image_regex = re.compile(f"{app_settings.harbor_host}(:80){{0,1}}([\/_a-zA-Z0-9:.-]*)")
+        docker_image_regex = re.compile(f"{app_settings.harbor_host}(:80){{0,1}}([/_a-zA-Z0-9:.-]*)")
 
         if matches := docker_image_regex.findall(self.url):
             # findall return a [(':4443', '/dir/image:tag')] in case of success

@@ -1,6 +1,10 @@
 {{ form_start(form) }}
 {{ form_row(form.name) }}
 {{ form_row(form.description) }}
+{{ form_row(form.contract) }}
+{{ form_row(form.purposeId) }}
+{{ form_row(form.resourceId) }}
+{{ form_row(form.resource) }}
 
 <button class="btn btn-success float-right btn-block">
     {{ (button_label|default('dashboard.dataset.form.btn_enregistrer'))|trans }}

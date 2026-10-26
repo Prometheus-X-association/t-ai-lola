@@ -51,7 +51,7 @@ class RunController extends LolaController {
     {
         $filename = "run_" . $run->getHash();
         $response = new Response($lolapyService->scenarioGetArchive($run->getHash()));
-        
+
         $disposition = $response->headers->makeDisposition(
                 ResponseHeaderBag::DISPOSITION_ATTACHMENT,
                 $filename . ".zip"

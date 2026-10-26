@@ -74,3 +74,74 @@ def test_datafile_int_to_bin_overflow():
 def test_datafile_bin_to_int():
     assert DataFile.bin_to_int(b"\x01"), 1
     assert DataFile.bin_to_int(b"\x00\x00\x00\x00\x00\x01\xe2@"), 123456
+
+
+# ---- Encrypt / Decrypt round trip (AES-256-GCM) ----
+
+import datetime
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptncompress import crypto
+from cryptncompress.crypto import Encrypt, Decrypt
+
+
+@pytest.fixture(scope="module")
+def keypair(tmp_path_factory):
+    d = tmp_path_factory.mktemp("keys")
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "test")])
+    now = datetime.datetime.now(datetime.timezone.utc)
+    cert = (
+        x509.CertificateBuilder()
+        .subject_name(name).issuer_name(name).public_key(key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(now).not_valid_after(now + datetime.timedelta(days=1))
+        .sign(key, hashes.SHA256())
+    )
+    pub = d / "public.pem"
+    priv = d / "private.pem"
+    pub.write_bytes(cert.public_bytes(serialization.Encoding.PEM))
+    priv.write_bytes(key.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.TraditionalOpenSSL,
+        serialization.NoEncryption(),
+    ))
+    return pub, priv
+
+
+@pytest.mark.parametrize("size", [0, 1, 31, 32, 33, 1000, 3 * 64 + 5, 3 * 64])
+def test_roundtrip(tmp_path, keypair, monkeypatch, size):
+    monkeypatch.setattr(crypto, "CHUNK_SIZE", 64)  # force multi chunk files
+    pub, priv = keypair
+    data = bytes(range(256)) * (size // 256 + 1)
+    data = data[:size]
+    src = tmp_path / "in"; src.write_bytes(data)
+    enc = tmp_path / "enc"; out = tmp_path / "out"
+    Encrypt(pub).encrypt_file("file", src, enc)
+    assert Decrypt(priv).decrypt_file(enc, out) == "file"
+    assert out.read_bytes() == data
+
+
+def test_tampered_chunk_is_rejected(tmp_path, keypair, monkeypatch):
+    monkeypatch.setattr(crypto, "CHUNK_SIZE", 64)
+    pub, priv = keypair
+    src = tmp_path / "in"; src.write_bytes(b"A" * 200)
+    enc = tmp_path / "enc"
+    Encrypt(pub).encrypt_file("file", src, enc)
+    raw = bytearray(enc.read_bytes()); raw[-1] ^= 1; enc.write_bytes(bytes(raw))
+    with pytest.raises(errors.DecryptChunkError):
+        Decrypt(priv).decrypt_file(enc, tmp_path / "out")
+
+
+def test_truncated_file_is_rejected(tmp_path, keypair, monkeypatch):
+    monkeypatch.setattr(crypto, "CHUNK_SIZE", 64)
+    pub, priv = keypair
+    src = tmp_path / "in"; src.write_bytes(b"A" * 200)
+    enc = tmp_path / "enc"
+    Encrypt(pub).encrypt_file("file", src, enc)
+    full = enc.read_bytes()
+    enc.write_bytes(full[: -(64 + SymmetricKey.tag_size)])  # drop last chunk
+    with pytest.raises(errors.DecryptChunkError):
+        Decrypt(priv).decrypt_file(enc, tmp_path / "out")

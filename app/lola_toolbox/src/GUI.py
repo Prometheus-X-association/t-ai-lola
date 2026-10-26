@@ -175,9 +175,39 @@ class Window:
             ],
         ]
 
+    def _check_version(self):
+        try:
+            latest_version = connection.Releases.get_latest_version()
+            if latest_version and latest_version > LOLA_TOOLBOX_VERSION:
+                self.sg_window["LOLA-TOOLBOX-VERSION-MESSAGE"].update(
+                    f"New version {latest_version} available. Go to the Release page in the 'About' tab."
+                )
+        except Exception as e:
+            print(f"Could not check for updates: {e}")
+
+    def _handle_transfert_files_selection(self):
+        lst_files = self.select_multiple_files()
+        self.sg_window["-FILELIST-"].update(lst_files)
+        suffix = "files" if len(lst_files) > 1 else "file"
+        self.sg_window["Total-files"].update(f"Selected {suffix}. Total: {len(lst_files)} {suffix}")
+
+    def _handle_transfert_encrypt(self):
+        lst_files = self.sg_window["-FILELIST-"].get_list_values()
+        if not self.values["output_encrypted_path_file_transfert"]:
+            sg.popup_error("Please select an output path for the encrypted file", font=self.font)
+            return
+        self.encrypt_event(
+            progress_bar_tag="progress_bar_transfert",
+            progress_step_tag="progress_step_transfert",
+            transfer_to_sftp_button_tag="Button-transfer_transfert",
+            output="output_encrypted_path_file_transfert",
+            multiples_files=lst_files,
+            filetype="file",
+        )
+
     def start(self):
         # Create the Window
-        self.window = sg.Window(
+        self.sg_window = sg.Window(
             "Prepare Data",
             self.layout,
             size=(800, 450),
@@ -191,7 +221,10 @@ class Window:
         checked_version = False
         # Event Loop to process "events" and get the "values" of the inputs
         while True:
-            self.event, self.values = self.window.read(timeout=100)
+            self.event, self.values = self.sg_window.read(timeout=100)
+            if self.event == sg.WIN_CLOSED or self.event is None:
+                break
+
             if self.event == "Button-encrypt":
                 self.encrypt_event(
                     progress_bar_tag="progress",
@@ -202,55 +235,20 @@ class Window:
                     dataset="dataset_path_file",
                     filetype="xapi",
                 )
-
-            if self.event == "Button-transfer":
+            elif self.event == "Button-transfer":
                 self.transfert_event("progress_step")
+            elif self.event == "Button-select_files_transfert":
+                self._handle_transfert_files_selection()
+            elif self.event == "Button-encrypt_transfert":
+                self._handle_transfert_encrypt()
+            elif self.event and self.event.startswith("-OPENLINK-"):
+                webbrowser.open(self.sg_window[self.event].get())
 
-            if self.event == sg.WIN_CLOSED or self.event is None:
-                break
+            if not checked_version:
+                checked_version = True
+                self._check_version()
 
-            ## Transfert tab
-            if self.event == "Button-select_files_transfert":
-                lst_files = self.select_multiple_files()
-                self.window["-FILELIST-"].update(lst_files)
-                if len(lst_files) > 1:
-                    string = f"Selected files. Total: {len(lst_files)} files"
-                else:
-                    string = f"Selected file. Total: {len(lst_files)} file"
-                self.window["Total-files"].update(string)
-
-            if self.event == "Button-encrypt_transfert":
-                lst_files = self.window["-FILELIST-"].get_list_values()
-                if self.values["output_encrypted_path_file_transfert"] == "":
-                    sg.popup_error("Please select an output path for the encrypted file", font=self.font)
-                    continue
-                self.encrypt_event(
-                    progress_bar_tag="progress_bar_transfert",
-                    progress_step_tag="progress_step_transfert",
-                    transfer_to_sftp_button_tag="Button-transfer_transfert",
-                    output="output_encrypted_path_file_transfert",
-                    multiples_files=lst_files,
-                    filetype="file",
-                )
-
-            if self.event and self.event.startswith("-OPENLINK-"):
-                webbrowser.open(self.window[self.event].get())
-
-            if checked_version is False:
-                try:
-                    latest_version = connection.Releases.get_latest_version()
-                    checked_version = True
-                    if latest_version:
-                        if latest_version > LOLA_TOOLBOX_VERSION:
-                            self.window["LOLA-TOOLBOX-VERSION-MESSAGE"].update(
-                                f"New version {latest_version} available. Go to the Release page in the 'About' tab."
-                            )
-                except Exception as e:
-                    # If version check fails, just mark it as checked and continue
-                    checked_version = True
-                    print(f"Could not check for updates: {e}")
-
-        self.window.close()
+        self.sg_window.close()
 
     def select_multiple_files(self):
         """
@@ -285,7 +283,7 @@ class Window:
         return tmp_zippath
 
     def transfert_event(self, tag_status_bar):
-        progress_status = self.window[tag_status_bar]
+        progress_status = self.sg_window[tag_status_bar]
         progress_status.update(
             f"Uploading {self.output_file} file to sftp Lola server"
         )
@@ -311,8 +309,8 @@ class Window:
         bordereau: str = None,
     ):
         # get sg object
-        progression_step = self.window[progress_step_tag]
-        progress_bar = self.window[progress_bar_tag]
+        progression_step = self.sg_window[progress_step_tag]
+        progress_bar = self.sg_window[progress_bar_tag]
 
         try:
             if not multiples_files:
@@ -345,7 +343,7 @@ class Window:
             
             if self.output_file.is_file():
                 progression_step.update(f"DONE. {self.output_file} file generated")
-                self.window[transfer_to_sftp_button_tag].update(disabled=False)
+                self.sg_window[transfer_to_sftp_button_tag].update(disabled=False)
                 sg.popup(f"Encryption successful!\nFile saved to: {self.output_file}", font=self.font)
             else:
                 sg.popup_error("Encryption failed - output file not created", font=self.font)
@@ -360,7 +358,7 @@ class Window:
             progress_bar.update(current_count=0)
 
     def update_progress_bar(self, current, end):
-        progress_bar = self.window["progress"]
+        progress_bar = self.sg_window["progress"]
         if end > 0:
             percent = (current * 100) / end
             progress_bar.update(current_count=percent)
@@ -371,9 +369,9 @@ class Window:
         """
         # Get list of event
         lst_links = [
-            self.window.element_list()[ii].Key
-            for ii in range(len(self.window.element_list()))
-            if str(self.window.element_list()[ii].Key).startswith("-OPENLINK-")
+            self.sg_window.element_list()[ii].Key
+            for ii in range(len(self.sg_window.element_list()))
+            if str(self.sg_window.element_list()[ii].Key).startswith("-OPENLINK-")
         ]
         for ii in lst_links:
-            self.window[ii].set_cursor(cursor="hand2")
+            self.sg_window[ii].set_cursor(cursor="hand2")

@@ -131,7 +131,7 @@ class AlgorithmController extends LolaController {
         $this->addFlash('success', $this->getTranslator()->trans('dashboard.algorithm.controller.flash_version_supprimee'));
         return $this->redirectToRoute("dashboard_algorithm_index");
     }
-    
+
 
     /**
      * Make a request on Lolapy API to get the algorithm parameters
@@ -150,6 +150,6 @@ class AlgorithmController extends LolaController {
         }
 
         return new Response($lolapyService->getAlgorithmParameters($algorithmVersion->getHash()));
-    }    
+    }
 
 }

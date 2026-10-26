@@ -37,6 +37,13 @@ class DecryptSymmetricKeyError(CryptErrors):
     pass
 
 
+class DecryptChunkError(CryptErrors):
+    """
+    Error raised when the authentication of an encrypted chunk fails (corrupted or tampered file)
+    """
+    pass
+
+
 class AsymmetricKeyError(CryptErrors):
     """
     Error on RSA Public Key

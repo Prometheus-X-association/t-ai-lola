@@ -39,11 +39,11 @@ class Tag extends AbstractLolaEntity {
     private $log;
 
     #[ORM\ManyToOne(targetEntity: MetaScenario::class, inversedBy: 'tags')]
-    public $metascenario;    
+    public $metascenario;
 
     public function __construct()
     {
-        $this->hash = "T" . sha1(random_bytes(255));
+        $this->hash = "T" . bin2hex(random_bytes(20));
     }
 
     public function getId(): ?int

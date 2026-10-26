@@ -18,7 +18,7 @@ class MetaScenarioType extends AbstractType
                 'label' => 'dashboard.metascenario.form.nom',
             ])
             ->add('description', \Symfony\Component\Form\Extension\Core\Type\TextareaType::class, [
-                'label' => 'dashboard.metascenario.form.description',    
+                'label' => 'dashboard.metascenario.form.description',
                 'required' => false,
             ])
             ->add('urlRepository', TextType::class, [

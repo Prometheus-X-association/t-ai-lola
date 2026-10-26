@@ -218,8 +218,6 @@ class ShellCommand:
                 stderr=stderr,
                 exit_code=None
             )
-        except Exception as e:
-            raise e
         finally:
             if self.ssh_client:
                 self.ssh_client.close()

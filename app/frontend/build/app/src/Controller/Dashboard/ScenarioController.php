@@ -79,7 +79,7 @@ class ScenarioController extends LolaController {
 
         // check if the tag and dataset exist and if user has permission to view the dataset
         if (!$tag || !$dataset || !$this->getUser()->hasPermission($dataset, $this->getDatasetRepository())) {
-            $this->addFlash('error', $this->getTranslator()->trans('dashboard.scenario.controller.flash_prepare_error'));            
+            $this->addFlash('error', $this->getTranslator()->trans('dashboard.scenario.controller.flash_prepare_error'));
             return $this->redirectToRoute("dashboard_scenario_index");
         }
 
@@ -95,7 +95,7 @@ class ScenarioController extends LolaController {
                     'dataset' => $dataSession["dataset"],
                     'scenario' => $scenario,
                 ]);
-               
+
     }
 
     /**
@@ -110,7 +110,7 @@ class ScenarioController extends LolaController {
         $this->getSession()?->set('edit_scenario', $dataSession);
         $scenario = $this->getScenarioRepository()->find($dataSession["scenario"]->getId());
         $scenarioAlgorithms = $this->getScenarioAlgorithmRepository()->findBy(['scenario' => $scenario->getId()]);
-        $algorithmVersions = $this->getAlgorithmVersionRepository()->findAvailableForUser($this->getUser()); 
+        $algorithmVersions = $this->getAlgorithmVersionRepository()->findAvailableForUser($this->getUser());
         $tableauAlgosScenario = [];
         // Insertion des algos interchangeables dans un tableau
         foreach ($scenarioAlgorithms as $algorithm) {
@@ -124,19 +124,19 @@ class ScenarioController extends LolaController {
             }
 
             $tableauAlgosScenario[] = [
-                "hash" => $algorithmVersion->getHash(), 
+                "hash" => $algorithmVersion->getHash(),
                 "nameAlgo" => $algorithmVersion->getAlgorithm()->getName(),
-                "nameAlgoVersion" => $algorithmVersion->getName(), 
+                "nameAlgoVersion" => $algorithmVersion->getName(),
                 "nfVariable" => $algorithm->getNfVariable(),
                 "parameters" => $algorithm->getParametres()
             ];
         }
         $tableauVersionAlgos = [];
-        // Insertion des versions des algos interchangeables dans un tableau 
+        // Insertion des versions des algos interchangeables dans un tableau
         foreach ($algorithmVersions as $version) {
             $tableauVersionAlgos[] = [
-                "hash" => $version->getHash(), 
-                "nameAlgo" => $version->getAlgorithm()->getName(), 
+                "hash" => $version->getHash(),
+                "nameAlgo" => $version->getAlgorithm()->getName(),
                 "nameAlgoVersion" => $version->getName()
             ];
         }
@@ -148,7 +148,7 @@ class ScenarioController extends LolaController {
                     'scenario' => $scenario,
                     'tableauAlgosScenario' => $tableauAlgosScenario,
                     'tableauVersionAlgos' => $tableauVersionAlgos
-        ]);        
+        ]);
     }
 
     /**
@@ -197,23 +197,23 @@ class ScenarioController extends LolaController {
     public function manage(Request $request): Response
     {
          $this->logger->info('ScenarioController::manage called');
-        
+
         $data = $request->request->all();
          $this->logger->debug('Request data received', ['data_keys' => array_keys($data)]);
-        
-        if (isset($data["create_button_no_algo"])) { 
+
+        if (isset($data["create_button_no_algo"])) {
              $this->logger->info('Creating scenario without algorithms');
             unset($data["create_button_no_algo"]);
             $dataSession = $this->getSession()?->get('create_scenario', []);
             $dataSession["parameters"] = serialize($data);
             $this->getSession()?->set('create_scenario', $dataSession);
-            
+
              $this->logger->debug('Session data prepared', [
                 'dataset_hash' => $dataSession["dataset"]->getHash(),
                 'tag_hash' => $dataSession["tag"]->getHash(),
                 'metascenario_id' => $dataSession["metascenario"]->getId()
             ]);
-            
+
             // create the scenario object
             $scenario = $this->create(
                     $dataSession["dataset"]->getHash(),
@@ -221,15 +221,15 @@ class ScenarioController extends LolaController {
                     unserialize($dataSession["parameters"]),
                     $dataSession["metascenario"]->getId()
             );
-            
+
              $this->logger->info('Scenario created without algorithms', ['scenario_id' => $scenario->getId()]);
 
-        } elseif (isset($data["create_button_with_algo_after_edit"])) { 
+        } elseif (isset($data["create_button_with_algo_after_edit"])) {
              $this->logger->info('Creating scenario with algorithms after edit');
-            
+
             $dataScenario = $this->getSession()->get("edit_scenario");
             unset($data["create_button_with_algo_after_edit"]);
-                    
+
             // create the scenario object
             $scenario = $this->create(
                     $dataScenario["dataset"]->getHash(),
@@ -237,7 +237,7 @@ class ScenarioController extends LolaController {
                     unserialize($dataScenario["parameters"]),
                     $dataScenario["metascenario"]->getId()
             );
-            
+
              $this->logger->info('Scenario created', ['scenario_id' => $scenario->getId()]);
 
             // handle the algorithms parameters
@@ -246,9 +246,9 @@ class ScenarioController extends LolaController {
                 list($algorithmHash, $nfVariable, $parameterName) = explode(":", $param);
                 $tabParameters[$algorithmHash][$nfVariable][$parameterName] = $value;
             }
-            
+
              $this->logger->debug('Processing algorithms', ['algorithm_count' => count($tabParameters)]);
-            
+
             foreach ($tabParameters as $algorithmHash => $dataParams) {
                 foreach ($dataParams as $nfVariable => $params) {
                     // if there is no parameters for algorithm, only selected_algorithm parameters is passed
@@ -268,22 +268,22 @@ class ScenarioController extends LolaController {
 
                     $this->getEm()->persist($scenarioAlgorithm);
                     $this->getEm()->flush();
-                    
+
                      $this->logger->info('ScenarioAlgorithm created', [
                         'scenario_algorithm_id' => $scenarioAlgorithm->getId(),
                         'nf_variable' => $nfVariable
                     ]);
                 }
             }
-            
+
              $this->logger->info('Scenario with algorithms created successfully', ['scenario_id' => $scenario->getId()]);
-            
-        } elseif (isset($data["create_button_with_algo"])) { 
+
+        } elseif (isset($data["create_button_with_algo"])) {
              $this->logger->info('Creating scenario with algorithms');
-            
+
             $dataScenario = $this->getSession()->get("create_scenario");
             unset($data["create_button_with_algo"]);
-            
+
             // create the scenario object
             $scenario = $this->create(
                     $dataScenario["dataset"]->getHash(),
@@ -291,18 +291,18 @@ class ScenarioController extends LolaController {
                     unserialize($dataScenario["parameters"]),
                     $dataScenario["metascenario"]->getId()
             );
-            
+
              $this->logger->info('Scenario created', ['scenario_id' => $scenario->getId()]);
-             $this->logger->debug('Algorithm data received', ['data' => $data]); 
+             $this->logger->debug('Algorithm data received', ['data' => $data]);
             // handle the algorithms parameters
             $tabParameters = [];
-            foreach ($data as $param => $value) {                
+            foreach ($data as $param => $value) {
                 list($algorithmHash, $nfVariable, $parameterName) = explode(":", $param);
-                $tabParameters[$algorithmHash][$nfVariable][$parameterName] = $value;               
+                $tabParameters[$algorithmHash][$nfVariable][$parameterName] = $value;
             }
-            
+
              $this->logger->debug('Processing algorithms', ['algorithm_count' => count($tabParameters)]);
-            
+
             foreach ($tabParameters as $algorithmHash => $dataParams) {
                 foreach ($dataParams as $nfVariable => $params) {
                     // if there is no parameters for algorithm, only selected_algorithm parameters is passed
@@ -322,52 +322,52 @@ class ScenarioController extends LolaController {
 
                     $this->getEm()->persist($scenarioAlgorithm);
                     $this->getEm()->flush();
-                    
+
                      $this->logger->info('ScenarioAlgorithm created', [
                         'scenario_algorithm_id' => $scenarioAlgorithm->getId(),
                         'nf_variable' => $nfVariable
                     ]);
                 }
             }
-            
+
              $this->logger->info('Scenario with algorithms created successfully', ['scenario_id' => $scenario->getId()]);
 
         } elseif (isset($data["update_button"])) {
              $this->logger->info('Updating existing scenario');
-            
-            $dataScenario = $this->getSession()->get("edit_scenario"); 
+
+            $dataScenario = $this->getSession()->get("edit_scenario");
             unset($data["update_button"]);
 
             // update the scenario object
             $scenario = $this->getScenarioRepository()->find($dataScenario["scenario"]->getId());
-            
+
              $this->logger->debug('Scenario found for update', ['scenario_id' => $scenario->getId()]);
-            
+
             $this->update(
                 $dataScenario["dataset"]->getHash(),
                 $dataScenario["tag"]->getHash(),
                 unserialize($dataScenario["parameters"]),
                 $scenario);
-            
+
              $this->logger->info('Scenario updated', ['scenario_id' => $scenario->getId()]);
-            
+
             // handle the algorithms parameters
             $tabParameters = [];
-            foreach ($data as $param => $value) {                
+            foreach ($data as $param => $value) {
                 list($algorithmHash, $nfVariable, $parameterName) = explode(":", $param);
-                $tabParameters[$algorithmHash][$nfVariable][$parameterName] = $value;               
+                $tabParameters[$algorithmHash][$nfVariable][$parameterName] = $value;
             }
-            
+
              $this->logger->debug('Processing algorithm updates', ['algorithm_count' => count($tabParameters)]);
-            
+
             foreach ($tabParameters as $algorithmHash => $dataParams) {
                 foreach ($dataParams as $nfVariable => $params) {
                     // if there is no parameters for algorithm, only selected_algorithm parameters is passed
                     unset($params["selected_algorithm"]);
                     $scenarioAlgorithm = $this->getScenarioAlgorithmRepository()->findBy(['scenario' => $dataScenario["scenario"]->getId()]);
-                    
+
                      $this->logger->debug('Found existing ScenarioAlgorithms', ['count' => count($scenarioAlgorithm)]);
-                    
+
                     foreach ($scenarioAlgorithm as $valeur) {
                         if ($valeur->getNfVariable() === $nfVariable) {
                              $this->logger->debug('Updating ScenarioAlgorithm', [
@@ -376,20 +376,20 @@ class ScenarioController extends LolaController {
                                 'new_algorithm_hash' => $algorithmHash,
                                 'nf_variable' => $nfVariable
                             ]);
-                            
+
                             $valeur->setAlgorithmVersion($this->getVisibleAlgorithmVersion($algorithmHash));
                             $valeur->setNfVariable($nfVariable);
                             $valeur->setParametres($params);
                             $this->getEm()->flush();
-                            
+
                              $this->logger->info('ScenarioAlgorithm updated successfully', [
                                 'scenario_algorithm_id' => $valeur->getId()
                             ]);
-                        } 
-                    }  
-                }   
+                        }
+                    }
+                }
             }
-            
+
              $this->logger->info('Scenario update completed', ['scenario_id' => $scenario->getId()]);
         } else {
              $this->logger->warning('Unknown action in manage method', ['data_keys' => array_keys($data)]);
@@ -410,7 +410,7 @@ class ScenarioController extends LolaController {
         return $algorithmVersion;
     }
 
-}   
+}
 
 //        $tagHash = $data["tag_hash"];
 //        $datasetHash = $data["dataset_hash"];
@@ -435,4 +435,4 @@ class ScenarioController extends LolaController {
 //        }
 //
 //        return $this->redirectToRoute("dashboard_scenario_index");
-     
+

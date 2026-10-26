@@ -37,7 +37,7 @@ class MetaScenario extends AbstractLolaEntity {
 
     #[ORM\OneToMany(targetEntity: Scenario::class, mappedBy: 'metascenario')]
     private $scenarios;
-    
+
 
     public function __construct()
     {
@@ -114,7 +114,7 @@ class MetaScenario extends AbstractLolaEntity {
         if (strpos( $this->urlRepository, "@" ) !== false) {
             // Et si l'url commence par http ou https, on supprime tout ce qui se trouve entre / et @
             if (strpos( $this->urlRepository, "http:" ) === 0) {
-                return "http://" . substr($this->urlRepository, strpos($this->urlRepository, "@") + 1, strlen($this->urlRepository));
+                return "https://" . substr($this->urlRepository, strpos($this->urlRepository, "@") + 1, strlen($this->urlRepository));
             } elseif (strpos( $this->urlRepository, "https:" ) === 0) {
                 return "https://" . substr($this->urlRepository, strpos($this->urlRepository, "@") + 1, strlen($this->urlRepository));
             // Sinon on supprime du début jusqu'au @
@@ -124,7 +124,7 @@ class MetaScenario extends AbstractLolaEntity {
 
         } else {
             return $this->urlRepository;
-        }   
+        }
     }
 
     public function setUrlRepository(string $urlRepository): self
@@ -166,11 +166,8 @@ class MetaScenario extends AbstractLolaEntity {
 
     public function removeScenario(Scenario $scenario): self
     {
-        if ($this->scenarios->removeElement($scenario)) {
-            // set the owning side to null (unless already changed)
-            if ($scenario->getMetascenario() === $this) {
-                $scenario->setMetascenario(null);
-            }
+        if ($this->scenarios->removeElement($scenario) && $scenario->getMetascenario() === $this) {
+            $scenario->setMetascenario(null);
         }
 
         return $this;
@@ -196,11 +193,8 @@ class MetaScenario extends AbstractLolaEntity {
 
     public function removeTag(Tag $tag): self
     {
-        if ($this->tags->removeElement($tag)) {
-            // set the owning side to null (unless already changed)
-            if ($tag->getMetascenario() === $this) {
-                $tag->setMetascenario(null);
-            }
+        if ($this->tags->removeElement($tag) && $tag->getMetascenario() === $this) {
+            $tag->setMetascenario(null);
         }
 
         return $this;

@@ -17,11 +17,14 @@ from lolapy.tools.docker import DockerImage
 
 
 
-class CONST_SCENARIO:
+class ConstScenario:
     """Store constant information for scenario"""
 
     scenario_recipe_file = "params.json"
     nextflow_main = "main.nf"
+
+
+CONST_SCENARIO = ConstScenario
 
 
 class SwitchableAlgorithm(BaseModel):
@@ -100,7 +103,7 @@ class ScenarioParameter(BaseModel):
 
         # Check that the choices field is validated if type is choices
         if value == "choices":
-            if not "choices" in values or values["choices"] == None:
+            if "choices" not in values or values["choices"] is None:
                 raise errors.ScenarioParameterFieldWrongFormat(
                     field="choices",
                     value=value,
@@ -129,8 +132,6 @@ class ScenarioParameter(BaseModel):
             return ScenarioParameter(**json_data)
         except pydantic.ValidationError as e:
             raise errors.ScenarioParameterMissingField(json_data, e)
-        except errors.ScenarioParameterFieldWrongFormat as e:
-            raise e
 
 class ScenarioRecipe(BaseModel):
     """Read param.json file and extract data inside.
@@ -251,13 +252,10 @@ class Scenario(BaseModel):
         ## 2. Get the list of template files
         ## 3. Check if template file exists
         scenario_recipe: ScenarioRecipe = ScenarioRecipe.from_file(self.scenario_recipe_path)
-        try:
-            _: list[ScenarioTemplate] = [
-                ScenarioTemplate.from_path(
-                    template_file=str(switchable_algo.template), scenario_path=self.scenario_path) for switchable_algo in scenario_recipe.switchable_algorithms
-            ]
-        except errors.ScenarioTemplateNotExist as e:
-            raise e
+        _: list[ScenarioTemplate] = [
+            ScenarioTemplate.from_path(
+                template_file=str(switchable_algo.template), scenario_path=self.scenario_path) for switchable_algo in scenario_recipe.switchable_algorithms
+        ]
 
 class Readme:
     """Readme object.

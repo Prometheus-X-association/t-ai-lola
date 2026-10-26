@@ -9,6 +9,9 @@ from huey import SqliteHuey
 from lolapy.blueprints.scenario import AlgorithmExecuteJson
 from lolapy.errors import LolapyGlobalError
 from lolapy.dataset import import_db
+from lolapy.dataset import errors as dataset_error
+from lolapy.dataset.pdc import PdcImporter
+import uuid
 from lolapy import tools
 from lolapy.scenario.scenario import Scenario
 from lolapy.tools import settings
@@ -86,7 +89,7 @@ def start_scenario(
             algorithm=algorithm,
         ).run()
     except LolapyGlobalError as lolapy_error:
-        logging.error(lolapy_error.message)
+        logging.exception(lolapy_error.message)
         frontend_api.FrontendRequest.log(
             "Error",
             message=tools.object_fullname(lolapy_error),
@@ -95,8 +98,7 @@ def start_scenario(
         ## Send error to the frontend on the scenario
         frontend_api.FrontendRequest.get(f"/api/scenario/error/{run_hash}")
     except Exception as e:
-        logging.error(traceback.format_exc())
-        logging.error(str(e))
+        logging.exception("Unexpected error in run_scenario: %s", e)
         frontend_api.FrontendRequest.get(f"/api/scenario/error/{run_hash}")
 
 
@@ -119,7 +121,7 @@ def install_scenario(scenario_hash: str, git_tag: str, repository_url: str):
             hash=scenario_hash,
         ).install()
     except LolapyGlobalError as lolapy_error:
-        logging.error(lolapy_error.message)
+        logging.exception(lolapy_error.message)
         frontend_api.FrontendRequest.log(
             "Error",
             message=tools.object_fullname(lolapy_error),
@@ -131,8 +133,7 @@ def install_scenario(scenario_hash: str, git_tag: str, repository_url: str):
             data={"tag": scenario_hash, "error": lolapy_error.public_message},
         )
     except Exception as e:
-        logging.error(traceback.format_exc())
-        logging.error(str(e))
+        logging.exception("Unexpected error in install_scenario: %s", e)
         frontend_api.FrontendRequest.post(
             url="/api/tag/error",
             data={"tag": scenario_hash, "error": LolapyGlobalError.standard_public_message},
@@ -146,7 +147,7 @@ def install_algorithm(algo_hash: str, git_version: str, url: str):
             repository_url=url, algo_hash=algo_hash, git_version=git_version
         ).install()
     except LolapyGlobalError as lolapy_error:
-        logging.error(lolapy_error.message)
+        logging.exception(lolapy_error.message)
         frontend_api.FrontendRequest.log(
             "Error",
             message=tools.object_fullname(lolapy_error),
@@ -158,8 +159,7 @@ def install_algorithm(algo_hash: str, git_version: str, url: str):
             data={"algorithm_hash": algo_hash, "error": lolapy_error.public_message},
         )
     except Exception as e:
-        logging.error(traceback.format_exc())
-        logging.error(str(e))
+        logging.exception("Unexpected error in install_algorithm: %s", e)
         frontend_api.FrontendRequest.log(
             "Error", message=tools.object_fullname(e), details=str(e)
         )
@@ -196,7 +196,7 @@ def import_dataset(data_path):
             frontend_api.FrontendRequest.get(
                 url=f"/api/dataset/{installation.dataset_hash}/error/{installation.import_id}"
             )
-        logging.error(lolapy_error.message)
+        logging.exception(lolapy_error.message)
     except Exception as e:
         frontend_api.FrontendRequest.log(
             "Error", message=str(e.__class__), details=str(e)
@@ -205,11 +205,90 @@ def import_dataset(data_path):
             frontend_api.FrontendRequest.get(
                 url=f"/api/dataset/{installation.dataset_hash}/error/{installation.import_id}"
             )
-        logging.error(traceback.format_exc())
-        logging.error(str(e))
+        logging.exception("Unexpected error in import_dataset: %s", e)
         frontend_api.FrontendRequest.log(
             "Error", message=tools.object_fullname(e), details=str(e)
         )
+
+
+@huey.task()
+def fetch_and_import_dataset_pdc(
+    dataset_hash: str,
+    user_hash: str,
+    contract: str,
+    resource: str,
+    purpose_id: str | None = None,
+    resource_id: str | None = None,
+):
+    """Async function to fetch a dataset via PDC according to data-import logic."""
+    import_id = str(uuid.uuid4())
+    logging.info(f"Starting PDC fetch for dataset={dataset_hash}, user={user_hash}, contract={contract}, resource={resource}, purpose_id={purpose_id}, resource_id={resource_id}")
+    frontend_api.FrontendRequest.log(
+        log_type="ImportDataset",
+        message=f"API start to import a dataset via PDC ({dataset_hash})",
+        details=f"Dataset temporary ID={import_id}, Resource={resource}",
+    )
+
+    try:
+        # Check permissions
+        has_permission = frontend_api.FrontendRequest.dataset_permission(user_hash, dataset_hash)
+        if not has_permission:
+            raise dataset_error.DatasetPermissionDenied(dataset=dataset_hash, user=user_hash)
+
+        # Notify frontend start
+        frontend_api.FrontendRequest.get(f"/api/dataset/{dataset_hash}/start/{import_id}")
+
+        settings_app = settings.get()
+        dataset_dir = settings_app.lolapy_dataset_path / dataset_hash
+        dataset_dir.mkdir(parents=True, exist_ok=True)
+        target_path = dataset_dir / Path(resource).name
+
+        importer = PdcImporter(
+            contract=contract,
+            resource=resource,
+            purpose_id=purpose_id,
+            resource_id=resource_id,
+        )
+        importer.login_pdc()
+        importer.process_exchange()
+        importer.login_receiver()
+        importer.get_from_receiver()
+
+        def on_progress(pct: float):
+            frontend_api.FrontendRequest.get(f"/api/dataset/{dataset_hash}/progress/{pct:.2f}")
+
+        bytes_written = importer.download_data(target_path, progress_callback=on_progress)
+        size_mb = max(1, round(bytes_written / (1024 * 1024)))
+
+        # Notify frontend completion
+        frontend_api.FrontendRequest.post(
+            f"/api/dataset/{dataset_hash}/complete/{import_id}",
+            data={"size": size_mb, "storagePath": str(target_path)},
+        )
+        frontend_api.FrontendRequest.log(
+            log_type="ImportDataset",
+            message=f"Dataset {dataset_hash} imported via PDC successfully",
+            details=f"Saved to {target_path} ({size_mb} MB)",
+        )
+    except LolapyGlobalError as lolapy_error:
+        frontend_api.FrontendRequest.log(
+            "Error",
+            message=tools.object_fullname(lolapy_error),
+            details=lolapy_error.message,
+        )
+        frontend_api.FrontendRequest.get(
+            url=f"/api/dataset/{dataset_hash}/error/{import_id}"
+        )
+        logging.exception(lolapy_error.message)
+    except Exception as e:
+        frontend_api.FrontendRequest.log(
+            "Error", message=tools.object_fullname(e), details=str(e)
+        )
+        frontend_api.FrontendRequest.get(
+            url=f"/api/dataset/{dataset_hash}/error/{import_id}"
+        )
+        logging.exception("Unexpected error in fetch_and_import_dataset_pdc: %s", e)
+
 
 @huey.task()
 def prepare_results(working_directories: list, run_hash: str, tag_hash: str):
@@ -234,11 +313,10 @@ def prepare_results(working_directories: list, run_hash: str, tag_hash: str):
         prepare_results.compress()
         frontend_url = app_settings.frontend_api_prepare_result_complete_url
     except LolapyGlobalError as lolapy_error:
-        logging.error(lolapy_error.message)
+        logging.exception(lolapy_error.message)
         frontend_url = app_settings.frontend_api_prepare_result_error_url
     except Exception as error:
-        logging.error(traceback.format_exc())
-        logging.error(error)
+        logging.exception("Unexpected error in prepare_results: %s", error)
         frontend_url = app_settings.frontend_api_prepare_result_error_url
     # Send GET request to frontend to url like /api/scenario/results/{complete,error}/<run_hash>
     # Can be success or failure depending

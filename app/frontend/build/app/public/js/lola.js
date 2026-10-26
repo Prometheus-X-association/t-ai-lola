@@ -1,3 +1,31 @@
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function syntaxHighlight(json) {
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, function (match) {
+        let cls = 'number';
+        if (match.startsWith('"')) {
+            if (match.endsWith(':')) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}
+
 $(document).ready(function () {
 
     /*
@@ -35,17 +63,6 @@ $(document).ready(function () {
         });
     })
 
-    /**
-     * Apply json formatting
-     */
-    function isJsonString(str) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        return true;
-    }    
     $(".format_json").each(function () {
         let data = $(this).html();
         if( isJsonString(data) ) {
@@ -53,42 +70,10 @@ $(document).ready(function () {
         }       
     });
 
-    function sanitize(string) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#x27;',
-            "/": '&#x2F;',
-        };
-        const reg = /[&<>"'/]/ig;
-        return string.replace(reg, (match) => (map[match]));
-    }
-
-    function syntaxHighlight(json) {
-        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-            var cls = 'number';
-            if (/^"/.test(match)) {
-                if (/:$/.test(match)) {
-                    cls = 'key';
-                } else {
-                    cls = 'string';
-                }
-            } else if (/true|false/.test(match)) {
-                cls = 'boolean';
-            } else if (/null/.test(match)) {
-                cls = 'null';
-            }
-            return '<span class="' + cls + '">' + match + '</span>';
-        });
-    }
-
     // selection of the dataset before the execution of a scenario
     // and check if the button to next step must be activated
     $(".btn-scenario-execute-dataset").on('click', function () {
-        selectedDataset = $(this);
+        const selectedDataset = $(this);
         $(".btn-scenario-execute-dataset").each(function () {
             $(this).addClass("btn-outline-success");
             $(this).removeClass("btn-success");

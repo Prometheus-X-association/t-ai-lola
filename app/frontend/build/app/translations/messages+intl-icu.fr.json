@@ -481,7 +481,7 @@
                 "btn_retour": "Retour à la liste des jeux de données",
                 "btn_ajouter": "Ajouter",
                 "aide_titre": "Ajout d'un jeu de données",
-                "aide": "<h5 class=\"card-title\">Création d'un jeu de données</h5><p class=\"card-text\">Cette page permet d'ajouter un nouveau jeu de données à la plateforme. Vous devez renseigner son nom et sa description. Ces informations pourront être modifiées ultérieurement.</p>"
+                "aide": "<h5 class=\"card-title\">Création d'un jeu de données</h5><p class=\"card-text\">Cette page permet d'ajouter un nouveau jeu de données à la plateforme. Renseignez le nom, la description ainsi que le <strong>Contrat PDC</strong> et la <strong>Ressource PDC</strong> pour importer automatiquement les données via le connecteur PDC sans passer par SFTP.</p>"
             },
             "edit": {
                 "title": "Modification",
@@ -494,6 +494,10 @@
             "form": {
                 "nom": "Nom",
                 "description": "Description",
+                "contract": "Contrat",
+                "purpose_id": "ID de la finalité (Purpose ID)",
+                "resource_id": "ID de la ressource (Resource ID)",
+                "resource": "Ressource",
                 "recipe": "Recette XAPI",
                 "recipe_link": "Lien de la recette XAPI",
                 "btn_enregistrer": "Enregistrer"

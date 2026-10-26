@@ -12,8 +12,10 @@ RUN apt update && \
     groupadd -g ${gid} ${group} && \
     useradd -u ${uid} -g ${group} -m ${user}
 
-COPY . /src
 WORKDIR /src
+COPY setup.py requirements.txt Readme.md ./
+COPY lolapy/ lolapy/
+COPY docs/swagger.yaml docs/swagger.yaml
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 ENV ENV_FILE=/src/.env.experimental
 USER ${user}:${group}

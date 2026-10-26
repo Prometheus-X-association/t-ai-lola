@@ -14,9 +14,9 @@
             {% if not app.user %}
                 <div class="auth-tabs" role="tablist" aria-label="{{ 'public.accessibility.auth_tabs'|trans }}">
                     <input id="tab-1" type="radio" name="tab" class="sign-in" aria-controls="login-panel"{% if not registerHasError %} checked{% endif %}>
-                    <label for="tab-1" class="tab" id="tab-login" role="tab" aria-controls="login-panel" aria-selected="{{ registerHasError ? 'false' : 'true' }}">{% trans %}public.accueil.connexion{% endtrans %}</label>
+                    <label for="tab-1" class="tab" id="tab-login" aria-controls="login-panel" aria-selected="{{ registerHasError ? 'false' : 'true' }}">{% trans %}public.accueil.connexion{% endtrans %}</label>
                     <input id="tab-2" type="radio" name="tab" class="for-pwd" aria-controls="register-panel"{% if registerHasError %} checked{% endif %}>
-                    <label for="tab-2" class="tab" id="tab-register" role="tab" aria-controls="register-panel" aria-selected="{{ registerHasError ? 'true' : 'false' }}">{% trans %}public.accueil.inscription{% endtrans %}</label>
+                    <label for="tab-2" class="tab" id="tab-register" aria-controls="register-panel" aria-selected="{{ registerHasError ? 'true' : 'false' }}">{% trans %}public.accueil.inscription{% endtrans %}</label>
                 </div>
             {% endif %}
 
@@ -72,12 +72,12 @@
                             <div class="hr-sm"></div>
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                         </form>
-                        <center>
+                        <div class="text-center">
                             <a href="https://lola.loria.fr" target="_blank" class="text-white public-site-link">
                                 <span>{% trans %}public.accueil.btn_lola_site_publique{% endtrans %}</span>
                                 <i class="fas fa-external-link-alt" aria-hidden="true"></i>
                             </a>
-                        </center>
+                        </div>
                     </div>
                     <div class="for-pwd-htm" id="register-panel" role="tabpanel" aria-labelledby="tab-register" aria-hidden="{{ registerHasError ? 'false' : 'true' }}">
                         {% for flashError in app.flashes('verify_email_error') %}

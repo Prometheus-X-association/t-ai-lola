@@ -2,8 +2,10 @@
 import os
 import re
 import sys
-import hashlib
-import base64
+
+# Must match the /tmp/lolauser bind mounts in docker-compose.local.yml.
+# Overridable through LOLA_LOCAL_HOME.
+LOLA_LOCAL_HOME = os.environ.get("LOLA_LOCAL_HOME", os.path.join(os.sep, "tmp", "lolauser"))
 
 def parse_yaml(file_path):
     vars_dict = {}
@@ -38,19 +40,19 @@ def update_env_file(sample_path, target_path, updates):
             matched = False
             for key, val in updates.items():
                 if line.startswith(f"{key}="):
-                    val_str = str(val).replace('/home/lolauser', '/tmp/lolauser')
+                    val_str = str(val).replace('/home/lolauser', LOLA_LOCAL_HOME)
                     lines.append(f"{key}={val_str}\n")
                     updated_keys.add(key)
                     matched = True
                     break
             if not matched:
-                line_str = line.replace('/home/lolauser', '/tmp/lolauser')
+                line_str = line.replace('/home/lolauser', LOLA_LOCAL_HOME)
                 lines.append(line_str)
                 
     # Append any updates that weren't in the sample file
     for key, val in updates.items():
         if key not in updated_keys:
-            val_str = str(val).replace('/home/lolauser', '/tmp/lolauser')
+            val_str = str(val).replace('/home/lolauser', LOLA_LOCAL_HOME)
             lines.append(f"{key}={val_str}\n")
             
     with open(target_path, 'w') as f:
@@ -65,20 +67,21 @@ def main():
     lolapy_sample = os.path.join(project_root, 'app', 'lolapy', '.env.sample')
     lolapy_target = os.path.join(project_root, 'app', 'lolapy', '.env')
     
+    dev_default_pwd = os.environ.get('LOCAL_DEV_PASSWORD', 'password')
     lolapy_updates = {
         'FRONTEND_API_IP': 'app',
         'FRONTEND_API_PORT': '80',
         'LOLAPY_HOST_IP': 'backend',
         'HARBOR_HOST': 'localhost:5001',
         'HARBOR_USER': 'backend',
-        'HARBOR_PASSWORD': 'password',
+        'HARBOR_PASSWORD': dev_default_pwd,
         'CLUSTER_TYPE': 'local',
         'SFTP_USER': 'lola',
         'SFTP_PASSWORD': 'lola',
         'MYSQL_ROOT_PASSWORD': 'lolapassword',
         'DATABASE_NAME': 'loladb',
         'MYSQL_USER': 'lola',
-        'MYSQL_PASSWORD': 'password',
+        'MYSQL_PASSWORD': dev_default_pwd,
     }
     update_env_file(lolapy_sample, lolapy_target, lolapy_updates)
     
@@ -96,7 +99,7 @@ def main():
         'DATABASE_NAME': 'loladb',
         'MYSQL_ROOT_PASSWORD': 'lolapassword',
         'MYSQL_USER': 'lola',
-        'MYSQL_PASSWORD': 'password',
+        'MYSQL_PASSWORD': dev_default_pwd,
         'SFTP_USER': 'lola',
         'SFTP_PASSWORD': 'lola',
         'SFTP_PORT': '2222',  # Non-conflicting local port for DMZ SFTP
@@ -145,15 +148,12 @@ def main():
             f.write(bcrypt_line + '\n')
         print(f"Generated bcrypt registry htpasswd file: {htpasswd_path}")
     except Exception as e:
-        # Fallback to SHA-1 if Docker is not available
-        sha1_hash = hashlib.sha1(password.encode('utf-8')).digest()
-        sha1_b64 = base64.b64encode(sha1_hash).decode('utf-8')
-        with open(htpasswd_path, 'w') as f:
-            f.write(f"backend:{{SHA}}{sha1_b64}\n")
-        print(f"Generated registry htpasswd file (fallback to SHA-1): {htpasswd_path}")
-    
+        # SHA-1 is not an acceptable fallback; the registry requires bcrypt.
+        print(f"Error: could not generate bcrypt htpasswd file (is Docker running?): {e}")
+        sys.exit(1)
+
     # 6. Create directories
-    home_dir = '/tmp/lolauser'
+    home_dir = LOLA_LOCAL_HOME
     datasets_dir = os.path.join(home_dir, 'nf-workdir', 'datasets')
     os.makedirs(datasets_dir, exist_ok=True)
     print(f"Ensured datasets directory exists: {datasets_dir}")

@@ -15,7 +15,7 @@ class LolaController extends AbstractController {
     protected LoggerInterface $logger;
     private RequestStack $requestStack;
     private EntityManagerInterface $entityManager;
-    
+
     public function __construct(TranslatorInterface $translator, LoggerInterface $logger, RequestStack $requestStack, EntityManagerInterface $entityManager) {
         $this->translator = $translator;
         $this->requestStack = $requestStack;

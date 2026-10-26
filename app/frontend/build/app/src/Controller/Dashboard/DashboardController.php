@@ -39,7 +39,7 @@ class DashboardController extends LolaController
                     'statistics' => $lolapyReturn
                 ]);
             }
-            
+
         }
     }
 

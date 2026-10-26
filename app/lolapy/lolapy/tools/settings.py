@@ -107,13 +107,6 @@ class AppSettings(BaseModel):
     lolapy_dataset_decrypt_key: Path
     lolapy_dataset_path: Path
     lolapy_disable_frontend_logs: bool
-    # trax_check_images: bool
-    # trax_image_client: str
-    # trax_image_admin: str
-    # sql_host_ip: str
-    # sql_host_port: int
-    # sql_root_user: str
-    # sql_root_password: str
     nextflow_executable: Path
     nextflow_log_listener_host: str
     nextflow_workdir: Path
@@ -130,6 +123,18 @@ class AppSettings(BaseModel):
     k8s_namespace: str = "default"
     k8s_service_account: str = "default"
     http_proxy: str | None = None
+
+    # PDC (Personal Data Connector) settings
+    pdc_host: str = "https://loria.pdc.visionstrust.com"
+    pdc_service_key: str = ""
+    pdc_secret_key: str = ""
+    pdc_purpose_id: str = "https://api.visionstrust.com/v1/catalog/serviceofferings/65f0809bae4df85cec866a80"
+    pdc_resource_id: str = "https://api.visionstrust.com/v1/catalog/serviceofferings/65f44ef4eaa4d99df777d93d"
+    pdc_pubkey_file: Path = Path("keys/pubkey.pem")
+    pdc_privkey_file: Path = Path("keys/privkey.pem")
+    pdc_receiver_host: str = "https://loria.ovh"
+    pdc_receiver_service_key: str = "azim"
+    pdc_receiver_secret_key: str = "roussanaly"
 
     @validator("http_proxy")
     def validate_http_proxy(cls, value) -> str | None:
@@ -297,13 +302,6 @@ class AppSettingsBuilder:
             lolapy_dataset_decrypt_key = Path(""),
             lolapy_dataset_path = Path(""),
             lolapy_disable_frontend_logs = False,
-            # trax_check_images=False,
-            # trax_image_client="trax_client",
-            # trax_image_admin="trax_admin",
-            # sql_host_ip = "",
-            # sql_host_port = 0,
-            # sql_root_user = "",
-            # sql_root_password = "",
             nextflow_executable = Path(""),
             nextflow_log_listener_host = "",
             nextflow_workdir = Path(""),

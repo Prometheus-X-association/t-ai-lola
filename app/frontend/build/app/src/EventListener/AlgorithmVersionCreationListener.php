@@ -29,8 +29,8 @@ class AlgorithmVersionCreationListener {
                 $algorithmVersion->getAlgorithm()->getUrlRepository(),
                 $algorithmVersion->getName(),
                 $algorithmVersion->getHash());
-        
-        
+
+
         error_log('### addAlgorithmVersion return: ' . print_r($returnAddAlgorithmVersion, true));
 
     }

@@ -123,17 +123,17 @@ class NextflowCheckEnv():
             for docker_image in docker_images_list:
                 docker_config += f"""\n params.{docker_image.name} = '{docker_image.url}'"""
         except Exception as e:
-            logging.error(f"Error generating docker config: {e}")
+            logging.exception("Error generating docker config: %s", e)
             raise nextflow_errors.NextflowConfigError(f"Error generating docker config: {e}") 
         try:
-            hash_file = hashlib.md5(
+            hash_file = hashlib.sha256(
                 open(self.config_file_docker, "rb").read()
             ).hexdigest()
         except FileNotFoundError:
             # If file not found, use an empty md5 so regenerate the file
             logging.info(f"File {self.config_file_docker} not found. Will be generated")
             hash_file = ""
-        hash_string = hashlib.md5(docker_config.encode()).hexdigest()
+        hash_string = hashlib.sha256(docker_config.encode()).hexdigest()
         # Generate the file if md5sum are not the same
         if hash_file != hash_string:
             logging.info(f"Generate {self.config_file_docker} because wrong md5sum")

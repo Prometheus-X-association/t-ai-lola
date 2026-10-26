@@ -76,7 +76,6 @@ class Releases:
                 ## ValueError means the tag version is wrong (maybe in the format vX.Y.Z )
                 ## Add 0 to the list to keep length of the initial list
                 sanitized_lst_releases.append(0)
-                pass
         assert len(sanitized_lst_releases) >= 1
         _, sorted_releases = zip(*sorted(zip(sanitized_lst_releases, lst_releases), reverse=True))
         return sorted_releases

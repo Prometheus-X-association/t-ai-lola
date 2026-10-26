@@ -81,11 +81,11 @@ class TermsOfUseController extends LolaController {
     {
         // set inactive all termsOfUse
         $this->getTermsOfUseRepository()->updateAllInactive();
-        
+
         // set active the selected termsOfUse
         $termsOfUse->setActive();
         $this->getEm()->flush();
-        
+
         // Reset for all users the agreement of the terms of use
         // Users must agree to the new terms of use before access to dashboard
         $this->getUserRepository()->updateTermsOfUseReset();

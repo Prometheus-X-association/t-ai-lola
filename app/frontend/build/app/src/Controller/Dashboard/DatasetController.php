@@ -31,7 +31,7 @@ class DatasetController extends LolaController {
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, LolapyServiceApi $lolapyService): Response
     {
         $dataset = new Dataset();
         $form = $this->createForm(DatasetType::class, $dataset);
@@ -40,6 +40,18 @@ class DatasetController extends LolaController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->persist($dataset);
             $this->getEm()->flush();
+
+            // If contract and resource are specified, trigger PDC fetch via Lolapy
+            if ($dataset->getContract() && $dataset->getResource()) {
+                $lolapyService->createDataset(
+                    $dataset->getHash(),
+                    $this->getUser()->getHash(),
+                    $dataset->getContract(),
+                    $dataset->getResource(),
+                    $dataset->getPurposeId(),
+                    $dataset->getResourceId()
+                );
+            }
 
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_dataset_ajoute'));
             return $this->redirectToRoute('dashboard_dataset_index');
@@ -59,7 +71,7 @@ class DatasetController extends LolaController {
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getEm()->flush();
-                        
+
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_dataset_modifie'));
             return $this->redirectToRoute('dashboard_dataset_index');
         }
@@ -110,7 +122,6 @@ class DatasetController extends LolaController {
             $group->addDataset($dataset);
             $this->getEm()->flush();
 
-//            $this->addFlash("success", "Le dataset " . $dataset->getName() . " a été partagé avec le groupe " . $group->getName());
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_partage_ajout', [
                 '%dataset_name%' => $dataset->getName(),
                 '%group_name%' => $group->getName(),
@@ -143,7 +154,7 @@ class DatasetController extends LolaController {
     }
 
     /**
-     * Return the file to be sent with the dataset. 
+     * Return the file to be sent with the dataset.
      * It contains the sftp_hash string to identify the user and the dataset id.
      */
     #[Route('/download/{hash}', name: 'download')]

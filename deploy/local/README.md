@@ -60,12 +60,13 @@ Here is the reference for all local services running on your machine:
 * **Host Port**: `5000` (Container port: `5000`)
 * **Environment File**: `app/lolapy/.env`
 
-### 📂 SFTP Server
+### 📂 SFTP Server (Deprecated in favor of PDC)
 * **Host**: `localhost`
 * **Port**: `2222` (Container port: `22`)
 * **Username**: `lola`
 * **Password**: `lola`
 * **Upload Folder (Host Path)**: `/tmp/lolauser/nf-workdir/datasets`
+* *Note*: Datasets are now imported directly via PDC (VisionsTrust Personal Data Connector) using the contract and resource inputs in the frontend. SFTP upload is no longer required.
 
 ### 🛢️ MySQL Database
 * **Host**: `localhost`

@@ -10,7 +10,7 @@ use App\Entity\AbstractLolaEntity;
 
 // Atenttion: changement of the LOLA data provider logic
 // Now, datasets can be different types: "csv", 'json', "xapi", etc.
-// The old logic is remained. To use old logic, just set type = "xapi" in ..... 
+// The old logic is remained. To use old logic, just set type = "xapi" in .....
 // TODO
 
 #[ORM\Entity(repositoryClass: DatasetRepository::class)]
@@ -78,15 +78,39 @@ class Dataset extends AbstractLolaEntity {
     private $storagePath;
 
     /**
-     * type dataset "file" 
+     * type dataset "file"
      */
     #[ORM\Column(type: 'string', length: 50)]
     private $type = 'file';
 
+    /**
+     * PDC Contract URI
+     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private $contract;
+
+    /**
+     * PDC Resource Path / Identifier
+     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private $resource;
+
+    /**
+     * PDC Purpose ID URI
+     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private $purposeId;
+
+    /**
+     * PDC Resource ID URI
+     */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private $resourceId;
+
     public function __construct()
     {
         $this->isShared = false;
-        $this->hash = "D" . sha1(random_bytes(255));
+        $this->hash = "D" . bin2hex(random_bytes(20));
         $this->status = self::STATUS_WAITING;
         $this->groups = new ArrayCollection();
         $this->datasetLogs = new ArrayCollection();
@@ -94,7 +118,7 @@ class Dataset extends AbstractLolaEntity {
     }
 
     private function formatSize(): string
-    {        
+    {
         if ($this->size === null) {
             return "N/A";
         }
@@ -273,42 +297,12 @@ class Dataset extends AbstractLolaEntity {
 
     public function removeDatasetLog(datasetLogs $datasetLog): self
     {
-        if ($this->datasetLogs->removeElement($datasetLog)) {
-            // set the owning side to null (unless already changed)
-            if ($datasetLog->getDataset() === $this) {
-                $datasetLog->setDataset(null);
-            }
+        if ($this->datasetLogs->removeElement($datasetLog) && $datasetLog->getDataset() === $this) {
+            $datasetLog->setDataset(null);
         }
 
         return $this;
     }
-
-    // [OLD] - removed november 2025 (because of removing of obligation to use xapi datasets)
-
-    
-    // public function getRecipe(): ?string
-    // {
-    //     return $this->recipe;
-    // }
-
-    // public function setRecipe(?string $recipe): self
-    // {
-    //     $this->recipe = $recipe;
-
-    //     return $this;
-    // }
-
-    // public function getRecipeLink(): ?string
-    // {
-    //     return $this->recipeLink;
-    // }
-
-    // public function setRecipeLink(?string $recipeLink): self
-    // {
-    //     $this->recipeLink = $recipeLink;
-
-    //     return $this;
-    // }
 
     public function getPourcentageProgress(): ?float
     {
@@ -354,6 +348,54 @@ class Dataset extends AbstractLolaEntity {
     public function setType(string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getContract(): ?string
+    {
+        return $this->contract;
+    }
+
+    public function setContract(?string $contract): self
+    {
+        $this->contract = $contract;
+
+        return $this;
+    }
+
+    public function getResource(): ?string
+    {
+        return $this->resource;
+    }
+
+    public function setResource(?string $resource): self
+    {
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    public function getPurposeId(): ?string
+    {
+        return $this->purposeId;
+    }
+
+    public function setPurposeId(?string $purposeId): self
+    {
+        $this->purposeId = $purposeId;
+
+        return $this;
+    }
+
+    public function getResourceId(): ?string
+    {
+        return $this->resourceId;
+    }
+
+    public function setResourceId(?string $resourceId): self
+    {
+        $this->resourceId = $resourceId;
 
         return $this;
     }

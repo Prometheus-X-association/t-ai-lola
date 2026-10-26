@@ -24,7 +24,7 @@ class TermsOfUse extends AbstractLolaEntity {
     {
         $this->active = false;
     }
-    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -51,7 +51,7 @@ class TermsOfUse extends AbstractLolaEntity {
     {
         $this->active = true;
         return $this;
-    }    
+    }
 
     public function setInactive(): self
     {
@@ -62,6 +62,6 @@ class TermsOfUse extends AbstractLolaEntity {
     public function getActive(): ?bool
     {
         return $this->active;
-    }    
+    }
 
 }

@@ -8,14 +8,14 @@ class LolapyServiceApi {
 
     /**
      * Logger service
-     * 
+     *
      * @var LoggerInterface
      */
     private $logger;  // Add this property
 
     /**
      * Security service for User logged data
-     * 
+     *
      * @var \Symfony\Bundle\SecurityBundle\Security
      */
     private $security;
@@ -47,6 +47,13 @@ class LolapyServiceApi {
      * @var string $resourceDatasetGet
      */
     private $resourceDatasetGet;
+
+    /**
+     * Resource url for Lolapy to create and fetch a dataset via PDC
+     *
+     * @var string $resourceDatasetCreate
+     */
+    private $resourceDatasetCreate;
 
     /**
      * Resource url for Lolapy to delete a dataset
@@ -139,6 +146,7 @@ class LolapyServiceApi {
         $this->resourcePing = $_ENV["LOLAPY_RESOURCE_PING"];
 
         $this->resourceDatasetGet = $_ENV["LOLAPY_RESOURCE_DATASET_GET"];
+        $this->resourceDatasetCreate = $_ENV["LOLAPY_RESOURCE_DATASET_CREATE"] ?? '/dataset/create';
         $this->resourceDatasetDelete = $_ENV["LOLAPY_RESOURCE_DATASET_DELETE"];
         $this->resourceScenarioTagAdd = $_ENV["LOLAPY_RESOURCE_SCENARIO_TAG_ADD"];
         $this->resourceScenarioTagRemove = $_ENV["LOLAPY_RESOURCE_SCENARIO_TAG_REMOVE"];
@@ -189,11 +197,7 @@ class LolapyServiceApi {
             return true;
         }
 
-        if ($this->executeCurlRequestPost($this->resourcePing, [], false)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (bool) $this->executeCurlRequestPost($this->resourcePing, [], false);
     }
 
     /**
@@ -218,6 +222,40 @@ class LolapyServiceApi {
         $content = curl_exec($curl);
         curl_close($curl);
         return $content;
+    }
+
+    /**
+     * Create and fetch dataset via PDC
+     *
+     * @param string $datasetHash
+     * @param string $userHash
+     * @param string|null $contract
+     * @param string|null $resource
+     * @param string|null $purposeId
+     * @param string|null $resourceId
+     *
+     * @return string|json
+     */
+    public function createDataset(
+        string $datasetHash,
+        string $userHash,
+        ?string $contract = null,
+        ?string $resource = null,
+        ?string $purposeId = null,
+        ?string $resourceId = null
+    ) {
+        if ($_ENV["LOLAPY_API_FAKE"] === "false") {
+            return $this->executeCurlRequestPost($this->resourceDatasetCreate, [
+                "dataset" => $datasetHash,
+                "user" => $userHash,
+                "contract" => $contract,
+                "resource" => $resource,
+                "purpose_id" => $purposeId,
+                "resource_id" => $resourceId
+            ]);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -439,7 +477,7 @@ class LolapyServiceApi {
             $tabAlgorithm["nf_variable"] = $scenarioAlgorithm->getNfVariable();
             $tabAlgorithm["parameters"] = $scenarioAlgorithm->getParametres();
             $tabAlgorithms[] = $tabAlgorithm;
-            
+
             $this->logger->debug('Algorithm added to execution', [
                 'algorithm_hash' => $tabAlgorithm["algorithm_hash"],
                 'nf_variable' => $tabAlgorithm["nf_variable"]
@@ -453,7 +491,6 @@ class LolapyServiceApi {
             $this->logger->info('Executing real API call to Lolapy');
             $result = $this->executeCurlRequestPost($this->resourceScenarioExecute, $dataExecution);
             $this->logger->info('API call completed', ['result' => $result]);
-            # return $result;
         } else {
             $this->logger->warning('FAKE mode - dumping data instead of API call', ['data' => $dataExecution]);
             dump($dataExecution);
@@ -504,7 +541,7 @@ class LolapyServiceApi {
 
     /**
      * Add a version for an algorithm
-     * 
+     *
      * @param $algorithmUrlRepository
      * @param $versionName
      * @param $versionHash
@@ -534,7 +571,7 @@ class LolapyServiceApi {
     {
         if ($_ENV["LOLAPY_API_FAKE"] === "false") {
             // Build the URL
-            $url = "http://" . $this->url . ":" . $this->port . $this->resourceServerUsage;
+            $url = ($_ENV["LOLAPY_URL_SCHEME"] ?? "https") . "://" . $this->url . ":" . $this->port . $this->resourceServerUsage;
 
             // Initiate cURL
             $curl = curl_init();
@@ -542,23 +579,23 @@ class LolapyServiceApi {
             // Set cURL options
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            
+
             // Execute the cURL request
             $response = curl_exec($curl);
-            
+
             // Check for errors
             if (curl_errno($curl)) {
                 $error_message = curl_error($curl);
                 curl_close($curl);
                 return "Curl error: " . $error_message;
             }
-            
+
             // Close the cURL session
             curl_close($curl);
-            
-            // Decode the JSON 
+
+            // Decode the JSON
             $json = json_decode($response, true);
-            
+
             return $json;
         } else {
                 return false;

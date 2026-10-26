@@ -12,7 +12,6 @@ from lolapy.dataset.errors import DatasetPermissionDenied
 from lolapy.nextflow import errors as nextflow_errors
 from lolapy.nextflow import nextflow
 from lolapy.scenario.scenario import Scenario
-# from lolapy.slurm import sbatch, slurm_job
 from lolapy.tools import settings
 from lolapy.tools.frontend_api import FrontendRequest
 
@@ -154,10 +153,10 @@ class RunScenario:
             my_nextflow.run()
 
         except Exception as e:
-            logging.error(e)
+            logging.exception("Failed to run scenario: %s", e)
             logging.error("Something went wrong")
         else:
-            logging.error("Nothing went wrong")
+            logging.info("Nothing went wrong")
         finally:
             RunScenario.stop_scenario(self.run_id)
 

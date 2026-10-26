@@ -21,7 +21,7 @@ def get_requirements():
 
 setuptools.setup(
     name="cryptncompress",
-    version="2.0.0",
+    version="3.0.0",
     author="Philippe N.",
     author_email="philippe.noel@loria.fr",
     description="Encrypt/Decrypt, compress and Decompress files in Lola project",

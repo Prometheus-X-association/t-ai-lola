@@ -19,13 +19,13 @@ class AbstractLolaEntity implements LoggableInterface {
      */
     #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
     public $updatedAt;
-    
+
     /**
      * @var User
      */
     #[ORM\ManyToOne(targetEntity: User::class)]
     public $createdBy;
-    
+
     /**
      * @var User
      */
@@ -79,7 +79,7 @@ class AbstractLolaEntity implements LoggableInterface {
     {
         return $this->updatedAt;
     }
-    
+
     /**
      * Set email of the authentified user who is creating the entity
      *
@@ -95,7 +95,7 @@ class AbstractLolaEntity implements LoggableInterface {
     }
 
     /**
-     * Get email of the user who created the entity 
+     * Get email of the user who created the entity
      *
      * @return User
      */

@@ -55,7 +55,7 @@ class ClusterUsage(BaseModel):
         try:
             cmd_result = shell_command.ShellCommand.new(command=command, on_localhost=True).run()
         except FileNotFoundError:
-            logging.error(f"Error when fetching cluster information. No `sinfo` command on the localmachine")
+            logging.error("Error when fetching cluster information. No `sinfo` command on the localmachine")
             return (None, None)
         if cmd_result.exit_code != 0:
             logging.warning(f"Error while running sinfo command ({command}) : {cmd_result.stderr}")
@@ -89,7 +89,7 @@ class ClusterUsage(BaseModel):
         try:
             cmd_result = shell_command.ShellCommand.new(command=command, on_localhost=True).run()
         except FileNotFoundError:
-            logging.error(f"Error when fetching cluster information. No `sinfo` command on the localmachine")
+            logging.error("Error when fetching cluster information. No `sinfo` command on the localmachine")
             return (None, None)
         if cmd_result.exit_code != 0:
             logging.warning(f"Error while running sinfo command ({command}) : {cmd_result.stderr}")
@@ -134,7 +134,7 @@ class ClusterUsage(BaseModel):
         try:
             cmd_result = shell_command.ShellCommand.new(command=command, on_localhost=True).run()
         except FileNotFoundError:
-            logging.error(f"Error when fetching cluster information. No `squeue` command on the localmachine")
+            logging.error("Error when fetching cluster information. No `squeue` command on the localmachine")
             return dict.fromkeys(jobs_status, None)
         if cmd_result.exit_code != 0:
             logging.warning(f"Error while running squeue command ({command}) : {cmd_result.stderr}")
