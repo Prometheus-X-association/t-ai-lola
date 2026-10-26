@@ -1,15 +1,136 @@
 {{ form_start(form) }}
+<div class="form-group mb-3">
+    {{ form_row(form.uploadType) }}
+</div>
 {{ form_row(form.name) }}
 {{ form_row(form.description) }}
-{{ form_row(form.contract) }}
-{{ form_row(form.purposeId) }}
-{{ form_row(form.resourceId) }}
-{{ form_row(form.resource) }}
 
-<button class="btn btn-success float-right btn-block">
+<div id="sftp_info_container" class="alert alert-info my-3">
+    <i class="fas fa-info-circle"></i>
+    {% trans %}dashboard.dataset.form.sftp_info{% endtrans %}
+</div>
+
+<div id="pdc_fields_container" class="card my-3 border-primary shadow-sm" style="display: none;">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-network-wired"></i> <strong>{% trans %}dashboard.dataset.form.pdc_configuration{% endtrans %}</strong></span>
+        <span class="badge badge-light" id="pdc_badge_type">PDC</span>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-secondary py-2 mb-3">
+            <div id="pdc_help_jwt" style="display: none;">
+                <i class="fas fa-key text-primary mr-1"></i> {% trans %}dashboard.dataset.form.pdc_jwt_help{% endtrans %}
+            </div>
+            <div id="pdc_help_s3" style="display: none;">
+                <i class="fas fa-cloud-download-alt text-info mr-1"></i> {% trans %}dashboard.dataset.form.pdc_s3_help{% endtrans %}
+            </div>
+        </div>
+
+        {{ form_row(form.contract) }}
+        {{ form_row(form.purposeId) }}
+        {{ form_row(form.resourceId) }}
+        <div id="pdc_s3_fields_container" style="display: none;">
+            {{ form_row(form.targetFilename) }}
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-success float-right btn-block mt-3">
     {{ (button_label|default('dashboard.dataset.form.btn_enregistrer'))|trans }}
 </button>
 {{ form_end(form) }}
+
+<script>
+(function() {
+    function getSelectedUploadType() {
+        if (typeof jQuery !== 'undefined') {
+            var $el = jQuery('#dataset_upload_type_select, select[name$="[uploadType]"]');
+            if ($el.length && $el.val()) {
+                return $el.val();
+            }
+            var $radio = jQuery('input[name$="[uploadType]"]:checked');
+            if ($radio.length && $radio.val()) {
+                return $radio.val();
+            }
+        }
+        var select = document.getElementById('dataset_upload_type_select') || document.querySelector('select[name$="[uploadType]"]');
+        if (select && select.value) {
+            return select.value;
+        }
+        var checkedRadio = document.querySelector('input[name$="[uploadType]"]:checked');
+        if (checkedRadio && checkedRadio.value) {
+            return checkedRadio.value;
+        }
+        return 'sftp';
+    }
+
+    function updateUploadFields() {
+        var val = getSelectedUploadType();
+        var isPdc = (val === 'pdc_jwt' || val === 'pdc_s3');
+        var isPdcS3 = (val === 'pdc_s3');
+        var isSftp = (val === 'sftp' || !isPdc);
+
+        var pdcContainer = document.getElementById('pdc_fields_container');
+        var pdcS3Container = document.getElementById('pdc_s3_fields_container');
+        var sftpContainer = document.getElementById('sftp_info_container');
+        var pdcHelpJwt = document.getElementById('pdc_help_jwt');
+        var pdcHelpS3 = document.getElementById('pdc_help_s3');
+        var pdcBadge = document.getElementById('pdc_badge_type');
+
+        if (pdcContainer) {
+            pdcContainer.style.setProperty('display', isPdc ? 'block' : 'none', 'important');
+        }
+        if (pdcS3Container) {
+            pdcS3Container.style.setProperty('display', isPdcS3 ? 'block' : 'none', 'important');
+        }
+        if (sftpContainer) {
+            sftpContainer.style.setProperty('display', isSftp ? 'block' : 'none', 'important');
+        }
+        if (pdcHelpJwt) {
+            pdcHelpJwt.style.setProperty('display', (val === 'pdc_jwt') ? 'block' : 'none', 'important');
+        }
+        if (pdcHelpS3) {
+            pdcHelpS3.style.setProperty('display', isPdcS3 ? 'block' : 'none', 'important');
+        }
+        if (pdcBadge) {
+            pdcBadge.textContent = (val === 'pdc_jwt') ? 'PDC (JWT Token)' : (val === 'pdc_s3' ? 'PDC (S3 URL)' : 'PDC');
+        }
+    }
+
+    function initListeners() {
+        if (typeof jQuery !== 'undefined') {
+            jQuery(document).on('change select2:select select2:close', '#dataset_upload_type_select, select[name$="[uploadType]"], input[name$="[uploadType]"]', function() {
+                updateUploadFields();
+            });
+            jQuery(document).on('click', '.select2-results__option', function() {
+                setTimeout(updateUploadFields, 30);
+            });
+        }
+    }
+
+    document.addEventListener('change', function(e) {
+        if (e.target && (e.target.id === 'dataset_upload_type_select' || (e.target.name && e.target.name.indexOf('[uploadType]') !== -1))) {
+            updateUploadFields();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initListeners();
+        updateUploadFields();
+        setTimeout(updateUploadFields, 200);
+        setTimeout(updateUploadFields, 600);
+    });
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        initListeners();
+        updateUploadFields();
+    }
+
+    window.addEventListener('load', function() {
+        initListeners();
+        updateUploadFields();
+    });
+})();
+</script>
 
 {% block javascript %}
     <!-- select2 -->

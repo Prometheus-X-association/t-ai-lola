@@ -22,6 +22,10 @@ class Dataset extends AbstractLolaEntity {
     const STATUS_ERROR = "ERROR";
     const STATUS_DELETING = "DELETING";
 
+    public const UPLOAD_TYPE_SFTP = 'sftp';
+    public const UPLOAD_TYPE_PDC_JWT = 'pdc_jwt';
+    public const UPLOAD_TYPE_PDC_S3 = 'pdc_s3';
+
     /**
      * Datasets with PROCESSING state can be deleted after this number of days (if not the delete button is not displayed)
      */
@@ -106,6 +110,18 @@ class Dataset extends AbstractLolaEntity {
      */
     #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $resourceId;
+
+    /**
+     * Upload type: 'sftp', 'pdc_jwt', 'pdc_s3'
+     */
+    #[ORM\Column(type: 'string', length: 30, options: ['default' => self::UPLOAD_TYPE_SFTP])]
+    private $uploadType = self::UPLOAD_TYPE_SFTP;
+
+    /**
+     * Target Filename on Recipient (for PDC S3 / Inokufu)
+     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $targetFilename;
 
     public function __construct()
     {
@@ -396,6 +412,30 @@ class Dataset extends AbstractLolaEntity {
     public function setResourceId(?string $resourceId): self
     {
         $this->resourceId = $resourceId;
+
+        return $this;
+    }
+
+    public function getUploadType(): ?string
+    {
+        return $this->uploadType ?? self::UPLOAD_TYPE_SFTP;
+    }
+
+    public function setUploadType(?string $uploadType): self
+    {
+        $this->uploadType = $uploadType;
+
+        return $this;
+    }
+
+    public function getTargetFilename(): ?string
+    {
+        return $this->targetFilename;
+    }
+
+    public function setTargetFilename(?string $targetFilename): self
+    {
+        $this->targetFilename = $targetFilename;
 
         return $this;
     }

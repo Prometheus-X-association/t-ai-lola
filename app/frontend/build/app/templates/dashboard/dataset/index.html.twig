@@ -78,10 +78,18 @@
                                 </a>
                             </div>
                         </td>
-                        <td> {{ dataset.name }}
+                        <td> 
+                            <strong>{{ dataset.name }}</strong>
+                            {% if dataset.uploadType == 'pdc_jwt' %}
+                                <span class="badge badge-primary"><i class="fas fa-key"></i> PDC (JWT)</span>
+                            {% elseif dataset.uploadType == 'pdc_s3' %}
+                                <span class="badge badge-info"><i class="fas fa-cloud-download-alt"></i> PDC (S3)</span>
+                            {% else %}
+                                <span class="badge badge-secondary"><i class="fas fa-file-upload"></i> SFTP</span>
+                            {% endif %}
                             {% if dataset.status == constant('\\App\\Entity\\Dataset::STATUS_AVAILABLE') %}
                                 <!-- badge du size dataset -->
-                                <span class="badge badge-info">{{ dataset.size }}</span> 
+                                <span class="badge badge-success">{{ dataset.size }}</span> 
                             {% endif %} 
                         </td>
                         {% if dataset.createdBy is not null and dataset.createdAt is not null%}
@@ -352,6 +360,18 @@
                                             <div class="dataset-detail-item">
                                                 <span>{% trans %}dashboard.dataset.index.details_type{% endtrans %}</span>
                                                 <strong>{{ dataset.type|default('file') }}</strong>
+                                            </div>
+                                            <div class="dataset-detail-item">
+                                                <span>{% trans %}dashboard.dataset.index.details_upload_type{% endtrans %}</span>
+                                                <strong>
+                                                    {% if dataset.uploadType == 'pdc_jwt' %}
+                                                        PDC (JWT)
+                                                    {% elseif dataset.uploadType == 'pdc_s3' %}
+                                                        PDC (S3)
+                                                    {% else %}
+                                                        SFTP
+                                                    {% endif %}
+                                                </strong>
                                             </div>
                                             <div class="dataset-detail-item">
                                                 <span>{% trans %}dashboard.dataset.index.details_hash{% endtrans %}</span>

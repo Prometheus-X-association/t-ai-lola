@@ -27,6 +27,9 @@ from lolapy.tools import csrf_guard
 from setup import lolapy_version
 
 flask_app = Flask(__name__)
+flask_app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", "lola-backend-secret-key-change-in-prod")
+flask_app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+
 csrf = CSRFProtect()
 csrf.init_app(flask_app)
 csrf_guard.install(flask_app)
@@ -43,6 +46,11 @@ from lolapy.blueprints import algorithm_blueprint, scenario_blueprint, dataset_b
 flask_app.register_blueprint(algorithm_blueprint)
 flask_app.register_blueprint(scenario_blueprint)
 flask_app.register_blueprint(dataset_blueprint)
+
+# Exempt M2M API blueprints from browser CSRF tokens (handled by csrf_guard)
+csrf.exempt(algorithm_blueprint)
+csrf.exempt(scenario_blueprint)
+csrf.exempt(dataset_blueprint)
 
 # Config swagger routes
 flask_app.config["SWAGGER"] = {

@@ -480,6 +480,8 @@
                 "details_no_logs": "No processing logs yet",
                 "details_hash": "Dataset hash",
                 "details_type": "Type",
+                "details_upload_type": "Upload type",
+                "btn_bordereau_tooltip": "Download manifest file to upload with Lola toolbox via SFTP",
                 "modale_aide_titre": "How to send a dataset to the Lola platform?",
                 "modale_aide": "<div class=\"card mb-2\">\n    <h5 class=\"card-header text-white bg-primary\">Requirements</h5>\n    <div class=\"card-body\">\n        <ul>\n            <li>data_prepare tool to encrypt and send data;</li>\n            <li>an XAPI dataset;</li>\n            <li>a bordereau downloadable on application platform (see part 1).</li>\n        </ul>\n    </div>\n    <h5 class=\"card-header text-white bg-primary\">Data_prepare, the tool to send data on Lola platform</h5>\n    <div class=\"card-body\">\n        Download <a href=\"https://gitlab.inria.fr/lola/data_prepare/-/releases\" target=\"_blank\"><strong>Data_prepare <i class=\"fas fa-external-link-alt\"></i></strong></a>.\n    </div>\n    <h5 class=\"card-header text-white bg-primary\">Step by step:</h5>\n    <div class=\"card-body\">\n        <p><strong><u>1. Register XAPI dataset and download bordereau</u></strong></p>\n        This step must be done on lola application platform. Click on \"Add dataset\" in \"Dataset\" tab. In the new window, you can set the name of the new dataset, its information and access permission. This information can be edited later. After validation, the bordereau is available.\n        <hr />\n        <p><strong><u>2. Download the bordereau</u></strong></p>\n        In the \"Dataset\", click on \"Bordereau\" to download the file.\n        <hr />\n        <p><strong><u>3. Send files with data_prepare tool</u></strong></p>\n        Open data_prepare tool on your system. Set path for bordereau and for the dataset file (XAPI format). You must set the path where to store the compressed/encrypted file in case of transfert failure. Click on \"Encrypt\" to start the compression/encryption. After a successful encryption, click on \"Transfer to Lola-platform\".                         <hr />\n        <p><strong><u>4. Check the status in the Lola application platform</u></strong></p>\n        The status of the dataset will be updated after few minutes in the platform application. Note that it may take some time, depending of the size of the XAPI file and the server occupation.\n    </div>\n</div>\n"
             },
@@ -489,7 +491,7 @@
                 "btn_retour": "Return to the list of dataset",
                 "btn_ajouter": "Create the dataset",
                 "aide_titre": "Create a new dataset",
-                "aide": "<p class=\"card-text\">\n    Set a name and a description for the new dataset.<br>Provide the <strong>PDC Contract</strong> and <strong>Resource</strong> to automatically import the data through the PDC connector without requiring SFTP.\n</p>\n"
+                "aide": "<p class=\"card-text\">\n    Select the upload type for this dataset:<br>• <strong>SFTP</strong>: Manual upload using the downloadable bordereau and data_prepare tool.<br>• <strong>PDC (JWT Token)</strong>: Automated import through the Personal Data Connector using JWT tokens.<br>• <strong>PDC (S3 URL)</strong>: Automated import through the Personal Data Connector using S3 URL descriptors.\n</p>\n"
             },
             "edit": {
                 "title": "Modification",
@@ -500,12 +502,21 @@
                 "aide": "<p class=\"card-text\">\n    Edit name and description of the dataset. <br>These information can be edited later.\n    Edit information of a dataset does not break links to existing run or scenario.\n</p>\n"
             },
             "form": {
+                "upload_type": "Upload type",
+                "upload_type_sftp": "SFTP",
+                "upload_type_pdc_jwt": "PDC (JWT Token)",
+                "upload_type_pdc_s3": "PDC (S3 URL)",
                 "nom": "Name",
                 "description": "Description",
                 "contract": "Contract",
                 "purpose_id": "Purpose ID",
                 "resource_id": "Resource ID",
                 "resource": "Resource",
+                "target_filename": "Target filename on recipient",
+                "pdc_configuration": "PDC Configuration",
+                "pdc_jwt_help": "Imports dataset from PDC provider using JWT token authorization.",
+                "pdc_s3_help": "Imports dataset from PDC provider with S3 URL descriptor or direct file download.",
+                "sftp_info": "After creating this dataset, download the bordereau (manifest) from the dataset list and upload your encrypted files using the Lola toolbox / SFTP.",
                 "recipe": "XAPI Recipe",
                 "recipe_link": "XAPI Recipe link",
                 "btn_enregistrer": "Save"

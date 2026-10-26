@@ -41,16 +41,21 @@ class DatasetController extends LolaController {
             $this->getEm()->persist($dataset);
             $this->getEm()->flush();
 
-            // If contract and resource are specified, trigger PDC fetch via Lolapy
-            if ($dataset->getContract() && $dataset->getResource()) {
-                $lolapyService->createDataset(
-                    $dataset->getHash(),
-                    $this->getUser()->getHash(),
-                    $dataset->getContract(),
-                    $dataset->getResource(),
-                    $dataset->getPurposeId(),
-                    $dataset->getResourceId()
-                );
+            // If PDC upload is selected, trigger PDC fetch via Lolapy
+            $uploadType = $dataset->getUploadType();
+            if ($uploadType === Dataset::UPLOAD_TYPE_PDC_JWT || $uploadType === Dataset::UPLOAD_TYPE_PDC_S3) {
+                if ($dataset->getContract()) {
+                    $lolapyService->createDataset(
+                        $dataset->getHash(),
+                        $this->getUser()->getHash(),
+                        $dataset->getContract(),
+                        $dataset->getResource(),
+                        $dataset->getPurposeId(),
+                        $dataset->getResourceId(),
+                        $uploadType,
+                        $dataset->getTargetFilename()
+                    );
+                }
             }
 
             $this->addFlash("success", $this->getTranslator()->trans('dashboard.dataset.controller.flash_dataset_ajoute'));

@@ -233,6 +233,8 @@ class LolapyServiceApi {
      * @param string|null $resource
      * @param string|null $purposeId
      * @param string|null $resourceId
+     * @param string|null $uploadType
+     * @param string|null $targetFilename
      *
      * @return string|json
      */
@@ -242,7 +244,9 @@ class LolapyServiceApi {
         ?string $contract = null,
         ?string $resource = null,
         ?string $purposeId = null,
-        ?string $resourceId = null
+        ?string $resourceId = null,
+        ?string $uploadType = 'pdc_jwt',
+        ?string $targetFilename = null
     ) {
         if ($_ENV["LOLAPY_API_FAKE"] === "false") {
             return $this->executeCurlRequestPost($this->resourceDatasetCreate, [
@@ -251,7 +255,9 @@ class LolapyServiceApi {
                 "contract" => $contract,
                 "resource" => $resource,
                 "purpose_id" => $purposeId,
-                "resource_id" => $resourceId
+                "resource_id" => $resourceId,
+                "upload_type" => $uploadType,
+                "target_filename" => $targetFilename,
             ]);
         } else {
             return false;

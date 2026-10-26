@@ -33,6 +33,7 @@ services:
       - 5000:5000
     environment:
       - ENV_FILE=/app/.env
+      - LOLAPY_URL_SCHEME=http
     volumes:
       - ../../app/lolapy/.env:/app/.env:ro
       - lolasqlite:/tmp
@@ -55,9 +56,10 @@ services:
       context: '../../app/lolapy'
     environment:
       - ENV_FILE=/app/.env
+      - LOLAPY_URL_SCHEME=http
     privileged: true
     group_add: 
-      - ${DOCKER_GROUP}
+      - ${DOCKER_GROUP:-0}
     user: lolauser
     volumes:
       - ../../app/lolapy/.env:/app/.env:ro

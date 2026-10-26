@@ -9,6 +9,7 @@ import tempfile
 import threading
 import time
 import zipfile
+import uuid
 from collections.abc import Callable
 from pathlib import Path
 from typing import Callable
@@ -25,6 +26,9 @@ from lolapy.tools.health import Health
 from flask_wtf.csrf import CSRFProtect
 
 flask_app = Flask(__name__)
+flask_app.config["SECRET_KEY"] = "fake-app-secret-key"
+flask_app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+
 csrf = CSRFProtect()
 csrf.init_app(flask_app)
 csrf_guard.install(flask_app)
@@ -584,3 +588,41 @@ def import_dataset():
     )
     bg_tasks.start()
     return Response(status=200)
+
+
+@flask_app.route("/dataset/create", methods=["POST"])
+def create_dataset():
+    json_data = request.get_json()
+    try:
+        dataset_hash = json_data["dataset"]
+    except (TypeError, KeyError):
+        message = f"Wrong request (?) in '{request.full_path}'"
+        logging.error(message)
+        return Response(status=400, response=message)
+
+    import_id = str(uuid.uuid4())
+    bg_tasks = QueueFakeAsync()
+    bg_tasks.push(
+        lambda: FrontendRequest.get(
+            f"/api/dataset/{dataset_hash}/start/{import_id}"
+        )
+    )
+    bg_tasks.push(
+        lambda: FrontendRequest.get(
+            f"/api/dataset/{dataset_hash}/progress/30.0"
+        )
+    )
+    bg_tasks.push(
+        lambda: FrontendRequest.get(
+            f"/api/dataset/{dataset_hash}/progress/70.0"
+        )
+    )
+    bg_tasks.push(
+        lambda: FrontendRequest.post(
+            f"/api/dataset/{dataset_hash}/complete/{import_id}",
+            data={"size": 150},
+        )
+    )
+    bg_tasks.start()
+    return Response(status=200)
+

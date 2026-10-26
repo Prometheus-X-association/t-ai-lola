@@ -470,8 +470,10 @@
                 "details_recent_activity": "Activit\u00e9 r\u00e9cente",
                 "details_description_empty": "Aucune description renseign\u00e9e.",
                 "details_no_logs": "Aucun log de traitement pour le moment",
-                "details_hash": "Hash du jeu de donn\u00e9es",
+                "details_hash": "Hash du jeu de données",
                 "details_type": "Type",
+                "details_upload_type": "Type de téléversement",
+                "btn_bordereau_tooltip": "Télécharger le bordereau pour l'envoi via SFTP avec l'outil Lola toolbox",
                 "modale_aide_titre": "Comment envoyer un jeu de données sur Lola ?",
                 "modale_aide": "<div class=\"card mb-2\">\n    <h5 class=\"card-header text-white bg-primary\">Comment envoyer un jeu de données sur Lola ?</h5>\n    <div class=\"card-body\">\n        <p>Pour envoyer un jeu de données sur Lola, il faut disposer :</p>\n        <ul>\n            <li>de l’outil data_prepare pour chiffrer et envoyer les données ;</li>\n            <li>d’un jeu de données au format xAPI ;</li>\n            <li>d’un bordereau téléchargeable sur l’application (voir partie 1).</li>\n        </ul>\n    </div>\n    <h5 class=\"card-header text-white bg-primary\">Data_prepare, l’outil pour envoyer ses données sur les serveurs de Lola</h5>\n    <div class=\"card-body\">\n        Télécharger <a href=\"https://gitlab.inria.fr/lola/data_prepare/-/releases\" target=\"_blank\"><strong>Data_prepare <i class=\"fas fa-external-link-alt\"></i></strong></a>.\n    </div>\n    <h5 class=\"card-header text-white bg-primary\">Étape par étape</h5>\n    <div class=\"card-body\">\n        <p><strong><u>1. Renseignement du jeu de données et génération du bordereau</u></strong></p>\n        Cette étape est réalisée sur l’application web Lola. Pour cela, allez dans l’onglet « Jeux de données ». Ensuite, cliquez sur « Ajouter un jeu de données ». Dans la nouvelle fenêtre, il est nécessaire de donner un nom au nouveau jeu de données. Il est possible d’ajouter une description du jeu de données et de modifier les permissions d’accès. Ces informations peuvent être modifiées après l’enregistrement d’un jeu de données. Une fois cette étape réalisée, un bordereau est automatiquement créé.\n        <hr />\n        <p><strong><u>2. Téléchargement du bordereau</u></strong></p>\n        Dans l’onglet « Jeux de données », cliquez sur le bouton « Bordereau » pour enregistrer le fichier de bordereau.\n        <hr />\n        <p><strong><u>3. Envoi des données avec l’outil data_prepare</u></strong></p>\n        Double-cliquez sur l’outil data_prepare. Une fois ouvert, renseignez les chemins vers le jeu de données et vers le bordereau. Le fichier compressé et chiffré est également sauvegardé sur votre ordinateur en cas d’échec du transfert vers le serveur Lola. Cliquez sur « Encrypt » pour démarrer la compression et le chiffrement. Une fois l’opération terminée, il est possible de cliquer sur « Transfer to Lola-platform ».\n        <hr />\n        <p><strong><u>4. Vérifier le statut dans l’application web Lola</u></strong></p>\n        Une fois le fichier transféré, le statut peut être suivi dans l’application web Lola. À noter qu’il peut se passer un peu de temps avant que le statut passe à « en traitement ». Une fois terminé, le statut passe à « disponible », ce qui indique que le jeu de données est prêt.\n    </div>\n</div>\n"
             },
@@ -481,7 +483,7 @@
                 "btn_retour": "Retour à la liste des jeux de données",
                 "btn_ajouter": "Ajouter",
                 "aide_titre": "Ajout d'un jeu de données",
-                "aide": "<h5 class=\"card-title\">Création d'un jeu de données</h5><p class=\"card-text\">Cette page permet d'ajouter un nouveau jeu de données à la plateforme. Renseignez le nom, la description ainsi que le <strong>Contrat PDC</strong> et la <strong>Ressource PDC</strong> pour importer automatiquement les données via le connecteur PDC sans passer par SFTP.</p>"
+                "aide": "<h5 class=\"card-title\">Création d'un jeu de données</h5><p class=\"card-text\">Sélectionnez le mode de téléversement :<br>• <strong>SFTP</strong> : Téléversement manuel via le bordereau téléchargeable et l'outil data_prepare.<br>• <strong>PDC (Jeton JWT)</strong> : Import automatique via le connecteur Personal Data Connector utilisant des jetons JWT.<br>• <strong>PDC (URL S3)</strong> : Import automatique via le Personal Data Connector utilisant un descripteur d'URL S3.</p>"
             },
             "edit": {
                 "title": "Modification",
@@ -492,12 +494,21 @@
                 "aide": "<h5 class=\"card-title\">Modification d'un jeu de données</h5><p class=\"card-text\">Cette page permet de modifier les informations principales d'un jeu de données. Vous pouvez modifier son nom et sa description. La modification de ces informations ne rompt pas les liens avec les scénarios ou les exécutions existants.</p>"
             },
             "form": {
+                "upload_type": "Mode de téléversement",
+                "upload_type_sftp": "SFTP",
+                "upload_type_pdc_jwt": "PDC (Jeton JWT)",
+                "upload_type_pdc_s3": "PDC (URL S3)",
                 "nom": "Nom",
                 "description": "Description",
                 "contract": "Contrat",
                 "purpose_id": "ID de la finalité (Purpose ID)",
                 "resource_id": "ID de la ressource (Resource ID)",
                 "resource": "Ressource",
+                "target_filename": "Nom du fichier cible chez le destinataire",
+                "pdc_configuration": "Configuration PDC",
+                "pdc_jwt_help": "Importe les données depuis le fournisseur PDC via l'autorisation par jeton JWT.",
+                "pdc_s3_help": "Importe les données depuis le fournisseur PDC via un descripteur d'URL S3 ou fichier direct.",
+                "sftp_info": "Après avoir créé ce jeu de données, téléchargez le bordereau depuis la liste et téléversez vos fichiers chiffrés à l'aide de l'outil Lola toolbox / SFTP.",
                 "recipe": "Recette XAPI",
                 "recipe_link": "Lien de la recette XAPI",
                 "btn_enregistrer": "Enregistrer"

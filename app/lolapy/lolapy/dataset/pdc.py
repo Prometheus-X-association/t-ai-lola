@@ -87,18 +87,22 @@ class PdcImporter:
     def __init__(
         self,
         contract: str,
-        resource: str,
+        resource: str | None = None,
         purpose_id: str | None = None,
         resource_id: str | None = None,
+        upload_type: str = "pdc_jwt",
+        target_filename: str | None = None,
     ):
         app_settings = settings.get()
         self.pdc_host = app_settings.pdc_host.rstrip("/")
         self.service_key = app_settings.pdc_service_key
         self.secret_key = app_settings.pdc_secret_key
         self.contract = contract
-        self.purpose_id = purpose_id or app_settings.pdc_purpose_id
-        self.resource_id = resource_id or app_settings.pdc_resource_id
+        self.purpose_id = purpose_id
+        self.resource_id = resource_id
         self.resource = resource
+        self.upload_type = upload_type
+        self.target_filename = target_filename
 
         self.pubkey_file = self._resolve_key_path(app_settings.pdc_pubkey_file, default_name="pubkey.pem")
         self.privkey_file = self._resolve_key_path(app_settings.pdc_privkey_file, default_name="privkey.pem")
@@ -110,6 +114,9 @@ class PdcImporter:
         self.pdc_token = None
         self.receiver_token = None
         self.data_jwt = None
+        self.receiver_response_text = None
+        self.receiver_response_bytes = None
+        self.returned_filename = None
 
     def _resolve_key_path(self, key_path: Path | str, default_name: str) -> Path:
         """Resolve key file location checking multiple plausible directories."""
@@ -151,7 +158,7 @@ class PdcImporter:
         if not pubkey_data.endswith("\n"):
             pubkey_data += "\n"
 
-        resource_enc = encode_uri(self.resource)
+        resource_enc = encode_uri(self.resource or "")
         pubkey_enc = encode_uri(pubkey_data)
         message = f"resource={resource_enc}&pubkey={pubkey_enc}".encode("utf-8")
 
@@ -199,16 +206,18 @@ class PdcImporter:
 
         data = {
             "contract": self.contract,
-            "purposeId": self.purpose_id,
-            "resourceId": self.resource_id,
             "providerParams": {
                 "query": [
-                    {"resource": self.resource},
+                    {"resource": self.resource or ""},
                     {"pubkey": pubkey_str},
                     {"signature": signature_b64},
                 ]
             },
         }
+        if self.purpose_id:
+            data["purposeId"] = self.purpose_id
+        if self.resource_id:
+            data["resourceId"] = self.resource_id
         logging.info(f"POST {url} with contract {self.contract}")
         resp = requests.post(url, json=data, headers=headers, timeout=30)
         if resp.status_code != 200:
@@ -232,37 +241,140 @@ class PdcImporter:
             raise ValueError(f"No token in receiver login response: {resp.text}")
         return self.receiver_token
 
-    def get_from_receiver(self) -> str:
-        """Retrieve data JWT from receiver service."""
+    def get_from_receiver(self, filename: str | None = None) -> str:
+        """Retrieve data JWT or descriptor from receiver service."""
         if not self.receiver_token:
             self.login_receiver()
 
-        url = f"{self.receiver_host}/get"
+        # Determine which filename to request from recipient server
+        file_to_get = filename or self.target_filename
+        if not file_to_get or not file_to_get.strip():
+            if self.upload_type == "pdc_jwt":
+                file_to_get = "token.jwt"
+            else:
+                # For S3 / descriptor, default to basename of resource (e.g. "xapi4research/test.json" -> "test.json")
+                if self.resource and self.resource.strip():
+                    file_to_get = Path(self.resource.strip()).name
+                if not file_to_get or not file_to_get.strip():
+                    file_to_get = "test.json"
+
+        file_to_get = file_to_get.strip()
+        url = f"{self.receiver_host}/get?filename={file_to_get}"
         headers = {
             "Content-Type": "plain/txt",
             "Authorization": f"Bearer {self.receiver_token}",
         }
-        logging.info(f"Fetching data token from receiver: {url}")
-        resp = requests.get(url, headers=headers, timeout=20)
+        logging.info(f"Fetching data from receiver: {url}")
+        resp = requests.get(url, headers=headers, timeout=60)
+
+        # If 404, try intelligent fallbacks
+        if resp.status_code == 404:
+            fallbacks = []
+            if file_to_get != "token.jwt":
+                fallbacks.append("token.jwt")
+            if self.resource:
+                base_name = Path(self.resource.strip()).name
+                if base_name and base_name != file_to_get:
+                    fallbacks.append(base_name)
+            if file_to_get != "test.json":
+                fallbacks.append("test.json")
+
+            for fb in fallbacks:
+                fb_url = f"{self.receiver_host}/get?filename={fb}"
+                logging.info(f"Retrying receiver fetch with fallback filename: {fb_url}")
+                fb_resp = requests.get(fb_url, headers=headers, timeout=60)
+                if fb_resp.status_code == 200:
+                    resp = fb_resp
+                    file_to_get = fb
+                    break
+
         if resp.status_code != 200:
             raise RuntimeError(f"Receiver get failed: HTTP {resp.status_code} - {resp.text}")
+
+        self.returned_filename = resp.headers.get("X-Filename") or file_to_get
+        self.receiver_response_text = resp.text
+        self.receiver_response_bytes = resp.content
         self.data_jwt = resp.text.strip()
         return self.data_jwt
 
     def download_data(self, target_file: Path, progress_callback=None) -> int:
         """
-        Download dataset from the resolved URL in Data JWT and save to target_file.
+        Download dataset and save to target_file.
+        Handles both:
+        - PDC JWT Token (Maskott): extracts URL from JWT payload and downloads with Authorization: Bearer <JWT>
+        - PDC S3 URL (Inokufu): extracts S3 URL from JSON descriptor (or direct file) and streams download without JWT
         Returns total bytes written.
         """
-        if not self.data_jwt:
+        if self.receiver_response_bytes is None:
             self.get_from_receiver()
 
+        target_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Check if the receiver response is a JSON descriptor with an 'url' field (e.g. S3 presigned URL)
+        is_descriptor = False
+        actual_file_url = None
+        try:
+            content_json = json.loads(self.receiver_response_text)
+            if isinstance(content_json, dict) and "url" in content_json and isinstance(content_json["url"], str):
+                is_descriptor = True
+                actual_file_url = content_json["url"]
+        except (json.JSONDecodeError, UnicodeDecodeError, TypeError):
+            pass
+
+        # Case 1: S3 URL descriptor (Inokufu style) or explicit pdc_s3 with descriptor
+        if is_descriptor and actual_file_url:
+            logging.info(f"Downloading dataset from S3 / direct URL: {actual_file_url[:80]}...")
+            resp = requests.get(actual_file_url, stream=True, timeout=120)
+            resp.raise_for_status()
+
+            total_length = resp.headers.get("content-length")
+            total_size = int(total_length) if total_length and total_length.isdigit() else None
+            downloaded = 0
+            last_reported = -1.0
+
+            with open(target_file, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=65536):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+                        if total_size and progress_callback:
+                            fraction = downloaded / total_size
+                            if fraction - last_reported >= 0.02 or fraction >= 1.0:
+                                progress_callback(min(1.0, fraction))
+                                last_reported = fraction
+
+            if progress_callback:
+                progress_callback(1.0)
+
+            self._post_process_file(target_file)
+            return downloaded
+
+        # Case 2: pdc_s3 where receiver directly returns the file contents (binary or plain)
+        if self.upload_type == "pdc_s3" and not self._is_likely_jwt(self.data_jwt):
+            logging.info(f"Saving file directly returned from receiver ({len(self.receiver_response_bytes)} bytes)")
+            with open(target_file, "wb") as f:
+                f.write(self.receiver_response_bytes)
+            if progress_callback:
+                progress_callback(1.0)
+            self._post_process_file(target_file)
+            return len(self.receiver_response_bytes)
+
+        # Case 3: JWT Token (Maskott style)
         payload = decode_jwt_payload(self.data_jwt)
         if not payload or "url" not in payload:
+            # Fallback: if not valid JWT payload, but response bytes exist
+            if self.receiver_response_bytes and len(self.receiver_response_bytes) > 0:
+                logging.info(f"Treating receiver response as direct content ({len(self.receiver_response_bytes)} bytes)")
+                with open(target_file, "wb") as f:
+                    f.write(self.receiver_response_bytes)
+                if progress_callback:
+                    progress_callback(1.0)
+                self._post_process_file(target_file)
+                return len(self.receiver_response_bytes)
             raise ValueError(f"Invalid Data JWT: url not found in payload: {payload}")
 
         download_url = payload["url"]
-        logging.info(f"Downloading resource from {download_url}")
+        logging.info(f"Downloading resource via JWT from {download_url}")
 
         headers = {"Authorization": f"Bearer {self.data_jwt}"}
         resp = requests.get(download_url, headers=headers, stream=True, timeout=120)
@@ -270,8 +382,6 @@ class PdcImporter:
 
         total_length = resp.headers.get("content-length")
         total_size = int(total_length) if total_length and total_length.isdigit() else None
-
-        target_file.parent.mkdir(parents=True, exist_ok=True)
         downloaded = 0
         last_reported = -1.0
 
@@ -289,7 +399,17 @@ class PdcImporter:
         if progress_callback:
             progress_callback(1.0)
 
-        # If file is gzip-compressed (e.g. .gz), ensure decompressed file is also available if needed
+        self._post_process_file(target_file)
+        return downloaded
+
+    def _is_likely_jwt(self, s: str | None) -> bool:
+        if not s or not isinstance(s, str):
+            return False
+        parts = s.strip().split(".")
+        return len(parts) == 3
+
+    def _post_process_file(self, target_file: Path):
+        """If file is gzip-compressed (e.g. .gz), ensure decompressed file is also available if needed."""
         if target_file.name.endswith(".gz"):
             decompressed_path = target_file.with_suffix("")
             try:
@@ -299,5 +419,3 @@ class PdcImporter:
                         shutil.copyfileobj(gz_in, f_out)
             except (gzip.BadGzipFile, OSError) as e:
                 logging.warning(f"Could not decompress gzip file {target_file}: {e}")
-
-        return downloaded

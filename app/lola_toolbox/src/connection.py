@@ -23,7 +23,7 @@ class sftp:
 
     def put(self, datafile: Path, callback: callable = None):
         filename = datafile.name
-        self.sftp_handler.put(datafile, 'upload/'+filename, callback=callback)
+        self.sftp_handler.put(str(datafile), 'upload/' + filename, callback=callback)
 
 
 class Releases:

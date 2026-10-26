@@ -79,6 +79,8 @@ deploy: configure certs ## Start the application and run migrations/fixtures
 	done
 	@echo "Waiting 10 seconds for database to be ready..."
 	sleep 10
+	@echo "Updating database schema..."
+	@DOCKER_GROUP=$(DOCKER_GROUP) docker compose -f docker-compose.local.yml exec -T app bin/console doctrine:schema:update --force || true
 	@echo "Deployment complete! Application is running locally."
 	@echo ""
 	@echo "================================================================="

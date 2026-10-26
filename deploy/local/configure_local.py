@@ -71,6 +71,7 @@ def main():
     lolapy_updates = {
         'FRONTEND_API_IP': 'app',
         'FRONTEND_API_PORT': '80',
+        'LOLAPY_URL_SCHEME': 'http',
         'LOLAPY_HOST_IP': 'backend',
         'HARBOR_HOST': 'localhost:5001',
         'HARBOR_USER': 'backend',

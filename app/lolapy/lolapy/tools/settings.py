@@ -128,13 +128,12 @@ class AppSettings(BaseModel):
     pdc_host: str = "https://loria.pdc.visionstrust.com"
     pdc_service_key: str = ""
     pdc_secret_key: str = ""
-    pdc_purpose_id: str = "https://api.visionstrust.com/v1/catalog/serviceofferings/65f0809bae4df85cec866a80"
-    pdc_resource_id: str = "https://api.visionstrust.com/v1/catalog/serviceofferings/65f44ef4eaa4d99df777d93d"
     pdc_pubkey_file: Path = Path("keys/pubkey.pem")
     pdc_privkey_file: Path = Path("keys/privkey.pem")
     pdc_receiver_host: str = "https://loria.ovh"
-    pdc_receiver_service_key: str = "azim"
-    pdc_receiver_secret_key: str = "roussanaly"
+    pdc_receiver_service_key: str = ""
+    pdc_receiver_secret_key: str = ""
+    lolapy_url_scheme: str = "http"
 
     @validator("http_proxy")
     def validate_http_proxy(cls, value) -> str | None:
@@ -163,6 +162,8 @@ class AppSettingsBuilder:
         """
         variables = self._read_file()
         expanded_variables = self.__expand_variables(variables)
+        for key, value in variables.items():
+            os.environ.setdefault(key, str(value))
         try:
             new_settings = AppSettings(**expanded_variables)
         except ValidationError as pydantic_error:
@@ -317,7 +318,8 @@ class AppSettingsBuilder:
             k8s_mount_path = "/home/lolauser/nf-workdir",
             k8s_namespace = "default",
             k8s_service_account = "default",
-            http_proxy = None)
+            http_proxy = None,
+            lolapy_url_scheme = "http")
         AppSettings._instance_ = my_app_settings
 
 

@@ -18,10 +18,12 @@ from lolapy.bin import async_tasks
 class CreateDatasetJSON(BaseModel):
     dataset: str
     user: str
-    contract: str
-    resource: str
+    contract: str | None = None
+    resource: str | None = None
     purpose_id: str | None = None
     resource_id: str | None = None
+    upload_type: str | None = "pdc_jwt"
+    target_filename: str | None = None
 
 
 @dataset_blueprint.route("/create", methods=["POST"])
@@ -36,6 +38,8 @@ def create_dataset():
         resource=data.resource,
         purpose_id=data.purpose_id,
         resource_id=data.resource_id,
+        upload_type=data.upload_type,
+        target_filename=data.target_filename,
     )
     return Response(status=200)
 
@@ -47,6 +51,8 @@ class ImportDatasetJSON(BaseModel):
     resource: str | None = None
     purpose_id: str | None = None
     resource_id: str | None = None
+    upload_type: str | None = "pdc_jwt"
+    target_filename: str | None = None
 
 @dataset_blueprint.route("/import", methods=["POST"])
 @validate_json(ImportDatasetJSON)
@@ -61,6 +67,8 @@ def import_dataset():
             resource=data.resource,
             purpose_id=data.purpose_id,
             resource_id=data.resource_id,
+            upload_type=data.upload_type,
+            target_filename=data.target_filename,
         )
     else:
         async_tasks.import_dataset(Path(data.dataset))

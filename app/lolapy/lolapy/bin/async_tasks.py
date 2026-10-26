@@ -216,17 +216,23 @@ def fetch_and_import_dataset_pdc(
     dataset_hash: str,
     user_hash: str,
     contract: str,
-    resource: str,
+    resource: str | None = None,
     purpose_id: str | None = None,
     resource_id: str | None = None,
+    upload_type: str | None = "pdc_jwt",
+    target_filename: str | None = None,
 ):
     """Async function to fetch a dataset via PDC according to data-import logic."""
     import_id = str(uuid.uuid4())
-    logging.info(f"Starting PDC fetch for dataset={dataset_hash}, user={user_hash}, contract={contract}, resource={resource}, purpose_id={purpose_id}, resource_id={resource_id}")
+    logging.info(
+        f"Starting PDC fetch for dataset={dataset_hash}, user={user_hash}, contract={contract}, "
+        f"resource={resource}, purpose_id={purpose_id}, resource_id={resource_id}, "
+        f"upload_type={upload_type}, target_filename={target_filename}"
+    )
     frontend_api.FrontendRequest.log(
         log_type="ImportDataset",
-        message=f"API start to import a dataset via PDC ({dataset_hash})",
-        details=f"Dataset temporary ID={import_id}, Resource={resource}",
+        message=f"API start to import a dataset via PDC ({dataset_hash}) [type: {upload_type}]",
+        details=f"Dataset temporary ID={import_id}, Resource={resource}, Target filename={target_filename}",
     )
 
     try:
@@ -241,18 +247,24 @@ def fetch_and_import_dataset_pdc(
         settings_app = settings.get()
         dataset_dir = settings_app.lolapy_dataset_path / dataset_hash
         dataset_dir.mkdir(parents=True, exist_ok=True)
-        target_path = dataset_dir / Path(resource).name
+        filename_to_use = target_filename or (Path(resource).name if resource else "dataset.bin")
+        target_path = dataset_dir / filename_to_use
 
         importer = PdcImporter(
             contract=contract,
             resource=resource,
             purpose_id=purpose_id,
             resource_id=resource_id,
+            upload_type=upload_type or "pdc_jwt",
+            target_filename=target_filename,
         )
         importer.login_pdc()
         importer.process_exchange()
         importer.login_receiver()
         importer.get_from_receiver()
+
+        if importer.returned_filename and importer.returned_filename != "token.jwt":
+            target_path = dataset_dir / importer.returned_filename
 
         def on_progress(pct: float):
             frontend_api.FrontendRequest.get(f"/api/dataset/{dataset_hash}/progress/{pct:.2f}")

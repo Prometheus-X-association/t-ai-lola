@@ -64,14 +64,13 @@ class _FrontendApi:
         Don't use it directly. Use FrontedRequest instead.
 
         Args:
-            adress: url of the server. For example https://127.0.0.1 or https://localhost. Should
-                start with `https://` but this constructor will add it if missing.
+            adress: url of the server. For example http://127.0.0.1 or https://localhost.
             port: port of the server
             fake_request: If set to True, no request will be send to the frontend. Every request
                 `will return` 200
         """
-        self.adress = with_scheme(adress)
         self.port = int(port)
+        self.adress = with_scheme(adress, self.port)
         self.fake_request = fake_request
 
     @classmethod
@@ -89,7 +88,7 @@ class _FrontendApi:
         self,
         request_fct: Callable,
         url: str,
-        data: str | None = None,
+        data: str | dict | None = None,
         files: PostFile | None = None,
     ) -> int:
         """Execute the correct request to the url.
@@ -122,10 +121,24 @@ class _FrontendApi:
         match request_fct:
             case requests.get:
                 log_request = "GET"
-                result: requests.Response = request_fct(final_url)
+                result: requests.Response = requests.get(final_url)
             case requests.post:
                 log_request = "POST"
-                result: requests.Response = request_fct(final_url, data, files)
+                headers = {}
+                post_files = None
+                if files is not None:
+                    post_files = files.format_file() if hasattr(files, "format_file") else files
+                if isinstance(data, (dict, list)):
+                    data_payload = json.dumps(data)
+                    headers["Content-Type"] = "application/json"
+                elif isinstance(data, str):
+                    data_payload = data
+                    headers["Content-Type"] = "application/json"
+                else:
+                    data_payload = data
+                result: requests.Response = requests.post(
+                    final_url, data=data_payload, files=post_files, headers=headers
+                )
             case _:
                 raise NotImplementedError(f"Unimplement request type {request_fct}")
 
