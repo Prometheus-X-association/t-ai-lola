@@ -83,6 +83,12 @@ def main():
         'DATABASE_NAME': 'loladb',
         'MYSQL_USER': 'lola',
         'MYSQL_PASSWORD': dev_default_pwd,
+        'PDC_RECEIVER_SERVICE_KEY': '',
+        'PDC_RECEIVER_SECRET_KEY': '',
+        'PDC_SERVICE_KEY': '',
+        'PDC_SECRET_KEY': '',
+        'FLASK_SECRET_KEY': '',
+        'HTTP_PROXY': '',
     }
     update_env_file(lolapy_sample, lolapy_target, lolapy_updates)
     

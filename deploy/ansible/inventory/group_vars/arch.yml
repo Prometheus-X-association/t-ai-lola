@@ -45,3 +45,11 @@ lolauser_password: ""
 arch_ip: ""
 dmz_ip: ""
 dmz_web_port: "8080"
+http_proxy: ""
+
+# PDC & Flask Configuration
+pdc_receiver_service_key: ""
+pdc_receiver_secret_key: ""
+pdc_service_key: ""
+pdc_secret_key: ""
+flask_secret_key: ""

@@ -57,6 +57,13 @@ class DatasetType extends AbstractType
                     'placeholder' => 'https://api.visionstrust.com/v1/catalog/serviceofferings/...',
                 ],
             ])
+            ->add('resource', TextType::class, [
+                'label' => 'dashboard.dataset.form.resource',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'path/to/data.json.gz',
+                ],
+            ])
             ->add('targetFilename', TextType::class, [
                 'label' => 'dashboard.dataset.form.target_filename',
                 'required' => false,

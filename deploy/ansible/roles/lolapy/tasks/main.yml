@@ -40,6 +40,12 @@
       - { key: 'HARBOR_USER', value: 'backend' }
       - { key: 'HARBOR_PASSWORD', value: '{{ harbor_password }}' }
       - { key: 'LOLAPY_HOST_IP', value: '{{ arch_ip }}' }
+      - { key: 'PDC_RECEIVER_SERVICE_KEY', value: '{{ pdc_receiver_service_key }}' }
+      - { key: 'PDC_RECEIVER_SECRET_KEY', value: '{{ pdc_receiver_secret_key }}' }
+      - { key: 'PDC_SERVICE_KEY', value: '{{ pdc_service_key }}' }
+      - { key: 'PDC_SECRET_KEY', value: '{{ pdc_secret_key }}' }
+      - { key: 'FLASK_SECRET_KEY', value: '{{ flask_secret_key }}' }
+      - { key: 'HTTP_PROXY', value: '{{ http_proxy }}' }
 
 - name: Append Slurm specific environment variables
   set_fact:
