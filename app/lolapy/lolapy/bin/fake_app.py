@@ -26,9 +26,6 @@ from lolapy.tools.health import Health
 from flask_wtf.csrf import CSRFProtect
 
 flask_app = Flask(__name__)
-flask_app.config["SECRET_KEY"] = "fake-app-secret-key"
-flask_app.config["WTF_CSRF_CHECK_DEFAULT"] = False
-
 csrf = CSRFProtect()
 csrf.init_app(flask_app)
 csrf_guard.install(flask_app)
