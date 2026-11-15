@@ -64,13 +64,14 @@ class _FrontendApi:
         Don't use it directly. Use FrontedRequest instead.
 
         Args:
-            adress: url of the server. For example http://127.0.0.1 or https://localhost.
+            adress: url of the server. For example https://127.0.0.1 or https://localhost. Should
+                start with `https://` but this constructor will add it if missing.
             port: port of the server
             fake_request: If set to True, no request will be send to the frontend. Every request
                 `will return` 200
         """
+        self.adress = with_scheme(adress)
         self.port = int(port)
-        self.adress = with_scheme(adress, self.port)
         self.fake_request = fake_request
 
     @classmethod

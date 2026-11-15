@@ -94,6 +94,8 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 80 443
 
+USER www-data
+
 # Start Apache in the foreground
 CMD ["apache2ctl", "-D", "FOREGROUND"]
 
