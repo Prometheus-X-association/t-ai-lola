@@ -153,7 +153,7 @@ sudo DOCKER_GROUP=$DOCKER_GROUP docker compose -f docker-compose.yml up -d
 
 # Fix permissions inside containers
 sudo docker exec -u root lolapy-hueyconsumer-1 chown munge:munge /etc/munge/munge.key
-sudo docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /tmp/certs
+sudo docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /app/certs
 sudo docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /home/lolauser
 
 # Prepare SFTP Directory

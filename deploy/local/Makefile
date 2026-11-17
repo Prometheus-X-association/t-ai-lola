@@ -63,7 +63,7 @@ deploy: configure certs ## Start the application and run migrations/fixtures
 	if [ ! -z "$$SFTP_USER" ]; then \
 		docker exec local-sftp-1 chown -R $$SFTP_USER /home/$$SFTP_USER/upload 2>/dev/null || true; \
 	fi
-	@docker exec -u root local-hueyconsumer-1 chown -R lolauser /tmp/certs 2>/dev/null || true
+	@docker exec -u root local-hueyconsumer-1 chown -R lolauser /app/certs 2>/dev/null || true
 	@docker exec -u root local-hueyconsumer-1 chown -R lolauser /tmp/lolauser 2>/dev/null || true
 	@echo "Restarting hueyconsumer..."
 	DOCKER_GROUP=$(DOCKER_GROUP) docker compose -f docker-compose.local.yml restart hueyconsumer

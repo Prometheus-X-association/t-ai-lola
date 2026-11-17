@@ -38,7 +38,7 @@ services:
       - ../../app/lolapy/.env:/app/.env:ro
       - lolasqlite:/tmp
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ../../app/lolapy/certs/:/tmp/certs:ro
+      - ../../app/lolapy/certs/:/app/certs:ro
       - ../../app/lolapy/keys/:/app/keys:ro
       - /tmp/lolauser:/tmp/lolauser
     command: 
@@ -65,7 +65,7 @@ services:
       - ../../app/lolapy/.env:/app/.env:ro
       - lolasqlite:/tmp
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ../../app/lolapy/certs/:/tmp/certs
+      - ../../app/lolapy/certs/:/app/certs
       - ../../app/lolapy/keys/:/app/keys:ro
       - /tmp/lolauser/nf-workdir:/tmp/lolauser/nf-workdir
     command:

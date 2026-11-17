@@ -143,7 +143,7 @@
   command: "docker exec lolapy-sftp-1 chown {{ dmz_sftp_user }} /home/{{ dmz_sftp_user }}/upload"
 
 - name: change certs permissions
-  command: "docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /tmp/certs"
+  command: "docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /app/certs"
 
 - name: give user lola access to home
   command: "docker exec -u root lolapy-hueyconsumer-1 chown -R lolauser /home/lolauser"
